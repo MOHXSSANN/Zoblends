@@ -10,10 +10,26 @@ const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
 // ── Before / After pairs ─────────────────────────────────────────────────────
 // Replace src strings with real image URLs once you have them
 const BEFORE_AFTERS = [
-  { before: '', after: '', label: 'Skin Fade' },
-  { before: '', after: '', label: 'Full Service' },
-  { before: '', after: '', label: 'Lineup' },
-  { before: '', after: '', label: 'Kids Cut' },
+  {
+    before: 'https://images.unsplash.com/photo-1622288432450-277d0fef5ed6?w=600&q=80',
+    after:  'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600&q=80',
+    label: 'Skin Fade',
+  },
+  {
+    before: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=600&q=80',
+    after:  'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=600&q=80',
+    label: 'Full Service',
+  },
+  {
+    before: 'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=600&q=80',
+    after:  'https://images.unsplash.com/photo-1567894340315-735d7c361db0?w=600&q=80',
+    label: 'Lineup',
+  },
+  {
+    before: 'https://images.unsplash.com/photo-1542327897-d73f4005b533?w=600&q=80',
+    after:  'https://images.unsplash.com/photo-1521119989659-a83eee488004?w=600&q=80',
+    label: 'Kids Cut',
+  },
 ]
 
 // ── Photo grid ───────────────────────────────────────────────────────────────

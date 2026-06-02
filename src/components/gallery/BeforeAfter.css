@@ -6,9 +6,11 @@
   cursor: col-resize;
   user-select: none;
   background: #0f0e0c;
+  container-type: inline-size;
 }
 
-.ba__img {
+/* After image — full size, sits underneath */
+.ba__img--after {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -18,6 +20,7 @@
   pointer-events: none;
 }
 
+/* Before — clipped wrapper */
 .ba__before-wrap {
   position: absolute;
   inset: 0 auto 0 0;
@@ -25,31 +28,20 @@
   z-index: 2;
 }
 
+/* Before image always as wide as the full container, not the clip */
 .ba__before-wrap .ba__img--before {
   position: absolute;
   left: 0;
   top: 0;
-  width: var(--ba-full-w, 100vw);
+  width: 100cqi;
   height: 100%;
   max-width: none;
   object-fit: cover;
+  display: block;
+  pointer-events: none;
 }
 
-/* override width so the image always fills the full container width */
-.ba__before-wrap {
-  --ba-full-w: 100%;
-}
-.ba__before-wrap .ba__img--before {
-  width: 100%;
-}
-/* we need the image to be as wide as the CONTAINER, not the clip */
-.ba {
-  container-type: inline-size;
-}
-.ba__before-wrap .ba__img--before {
-  width: 100cqi;
-}
-
+/* Divider line */
 .ba__divider {
   position: absolute;
   top: 0;
@@ -61,6 +53,7 @@
   pointer-events: none;
 }
 
+/* Drag handle */
 .ba__handle {
   position: absolute;
   top: 50%;
@@ -70,20 +63,21 @@
 }
 
 .ba__handle-circle {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   background: #d4af37;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  font-size: 14px;
+  gap: 4px;
+  font-size: 15px;
   font-weight: 700;
   color: #0a0908;
   box-shadow: 0 0 0 3px rgba(212,175,55,0.3);
 }
 
+/* Before / After tags */
 .ba__tag {
   position: absolute;
   bottom: 14px;
@@ -94,13 +88,15 @@
   letter-spacing: 0.15em;
   padding: 4px 8px;
   background: rgba(10,9,8,0.7);
-  color: rgba(245,244,240,0.5);
+  color: rgba(245,244,240,0.6);
   pointer-events: none;
+  text-transform: uppercase;
 }
 
 .ba__tag--before { left: 12px; }
 .ba__tag--after  { right: 12px; }
 
+/* Optional label at top */
 .ba__label {
   position: absolute;
   top: 14px;
