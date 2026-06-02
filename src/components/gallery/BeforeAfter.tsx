@@ -23,9 +23,11 @@ export default function BeforeAfter({ before, after, label }: Props) {
   }
 
   function move(clientX: number) {
-    const newDir = clientX >= lastClientX.current
-    setGoingRight(newDir)
-    lastClientX.current = clientX
+    const delta = clientX - lastClientX.current
+    if (Math.abs(delta) > 2) {
+      setGoingRight(delta > 0)
+      lastClientX.current = clientX
+    }
     setPos(getPercent(clientX))
     setSnipping(true)
     if (snipTimer.current) clearTimeout(snipTimer.current)
@@ -56,13 +58,16 @@ export default function BeforeAfter({ before, after, label }: Props) {
         onTouchMove={(e) => { e.preventDefault(); move(e.touches[0].clientX) }}
       >
         <img
-          key={goingRight ? 'right' : 'left'}
           className="ba__scissors-img"
           src={goingRight ? '/8.png' : '/9.png'}
           alt="scissors"
           draggable={false}
         />
       </div>
+
+      {/* Preload both scissors so direction swap has no flash */}
+      <img src="/8.png" style={{ display: 'none' }} alt="" aria-hidden />
+      <img src="/9.png" style={{ display: 'none' }} alt="" aria-hidden />
 
       <span className="ba__tag ba__tag--before">BEFORE</span>
       <span className="ba__tag ba__tag--after">AFTER</span>
