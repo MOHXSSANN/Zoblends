@@ -38,7 +38,9 @@ export default function ContactFAQ() {
       </div>
 
       <div className="cfaq__search-wrap">
-        <span className="cfaq__search-icon">▶</span>
+        <svg className="cfaq__search-icon" width="14" height="14" viewBox="0 0 14 14" fill="#d4af37">
+          <polygon points="2,1 13,7 2,13" />
+        </svg>
         <input
           className="cfaq__search"
           type="text"
