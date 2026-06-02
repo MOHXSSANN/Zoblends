@@ -45,7 +45,10 @@ const PHOTOS: { src: string; tag: string }[] = [
 
 // ── Videos ───────────────────────────────────────────────────────────────────
 const VIDEOS: { src: string; poster?: string; label: string }[] = [
-  { src: '', label: 'Fade Process' },
+  {
+    src: 'https://mhhagaztfurgivlspdss.supabase.co/storage/v1/object/public/videos/Zovid.mp4',
+    label: 'Taper Process',
+  },
   { src: '', label: 'Lineup Detail' },
 ]
 
