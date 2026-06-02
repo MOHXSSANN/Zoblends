@@ -52,7 +52,10 @@ export default function BeforeAfter({ before, after, label }: Props) {
 
       <div
         className={`ba__handle${snipping ? ' ba__handle--snip' : ''}`}
-        style={{ left: `${pos}%` }}
+        style={{
+          left: `${pos}%`,
+          '--scissors-scale': Math.max(0.35, pos / 50),
+        } as React.CSSProperties}
         onMouseDown={(e) => { e.preventDefault(); dragging.current = true; lastClientX.current = e.clientX }}
         onTouchStart={(e) => { e.preventDefault(); lastClientX.current = e.touches[0].clientX }}
         onTouchMove={(e) => { e.preventDefault(); move(e.touches[0].clientX) }}
