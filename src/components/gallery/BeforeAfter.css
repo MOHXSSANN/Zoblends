@@ -9,7 +9,7 @@
   container-type: inline-size;
 }
 
-/* After image — full size, sits underneath */
+/* After image — full size underneath */
 .ba__img--after {
   position: absolute;
   inset: 0;
@@ -20,7 +20,7 @@
   pointer-events: none;
 }
 
-/* Before — clipped wrapper */
+/* Before — clipped by width */
 .ba__before-wrap {
   position: absolute;
   inset: 0 auto 0 0;
@@ -28,7 +28,6 @@
   z-index: 2;
 }
 
-/* Before image always as wide as the full container, not the clip */
 .ba__before-wrap .ba__img--before {
   position: absolute;
   left: 0;
@@ -41,47 +40,53 @@
   pointer-events: none;
 }
 
-/* Divider line */
+/* Vertical cut line */
 .ba__divider {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 2px;
-  background: #d4af37;
+  background: rgba(212,175,55,0.6);
   z-index: 3;
   transform: translateX(-50%);
   pointer-events: none;
 }
 
-/* Drag handle */
+/* Scissors handle */
 .ba__handle {
   position: absolute;
   top: 50%;
-  z-index: 4;
+  z-index: 5;
   transform: translate(-50%, -50%);
   touch-action: none;
+  cursor: col-resize;
+  filter: drop-shadow(0 0 8px rgba(212,175,55,0.4));
 }
 
-.ba__handle-circle {
-  width: 44px;
-  height: 44px;
-  background: #d4af37;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  font-size: 15px;
-  font-weight: 700;
-  color: #0a0908;
-  box-shadow: 0 0 0 3px rgba(212,175,55,0.3);
+.ba__scissors-img {
+  width: 100px;
+  height: auto;
+  display: block;
+  pointer-events: none;
+  object-fit: contain;
+}
+
+/* Snip bounce */
+.ba__handle--snip .ba__scissors-img {
+  animation: snip-bounce 0.28s ease;
+}
+
+@keyframes snip-bounce {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
 }
 
 /* Before / After tags */
 .ba__tag {
   position: absolute;
   bottom: 14px;
-  z-index: 5;
+  z-index: 6;
   font-family: 'Space Grotesk', sans-serif;
   font-size: 10px;
   font-weight: 700;
@@ -96,13 +101,13 @@
 .ba__tag--before { left: 12px; }
 .ba__tag--after  { right: 12px; }
 
-/* Optional label at top */
+/* Label */
 .ba__label {
   position: absolute;
   top: 14px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 5;
+  z-index: 6;
   font-family: 'Space Grotesk', sans-serif;
   font-size: 11px;
   font-weight: 600;
