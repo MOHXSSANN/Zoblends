@@ -51,7 +51,7 @@ export default function BeforeAfter({ before, after, label }: Props) {
       <div
         className={`ba__handle${snipping ? ' ba__handle--snip' : ''}`}
         style={{ left: `${pos}%` }}
-        onMouseDown={(e) => { dragging.current = true; lastClientX.current = e.clientX }}
+        onMouseDown={(e) => { e.preventDefault(); dragging.current = true; lastClientX.current = e.clientX }}
         onTouchStart={(e) => { e.preventDefault(); lastClientX.current = e.touches[0].clientX }}
         onTouchMove={(e) => { e.preventDefault(); move(e.touches[0].clientX) }}
       >
