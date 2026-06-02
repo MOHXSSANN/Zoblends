@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+// @ts-ignore
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps'
 import { APIProvider, Map3D } from '@vis.gl/react-google-maps'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -75,8 +76,8 @@ export default function ContactMap() {
                 style={{ width: '100%', height: '100%', background: '#080706' }}
               >
                 <Geographies geography={GEO_URL}>
-                  {({ geographies }) =>
-                    geographies.map((geo) => (
+                  {({ geographies }: { geographies: any[] }) =>
+                    geographies.map((geo: any) => (
                       <Geography
                         key={geo.rsmKey}
                         geography={geo}

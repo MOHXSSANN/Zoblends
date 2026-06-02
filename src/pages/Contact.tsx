@@ -6,17 +6,6 @@ import ContactFAQ from '../components/contact/ContactFAQ'
 import './Page.css'
 import './Contact.css'
 
-const HOURS = [
-  { day: 'Sunday',    open: '11 AM', close: '7 PM' },
-  { day: 'Monday',    open: '11 AM', close: '7 PM' },
-  { day: 'Tuesday',   open: '11 AM', close: '7 PM' },
-  { day: 'Wednesday', open: '11 AM', close: '7 PM' },
-  { day: 'Thursday',  open: '11 AM', close: '7 PM' },
-  { day: 'Friday',    open: '11 AM', close: '8 PM' },
-  { day: 'Saturday',  open: '11 AM', close: '8 PM' },
-]
-
-const TODAY = new Date().toLocaleDateString('en-US', { weekday: 'long' })
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
 export default function Contact() {
