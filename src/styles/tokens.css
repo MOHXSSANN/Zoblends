@@ -1,0 +1,59 @@
+:root {
+  /* ─── Palette ─────────────────────────────── */
+  --black:         #0a0908;
+  --surface:       #111010;
+  --concrete:      #1a1917;
+  --white:         #f5f4f0;
+  --white-dim:     rgba(245, 244, 240, 0.55);
+  --white-ghost:   rgba(245, 244, 240, 0.08);
+
+  --gold:          #d4af37;
+  --gold-light:    #e8c84e;
+  --gold-dim:      rgba(212, 175, 55, 0.35);
+  --gold-glow-sm:  rgba(212, 175, 55, 0.55);
+  --gold-glow-md:  rgba(212, 175, 55, 0.25);
+  --gold-glow-lg:  rgba(212, 175, 55, 0.08);
+
+  --dim:           #4a4845;
+  --border:        rgba(245, 244, 240, 0.07);
+  --border-gold:   rgba(212, 175, 55, 0.3);
+
+  /* ─── Typography ─────────────────────────── */
+  --font-display: 'Cinzel', 'Trajan Pro', Georgia, serif;
+  --font-body:    'Space Grotesk', 'Inter', sans-serif;
+  --font-mono:    'Space Mono', 'Courier New', monospace;
+
+  --text-hero:  clamp(72px, 12vw, 160px);
+  --text-xl:    clamp(36px, 5vw, 64px);
+  --text-lg:    clamp(22px, 3vw, 32px);
+  --text-md:    clamp(14px, 1.5vw, 18px);
+  --text-sm:    13px;
+  --text-xs:    11px;
+
+  /* ─── Spacing ────────────────────────────── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* ─── Hex Lights ─────────────────────────── */
+  --hex-w:      50px;
+  --hex-h:      58px;
+  --hex-gap-h:  52px;   /* center-to-center horizontal */
+  --hex-gap-v:  44px;   /* center-to-center vertical   */
+
+  /* ─── Transitions ────────────────────────── */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-expo:  cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-snappy:   cubic-bezier(0.25, 0, 0.1, 1);
+
+  /* ─── Radii ──────────────────────────────── */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+}

@@ -1,0 +1,69 @@
+.cut-counter {
+  padding: 48px 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.cut-counter__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.cut-counter__eyebrow {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.cut-counter__number {
+  font-family: var(--font-display);
+  font-size: clamp(72px, 22vw, 140px);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--white);
+  letter-spacing: -0.02em;
+  text-shadow:
+    0 0 60px rgba(212, 175, 55, 0.15),
+    0 0 120px rgba(212, 175, 55, 0.08);
+}
+
+.cut-counter__sub {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+}
+
+.cut-counter__live {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(245, 244, 240, 0.25);
+  margin-top: 4px;
+}
+
+.cut-counter__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}

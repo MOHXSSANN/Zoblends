@@ -1,0 +1,167 @@
+.contact__garage-section {
+  background: var(--black);
+  padding: 120px 0 0;
+}
+
+.contact__garage-header {
+  padding: 0 24px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.contact__garage-address {
+  padding: 14px 24px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  text-align: center;
+}
+
+.contact__arrow-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 32px 0 8px;
+  background: var(--black);
+}
+
+.contact__arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+}
+
+.contact__info-section {
+  padding-top: 48px;
+}
+
+.contact__links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.contact__link-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 20px;
+  background: var(--concrete);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  transition: border-color 0.2s ease;
+}
+
+.contact__link-btn:active {
+  border-color: var(--gold);
+}
+
+.contact__link-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.contact__link-value {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.contact__section-label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+
+.contact__hours {
+  margin-bottom: 40px;
+}
+
+.contact__hours-list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+}
+
+.contact__hours-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.contact__hours-row--today .contact__hours-day,
+.contact__hours-row--today .contact__hours-time {
+  color: var(--white);
+}
+
+.contact__hours-day {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--white-dim);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contact__today-tag {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: var(--gold-dim);
+  padding: 2px 8px;
+}
+
+.contact__hours-time {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--white-dim);
+}
+
+.contact__tz {
+  font-family: var(--font-body);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(245, 244, 240, 0.2);
+  margin-top: 10px;
+}
+
+.contact__policy {
+  background: var(--concrete);
+  border-left: 2px solid var(--gold);
+  padding: 16px 20px;
+}
+
+.contact__policy p {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--white-dim);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.contact__policy a {
+  color: var(--gold);
+  text-decoration: none;
+}

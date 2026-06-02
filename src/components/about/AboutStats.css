@@ -1,0 +1,121 @@
+.about-stats {
+  padding: 64px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* ── Big counter ── */
+.about-stats__counter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+
+.about-stats__eyebrow {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.about-stats__number {
+  font-family: var(--font-display);
+  font-size: clamp(72px, 22vw, 140px);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--white);
+  letter-spacing: -0.02em;
+  text-shadow:
+    0 0 60px rgba(212, 175, 55, 0.15),
+    0 0 120px rgba(212, 175, 55, 0.08);
+}
+
+.about-stats__counter-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.about-stats__sub {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+}
+
+.about-stats__live {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(245, 244, 240, 0.25);
+}
+
+.about-stats__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* ── Divider ── */
+.about-stats__divider {
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Smaller stats row ── */
+.about-stats__row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--border);
+}
+
+.about-stats__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 24px 8px;
+  border-right: 1px solid var(--border);
+  text-align: center;
+}
+
+.about-stats__stat:last-child {
+  border-right: none;
+}
+
+.about-stats__stat-value {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 8vw, 40px);
+  font-weight: 900;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.about-stats__stat-label {
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+}
