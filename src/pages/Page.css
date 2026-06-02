@@ -12,6 +12,8 @@
   flex-direction: column;
   gap: 10px;
   margin-bottom: 64px;
+  align-items: center;
+  text-align: center;
 }
 
 .page__eyebrow {
