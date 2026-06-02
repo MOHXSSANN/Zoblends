@@ -30,7 +30,7 @@ export default function AboutHero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.7, ease: EASE }}
         >
-          02 — The Barber
+          02 / The Barber
         </motion.span>
 
         <motion.h1

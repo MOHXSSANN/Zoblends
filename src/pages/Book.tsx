@@ -17,7 +17,7 @@ export default function Book() {
   return (
     <>
       <Helmet>
-        <title>Secure a Spot — Zoblends</title>
+        <title>Secure a Spot | Zoblends</title>
         <meta name="description" content="Book your chair with Zoblends. Precision cuts in Ottawa, Ontario." />
       </Helmet>
 

@@ -12,7 +12,7 @@ export default function Contact() {
   return (
     <>
       <Helmet>
-        <title>Get in Touch — Zoblends</title>
+        <title>Get in Touch | Zoblends</title>
         <meta name="description" content="Find Zoblends in Ottawa. Hours, location, Instagram and direct contact." />
       </Helmet>
 
@@ -24,7 +24,7 @@ export default function Contact() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: EASE }}
         >
-          <span className="page__eyebrow">04 — Contact</span>
+          <span className="page__eyebrow">04 / Contact</span>
           <h1 className="page__title">Get in Touch</h1>
         </motion.div>
 

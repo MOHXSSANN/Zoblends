@@ -7,7 +7,7 @@ export default function About() {
   return (
     <>
       <Helmet>
-        <title>The Barber — Zoblends</title>
+        <title>The Barber | Zoblends</title>
         <meta name="description" content="The story behind Zoblends. Precision cuts and premium experience in Ottawa, Ontario." />
       </Helmet>
 

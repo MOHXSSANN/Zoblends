@@ -17,7 +17,7 @@ export default function Reviews() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
-          <span className="page__eyebrow">03 — Reviews</span>
+          <span className="page__eyebrow">03 / Reviews</span>
           <h1 className="page__title">Hear It From Them</h1>
           <p className="page__sub">Real clients. No filter.</p>
         </motion.div>

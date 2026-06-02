@@ -7,7 +7,7 @@ const FAQS = [
   { q: 'How much is a fade?',            a: 'Haircut is $40. Full service is $50. Line up/clean up is $25.' },
   { q: 'Do you cut kids hair?',          a: 'Yes. Kids cuts are $30 and take about 30 minutes.' },
   { q: 'How long does it take?',         a: 'Depends on the service. Line ups are 25 min. Full service is 1 hour.' },
-  { q: 'How do I pay?',                  a: 'Cash or card — payment is always in person at the appointment. No online payments.' },
+  { q: 'How do I pay?',                  a: 'Cash or card. Payment is always in person at the appointment. No online payments.' },
   { q: 'Do you do beard trims?',         a: 'Full haircut + beard is $45. Takes about 40 minutes.' },
   { q: 'How far ahead should I book?',   a: 'At least a day or two. Fridays and Saturdays book out fast.' },
   { q: 'What if I\'m late?',             a: 'Message @zo_blendz_ as soon as possible. Late arrivals may need to reschedule.' },
