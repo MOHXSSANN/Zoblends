@@ -11,7 +11,7 @@ export default function HeroSection() {
       <div className="hero-section__video-wrap" aria-hidden="true">
         <video
           className="hero-section__video"
-          src="/Zovid.mp4"
+          src="https://mhhagaztfurgivlspdss.supabase.co/storage/v1/object/public/videos/Zovid.mp4"
           autoPlay
           muted
           loop

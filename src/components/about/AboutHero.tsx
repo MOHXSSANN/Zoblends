@@ -11,7 +11,7 @@ export default function AboutHero() {
       <div className="about-hero__video-wrap" aria-hidden="true">
         <video
           className="about-hero__video"
-          src="/0601.mp4"
+          src="https://mhhagaztfurgivlspdss.supabase.co/storage/v1/object/public/videos/0601.mp4"
           autoPlay
           muted
           loop

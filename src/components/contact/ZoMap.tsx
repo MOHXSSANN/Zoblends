@@ -11,7 +11,7 @@ export default function ZoMap() {
       <video
         ref={videoRef}
         className="zo-map__video"
-        src="/zo3d/Zo3dmap.mp4"
+        src="https://mhhagaztfurgivlspdss.supabase.co/storage/v1/object/public/videos/zo3d/Zo3dmap.mp4"
         autoPlay
         muted
         playsInline
