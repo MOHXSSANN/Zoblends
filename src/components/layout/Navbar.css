@@ -103,6 +103,34 @@
   border-color: var(--gold);
 }
 
+/* ── Cart icon ───────────────────────────────────── */
+.navbar__cart-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: rgba(245,244,240,0.6);
+  transition: color 0.2s;
+  text-decoration: none;
+}
+.navbar__cart-icon:hover { color: #d4af37; }
+
+.navbar__cart-count {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  width: 16px;
+  height: 16px;
+  background: #d4af37;
+  border-radius: 50%;
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 700;
+  color: #0a0908;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* ── Burger ───────────────────────────────────────── */
 .navbar__burger {
   display: none;
