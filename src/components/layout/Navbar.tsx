@@ -11,12 +11,21 @@ const NAV_LINKS = [
 ]
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled]   = useState(false)
+  const [hidden, setHidden]       = useState(false)
+  const [menuOpen, setMenuOpen]   = useState(false)
   const location = useLocation()
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40)
+    let lastY = window.scrollY
+    const onScroll = () => {
+      const y = window.scrollY
+      setScrolled(y > 40)
+      if (y < 80) { setHidden(false) }
+      else if (y > lastY + 4) { setHidden(true); setMenuOpen(false) }
+      else if (y < lastY - 4) { setHidden(false) }
+      lastY = y
+    }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
@@ -27,8 +36,8 @@ export default function Navbar() {
     <motion.header
       className={`navbar${scrolled ? ' navbar--scrolled' : ''}`}
       initial={{ y: -80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as [number, number, number, number], delay: 0.2 }}
+      animate={{ y: hidden ? '-100%' : 0, opacity: hidden ? 0 : 1 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as [number, number, number, number], delay: hidden ? 0 : 0.2 }}
     >
       <Link to="/" className="navbar__logo" aria-label="Zoblends home">
         ZoBlends
