@@ -5,7 +5,7 @@ const NAV = [
   { label: 'The Receipts', href: '/gallery' },
   { label: 'The Barber',   href: '/about'   },
   { label: 'Reviews',      href: '/reviews' },
-  { label: 'Shop',         href: '/shop'    },
+  { label: 'Shop Products', href: '/shop'    },
   { label: 'Get in Touch', href: '/contact' },
 ]
 
