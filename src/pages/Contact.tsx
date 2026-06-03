@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import ZoMap from '../components/contact/ZoMap'
 import ContactInfo8bit from '../components/contact/ContactInfo8bit'
 import ContactFAQ from '../components/contact/ContactFAQ'
+import NewsletterBanner from '../components/layout/NewsletterBanner'
 import './Page.css'
 import './Contact.css'
 
@@ -64,6 +65,8 @@ export default function Contact() {
         <ContactInfo8bit />
         <ContactFAQ />
       </div>
+
+      <NewsletterBanner />
     </>
   )
 }
