@@ -62,3 +62,7 @@
   height: 1px;
   background: var(--border);
 }
+
+.page--no-header {
+  padding-top: 32px;
+}

@@ -1,3 +1,53 @@
+/* ── Hero video ──────────────────────────────────── */
+.book__hero {
+  position: relative;
+  width: 100%;
+  height: 42vh;
+  min-height: 240px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+
+.book__hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+.book__hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(10,9,8,0.85) 0%,
+    rgba(10,9,8,0.2)  30%,
+    rgba(10,9,8,0.9)  100%
+  );
+}
+
+.book__hero-text {
+  position: relative;
+  z-index: 1;
+  padding: 0 24px 28px;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.book__hero-text .page__title {
+  font-size: clamp(24px, 6vw, 42px);
+  white-space: nowrap;
+}
+
 /* ── Step dots ───────────────────────────────────── */
 .book__steps {
   display: flex;
@@ -258,7 +308,7 @@
   font-family: var(--font-body);
   font-size: 11px;
   letter-spacing: 0.1em;
-  color: rgba(245,244,240,0.2);
+  color: rgba(245,244,240,0.5);
   margin: 12px 0;
 }
 
@@ -319,7 +369,7 @@
   width: 100%;
   box-sizing: border-box;
 }
-.book__input::placeholder { color: rgba(245,244,240,0.2); }
+.book__input::placeholder { color: rgba(245,244,240,0.5); }
 .book__input:focus { border-color: rgba(212,175,55,0.5); }
 .book__input--error { border-color: #e05555; }
 
@@ -456,7 +506,7 @@
   font-size: 10px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(245,244,240,0.2);
+  color: rgba(245,244,240,0.5);
   margin: 0;
 }
 
@@ -466,7 +516,7 @@
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(245,244,240,0.2);
+  color: rgba(245,244,240,0.5);
   text-align: center;
   margin-top: 40px;
 }

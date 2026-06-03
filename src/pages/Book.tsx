@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
+import { BookDateTimePicker } from '../components/ui/BookDateTimePicker'
 import './Page.css'
 import './Book.css'
 
@@ -63,6 +64,7 @@ export default function Book() {
   const [time, setTime]             = useState<string | null>(null)
   const [takenSlots, setTakenSlots] = useState<Set<string>>(new Set())
   const [loadingSlots, setLoadingSlots] = useState(false)
+  const [pickerDate, setPickerDate] = useState<Date | undefined>()
   const [info, setInfo]             = useState<GuestInfo>({ name: '', email: '', phone: '' })
   const [errors, setErrors]         = useState<Partial<GuestInfo>>({})
   const [submitting, setSubmitting]         = useState(false)
@@ -237,9 +239,18 @@ export default function Book() {
         <meta name="description" content="Book your chair with Zoblends." />
       </Helmet>
 
-      <div className="page">
+      <div className="book__hero">
+        <video
+          className="book__hero-video"
+          src="/ZobOOKING.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
+        <div className="book__hero-overlay" />
         <motion.div
-          className="page__header"
+          className="book__hero-text"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: EASE }}
@@ -248,15 +259,10 @@ export default function Book() {
           <h1 className="page__title">Secure a Spot</h1>
           <p className="page__sub">Pick your service. Lock it in.</p>
         </motion.div>
+      </div>
 
-        {/* ── Step indicator ── */}
-        {step !== 'done' && step !== 'waitlist' && step !== 'waitlist-done' && (
-          <div className="book__steps">
-            {(['service','datetime','details','confirm'] as Step[]).map((s) => (
-              <div key={s} className={`book__step-dot${step === s ? ' book__step-dot--active' : ''}`} />
-            ))}
-          </div>
-        )}
+      <div className="page page--no-header">
+
 
         <AnimatePresence mode="wait">
 
@@ -298,66 +304,22 @@ export default function Book() {
               transition={{ duration: 0.4, ease: EASE }}
             >
               <button className="book__back" onClick={() => setStep('service')}>← Back</button>
-              <div className="book__section-label">Chosen Service</div>
-              <div className="book__chosen-service">
+              <div className="book__chosen-service" style={{ marginBottom: 20, flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, textAlign: 'center' }}>
                 <span>{service.name}</span>
                 <span className="book__chosen-meta">{service.duration} · {service.price}</span>
               </div>
 
-              <div className="book__section-label" style={{ marginTop: 28 }}>Pick a Date</div>
-              <div className="book__dates" ref={datesRef}>
-                {dates.map(d => (
-                  <button
-                    key={d.toISOString()}
-                    className={`book__date-btn${date?.toDateString() === d.toDateString() ? ' book__date-btn--active' : ''}`}
-                    onClick={() => { setDate(d); setTime(null) }}
-                  >
-                    <span className="book__date-day">{DAY_NAMES[d.getDay()]}</span>
-                    <span className="book__date-num">{d.getDate()}</span>
-                    <span className="book__date-month">{MONTH_NAMES[d.getMonth()]}</span>
-                  </button>
-                ))}
-              </div>
+              <BookDateTimePicker
+                durationMin={service.durationMin}
+                onConfirm={(d, t) => { setDate(d); setTime(t); setStep('details'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                onDateChange={(d) => setPickerDate(d)}
+              />
 
-              {date && (
-                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: EASE }}>
-                  <div className="book__section-label" style={{ marginTop: 28 }}>Pick a Time</div>
-                  {loadingSlots ? (
-                    <p className="book__slots-loading">Checking availability…</p>
-                  ) : (
-                    <div className="book__slots">
-                      {slots.map(s => {
-                        const taken = takenSlots.has(s)
-                        return (
-                          <button
-                            key={s}
-                            className={`book__slot${time === s ? ' book__slot--active' : ''}${taken ? ' book__slot--taken' : ''}`}
-                            onClick={() => !taken && setTime(s)}
-                            disabled={taken}
-                          >
-                            {s}
-                            {taken && <span className="book__slot-taken-label">Taken</span>}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  )}
-                </motion.div>
-              )}
-
-              <button
-                className={`book__next-btn${date && time ? '' : ' book__next-btn--disabled'}`}
-                onClick={chooseDateTime}
-                disabled={!date || !time}
-              >
-                Continue →
-              </button>
-
-              {date && (
+              {pickerDate && (
                 <div className="book__waitlist-alt">
                   <span className="book__waitlist-alt-text">All times taken or none work?</span>
                   <button className="book__waitlist-link" onClick={() => setStep('waitlist')}>
-                    Join the waitlist for {DAY_NAMES[date.getDay()]}, {MONTH_NAMES[date.getMonth()]} {date.getDate()} →
+                    Join the waitlist for {DAY_NAMES[pickerDate.getDay()]}, {MONTH_NAMES[pickerDate.getMonth()]} {pickerDate.getDate()} →
                   </button>
                 </div>
               )}

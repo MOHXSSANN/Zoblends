@@ -48,7 +48,7 @@ export default function AboutHero() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9, duration: 0.8 }}
         >
-          Precision · Ottawa, Ontario
+          Your Barber's Favourite Barber
         </motion.p>
       </div>
 

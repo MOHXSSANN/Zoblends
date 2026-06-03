@@ -83,7 +83,7 @@ function bookingCancellationHtml(d: Extract<EmailType, { type: 'booking-cancella
       ${row('Time',    d.time)}
       ${row('Ref',     d.confirmationNumber)}
     </table>
-    <p style="font-size:13px;color:rgba(245,244,240,0.5);margin:24px 0 0;line-height:1.6;">No worries — spots open up. Rebook whenever you're ready.</p>
+    <p style="font-size:13px;color:rgba(245,244,240,0.5);margin:24px 0 0;line-height:1.6;">No worries, spots open up. Rebook whenever you're ready.</p>
     ${btn('Book Again →', 'https://zoblends.com/book')}
   `)
 }
@@ -95,8 +95,8 @@ function reviewRequestHtml(d: Extract<EmailType, { type: 'review-request' }>) {
     <p style="font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:rgba(212,175,55,0.6);margin:0 0 8px;">Thank You</p>
     <h1 style="font-size:24px;font-weight:700;color:#f5f4f0;margin:0 0 16px;">How'd the cut feel, ${d.name.split(' ')[0]}?</h1>
     <p style="font-size:14px;color:rgba(245,244,240,0.55);line-height:1.7;margin:0 0 8px;">
-      Hope you're loving it. If you've got a minute, leaving us a Google review goes a long way —
-      it helps other people find Zoblends and means a lot to Zowad.
+      Hope you're loving it. If you've got a minute, leaving us a Google review goes a long way.
+      It helps other people find Zoblends and means a lot to Zowad.
     </p>
     <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid rgba(212,175,55,0.08);margin-top:20px;">
       ${row('Service', d.service)}
@@ -120,7 +120,7 @@ function noShowWarningHtml(d: Extract<EmailType, { type: 'no-show-warning' }>) {
     </table>
     <p style="font-size:13px;color:rgba(245,244,240,0.5);margin:24px 0 0;line-height:1.7;">
       That slot was held for you and turned away other clients.
-      Please cancel in advance if your plans change — it keeps the schedule running for everyone.
+      Please cancel in advance if your plans change. It keeps the schedule running for everyone.
       Repeated no-shows may result in bookings being restricted.
     </p>
     ${btn('Rebook Your Spot →', 'https://zoblends.com/book', 'outline')}
@@ -162,7 +162,7 @@ function bookingReminderHtml(d: Extract<EmailType, { type: 'booking-reminder' }>
   `)
 }
 
-// ─── 7. Admin — New Booking Notification ─────────────────────────────────────
+// ─── 7. Admin: New Booking Notification ──────────────────────────────────────
 
 function adminNewBookingHtml(d: Extract<EmailType, { type: 'admin-new-booking' }>) {
   return shell(`
@@ -208,12 +208,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       to      = data.to
       break
     case 'no-show-warning':
-      subject = `Missed appointment — ${data.date}`
+      subject = `Missed appointment: ${data.date}`
       html    = noShowWarningHtml(data)
       to      = data.to
       break
     case 'waitlist-spot-open':
-      subject = `A spot opened up on ${data.date} — Zoblends`
+      subject = `A spot opened up on ${data.date} at Zoblends`
       html    = waitlistSpotHtml(data)
       to      = data.to
       break
@@ -223,7 +223,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       to      = data.to
       break
     case 'admin-new-booking':
-      subject = `New booking — ${data.name} · ${data.service} · ${data.date}`
+      subject = `New booking: ${data.name} · ${data.service} · ${data.date}`
       html    = adminNewBookingHtml(data)
       to      = ADMIN_EMAIL
       break
