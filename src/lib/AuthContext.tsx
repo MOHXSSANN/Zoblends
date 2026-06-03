@@ -12,7 +12,7 @@ declare global {
         id: {
           initialize: (cfg: object) => void
           renderButton: (el: HTMLElement, cfg: object) => void
-          prompt: () => void
+          prompt: (cb?: (n: { isNotDisplayed?: () => boolean; isSkippedMoment?: () => boolean }) => void) => void
           cancel: () => void
         }
       }
@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function signInWithGoogle() {
     if (window.google?.accounts) {
-      window.google.accounts.id.prompt((notification: any) => {
+      window.google.accounts.id.prompt((notification) => {
         // If One Tap is suppressed (cooldown / dismissed before), fall back to redirect
         if (notification.isNotDisplayed?.() || notification.isSkippedMoment?.()) {
           const redirectTo = import.meta.env.VITE_SITE_URL ?? window.location.origin
