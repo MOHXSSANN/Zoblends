@@ -59,6 +59,38 @@ export default function MyBookings() {
   async function handleCancel(b: Booking) {
     setCancelling(true)
     await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', b.id)
+
+    // Send cancellation email and notify waitlist (fire-and-forget)
+    const d = new Date(b.starts_at)
+    const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
+    const dateStr = `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}`
+    const h = d.getHours(), mn = d.getMinutes()
+    const ampm = h >= 12 ? 'PM' : 'AM'
+    const h12 = h > 12 ? h - 12 : h === 0 ? 12 : h
+    const timeStr = `${h12}:${mn === 0 ? '00' : String(mn).padStart(2,'0')} ${ampm}`
+    const isoDate = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'booking-cancellation',
+        to: b.email,
+        name: b.name,
+        service: b.service_name,
+        date: dateStr,
+        time: timeStr,
+        confirmationNumber: b.confirmation_number ?? '',
+      }),
+    }).catch(() => {/* non-critical */})
+
+    fetch('/api/notify-waitlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date: isoDate }),
+    }).catch(() => {/* non-critical */})
+
     const updated = { ...b, status: 'cancelled' as const }
     setBookings(prev => prev.map(x => x.id === b.id ? updated : x))
     setSelected(updated)

@@ -233,6 +233,7 @@ export default function Navbar() {
               <div className="navbar__overlay-divider" />
               {user ? (
                 <div className="navbar__overlay-account">
+                  {console.log('[ADMIN DEBUG] user.email:', user.email, '| user_metadata.email:', user.user_metadata?.email) as unknown as null}
                   <div className="navbar__overlay-user">
                     {user.user_metadata?.avatar_url && (
                       <img className="navbar__overlay-avatar" src={user.user_metadata.avatar_url} alt="" />
@@ -242,6 +243,9 @@ export default function Navbar() {
                     </span>
                   </div>
                   <Link to="/my-bookings" className="navbar__overlay-account-link">My Bookings</Link>
+                  {(user.email === 'mo.hxssan360@gmail.com' || user.user_metadata?.email === 'mo.hxssan360@gmail.com') && (
+                    <Link to="/admin" className="navbar__overlay-account-link navbar__overlay-account-link--admin">Admin</Link>
+                  )}
                   <button className="navbar__overlay-signout" onClick={signOut}>Sign Out</button>
                 </div>
               ) : (

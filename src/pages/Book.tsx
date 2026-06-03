@@ -14,7 +14,7 @@ const SERVICES = [
   { id: 'lineup',        name: 'Line Up / Clean Up',   duration: '25 min', durationMin: 25, price: '$25' },
 ]
 
-type Step = 'service' | 'datetime' | 'details' | 'confirm' | 'done'
+type Step = 'service' | 'datetime' | 'details' | 'confirm' | 'done' | 'waitlist' | 'waitlist-done'
 
 interface GuestInfo { name: string; email: string; phone: string }
 
@@ -47,12 +47,22 @@ function getTimeSlots(durationMin: number): string[] {
   return slots
 }
 
+function isoToSlot(iso: string): string {
+  const d = new Date(iso)
+  const h = d.getHours(), m = d.getMinutes()
+  const ampm = h >= 12 ? 'PM' : 'AM'
+  const h12 = h > 12 ? h - 12 : h === 0 ? 12 : h
+  return `${h12}:${m === 0 ? '00' : String(m).padStart(2,'0')} ${ampm}`
+}
+
 export default function Book() {
   const { user } = useAuth()
   const [step, setStep]             = useState<Step>('service')
   const [service, setService]       = useState<typeof SERVICES[0] | null>(null)
   const [date, setDate]             = useState<Date | null>(null)
   const [time, setTime]             = useState<string | null>(null)
+  const [takenSlots, setTakenSlots] = useState<Set<string>>(new Set())
+  const [loadingSlots, setLoadingSlots] = useState(false)
   const [info, setInfo]             = useState<GuestInfo>({ name: '', email: '', phone: '' })
   const [errors, setErrors]         = useState<Partial<GuestInfo>>({})
   const [submitting, setSubmitting]         = useState(false)
@@ -61,6 +71,24 @@ export default function Book() {
 
   const dates = getAvailableDates()
   const slots = service ? getTimeSlots(service.durationMin) : []
+
+  // Fetch booked slots whenever date changes
+  useEffect(() => {
+    if (!date) return
+    const dateStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`
+    setLoadingSlots(true)
+    supabase
+      .from('bookings')
+      .select('starts_at')
+      .eq('status', 'confirmed')
+      .gte('starts_at', `${dateStr}T00:00:00`)
+      .lte('starts_at', `${dateStr}T23:59:59`)
+      .then(({ data }) => {
+        const taken = new Set<string>((data ?? []).map(b => isoToSlot(b.starts_at)))
+        setTakenSlots(taken)
+        setLoadingSlots(false)
+      })
+  }, [date])
 
   // Pre-fill from Google account
   useEffect(() => {
@@ -134,11 +162,59 @@ export default function Book() {
       confirmation_number: confNum,
     })
 
-    setSubmitting(false)
     if (!error) {
+      // Send confirmation email to client
+      fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'booking-confirmation',
+          to: info.email,
+          name: info.name,
+          service: service.name,
+          date: formatDate(date),
+          time,
+          duration: service.duration,
+          price: service.price,
+          confirmationNumber: confNum,
+        }),
+      }).catch(() => {})
+
+      // Notify admin
+      fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'admin-new-booking',
+          name: info.name,
+          service: service.name,
+          date: formatDate(date),
+          time,
+          phone: info.phone,
+          email: info.email,
+          confirmationNumber: confNum,
+        }),
+      }).catch(() => {})
+
       setConfirmationNum(confNum)
       setStep('done')
     }
+    setSubmitting(false)
+  }
+
+  async function handleWaitlistSubmit() {
+    if (!date) return
+    setSubmitting(true)
+    const dateStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`
+    const { error } = await supabase.from('waitlist').insert({
+      name: info.name,
+      email: info.email,
+      phone: info.phone,
+      desired_date: dateStr,
+      status: 'waiting',
+    })
+    setSubmitting(false)
+    if (!error) setStep('waitlist-done')
   }
 
   function reset() {
@@ -174,7 +250,7 @@ export default function Book() {
         </motion.div>
 
         {/* ── Step indicator ── */}
-        {step !== 'done' && (
+        {step !== 'done' && step !== 'waitlist' && step !== 'waitlist-done' && (
           <div className="book__steps">
             {(['service','datetime','details','confirm'] as Step[]).map((s) => (
               <div key={s} className={`book__step-dot${step === s ? ' book__step-dot--active' : ''}`} />
@@ -246,17 +322,26 @@ export default function Book() {
               {date && (
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: EASE }}>
                   <div className="book__section-label" style={{ marginTop: 28 }}>Pick a Time</div>
-                  <div className="book__slots">
-                    {slots.map(s => (
-                      <button
-                        key={s}
-                        className={`book__slot${time === s ? ' book__slot--active' : ''}`}
-                        onClick={() => setTime(s)}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
+                  {loadingSlots ? (
+                    <p className="book__slots-loading">Checking availability…</p>
+                  ) : (
+                    <div className="book__slots">
+                      {slots.map(s => {
+                        const taken = takenSlots.has(s)
+                        return (
+                          <button
+                            key={s}
+                            className={`book__slot${time === s ? ' book__slot--active' : ''}${taken ? ' book__slot--taken' : ''}`}
+                            onClick={() => !taken && setTime(s)}
+                            disabled={taken}
+                          >
+                            {s}
+                            {taken && <span className="book__slot-taken-label">Taken</span>}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
                 </motion.div>
               )}
 
@@ -267,6 +352,15 @@ export default function Book() {
               >
                 Continue →
               </button>
+
+              {date && (
+                <div className="book__waitlist-alt">
+                  <span className="book__waitlist-alt-text">All times taken or none work?</span>
+                  <button className="book__waitlist-link" onClick={() => setStep('waitlist')}>
+                    Join the waitlist for {DAY_NAMES[date.getDay()]}, {MONTH_NAMES[date.getMonth()]} {date.getDate()} →
+                  </button>
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -372,6 +466,86 @@ export default function Book() {
 
               <button className="book__next-btn book__confirm-btn" onClick={handleSubmit} disabled={submitting}>
                 {submitting ? 'Confirming…' : 'Confirm Booking'}
+              </button>
+            </motion.div>
+          )}
+
+          {/* ── Step: Waitlist Form ── */}
+          {step === 'waitlist' && date && (
+            <motion.div key="waitlist"
+              initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }}
+              transition={{ duration: 0.4, ease: EASE }}
+            >
+              <button className="book__back" onClick={() => setStep('datetime')}>← Back</button>
+              <div className="book__waitlist-header">
+                <div className="book__section-label">Join Waitlist</div>
+                <p className="book__waitlist-desc">
+                  We'll email you if a spot opens up on{' '}
+                  <strong>{DAY_NAMES[date.getDay()]}, {MONTH_NAMES[date.getMonth()]} {date.getDate()}</strong>.
+                </p>
+              </div>
+
+              <div className="book__form">
+                <div className="book__field">
+                  <label className="book__label">Full Name</label>
+                  <input
+                    className={`book__input${errors.name ? ' book__input--error' : ''}`}
+                    placeholder="Your name"
+                    value={info.name}
+                    onChange={e => setInfo(p => ({ ...p, name: e.target.value }))}
+                  />
+                  {errors.name && <span className="book__error">{errors.name}</span>}
+                </div>
+                <div className="book__field">
+                  <label className="book__label">Email</label>
+                  <input
+                    className={`book__input${errors.email ? ' book__input--error' : ''}`}
+                    type="email"
+                    placeholder="your@email.com"
+                    value={info.email}
+                    onChange={e => setInfo(p => ({ ...p, email: e.target.value }))}
+                  />
+                  {errors.email && <span className="book__error">{errors.email}</span>}
+                </div>
+                <div className="book__field">
+                  <label className="book__label">Phone</label>
+                  <input
+                    className={`book__input${errors.phone ? ' book__input--error' : ''}`}
+                    type="tel"
+                    placeholder="+1 (613) 000-0000"
+                    value={info.phone}
+                    onChange={e => setInfo(p => ({ ...p, phone: e.target.value }))}
+                  />
+                  {errors.phone && <span className="book__error">{errors.phone}</span>}
+                </div>
+              </div>
+
+              <button
+                className="book__next-btn"
+                onClick={() => { if (validate()) handleWaitlistSubmit() }}
+                disabled={submitting}
+              >
+                {submitting ? 'Joining…' : 'Join Waitlist'}
+              </button>
+            </motion.div>
+          )}
+
+          {/* ── Step: Waitlist Done ── */}
+          {step === 'waitlist-done' && date && (
+            <motion.div key="waitlist-done"
+              initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, ease: EASE }}
+              className="book__done"
+            >
+              <img src="/zowaitlistletter.png" alt="" className="book__waitlist-img" />
+              <h2 className="book__done-title">You're on the list.</h2>
+              <p className="book__done-sub">
+                We'll email <strong>{info.email}</strong> if a spot opens up on{' '}
+                {DAY_NAMES[date.getDay()]}, {MONTH_NAMES[date.getMonth()]} {date.getDate()}.
+              </p>
+              <p className="book__done-note">Keep an eye on your inbox.</p>
+              <button className="book__next-btn" style={{ marginTop: 32 }} onClick={reset}>
+                Back to Services
               </button>
             </motion.div>
           )}

@@ -8,6 +8,7 @@ import Contact    from './pages/Contact'
 import Book       from './pages/Book'
 import Shop       from './pages/Shop'
 import MyBookings from './pages/MyBookings'
+import Admin      from './pages/Admin'
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/book"       element={<Book />}       />
         <Route path="/shop"       element={<Shop />}       />
         <Route path="/my-bookings" element={<MyBookings />} />
+        <Route path="/admin"      element={<Admin />}      />
       </Route>
     </Routes>
   )

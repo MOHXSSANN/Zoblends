@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zoblends — Email Suite</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background-color:#0a0908;
+    font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color:#f5f4f0;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap { max-width:1280px; margin:0 auto; padding:72px 32px 96px; }
+  header { text-align:center; margin-bottom:64px; }
+  .logo {
+    font-family:Georgia, 'Times New Roman', serif;
+    font-size:30px; letter-spacing:0.14em; color:#d4af37; font-weight:400;
+  }
+  .eyebrow {
+    font-size:11px; letter-spacing:0.24em; text-transform:uppercase;
+    color:rgba(245,244,240,0.35); margin-top:22px;
+  }
+  .rule { width:40px; height:1px; background:rgba(212,175,55,0.4); margin:28px auto 0; }
+  .grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));
+    gap:48px 40px;
+  }
+  .card { display:flex; flex-direction:column; }
+  .card-head {
+    display:flex; align-items:baseline; gap:12px; margin-bottom:18px;
+    padding-bottom:16px; border-bottom:1px solid rgba(212,175,55,0.15);
+  }
+  .num {
+    font-family:Georgia, serif; font-size:13px; color:#d4af37;
+    letter-spacing:0.08em; min-width:24px;
+  }
+  .title { font-size:15px; color:#f5f4f0; letter-spacing:0.01em; }
+  .sub { font-size:12px; color:rgba(245,244,240,0.35); margin-left:auto; }
+  .frame {
+    border:1px solid rgba(212,175,55,0.18);
+    background:#0a0908;
+    overflow:hidden;
+    position:relative;
+  }
+  iframe { width:100%; height:660px; border:0; display:block; }
+  .open {
+    display:inline-block; margin-top:16px;
+    font-size:11px; letter-spacing:0.16em; text-transform:uppercase;
+    color:rgba(245,244,240,0.4); text-decoration:none;
+    transition:color .2s ease;
+  }
+  .open:hover { color:#d4af37; }
+  footer {
+    text-align:center; margin-top:80px;
+    font-size:11px; letter-spacing:0.04em; color:rgba(245,244,240,0.25);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">ZOBLENDS</div>
+    <div class="eyebrow">Transactional Email Suite</div>
+    <div class="rule"></div>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head"><span class="num">01</span><span class="title">Booking Confirmation</span><span class="sub">Confirmed</span></div>
+      <div class="frame"><iframe src="emails/1-booking-confirmation.html" title="Booking Confirmation" loading="lazy"></iframe></div>
+      <a class="open" href="emails/1-booking-confirmation.html" target="_blank">Open full →</a>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="num">02</span><span class="title">Booking Cancellation</span><span class="sub">Cancelled</span></div>
+      <div class="frame"><iframe src="emails/2-booking-cancellation.html" title="Booking Cancellation" loading="lazy"></iframe></div>
+      <a class="open" href="emails/2-booking-cancellation.html" target="_blank">Open full →</a>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="num">03</span><span class="title">Review Request</span><span class="sub">Post-Cut</span></div>
+      <div class="frame"><iframe src="emails/3-review-request.html" title="Review Request" loading="lazy"></iframe></div>
+      <a class="open" href="emails/3-review-request.html" target="_blank">Open full →</a>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="num">04</span><span class="title">No-Show Warning</span><span class="sub">Missed</span></div>
+      <div class="frame"><iframe src="emails/4-no-show-warning.html" title="No-Show Warning" loading="lazy"></iframe></div>
+      <a class="open" href="emails/4-no-show-warning.html" target="_blank">Open full →</a>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="num">05</span><span class="title">Waitlist Spot Available</span><span class="sub">Urgent</span></div>
+      <div class="frame"><iframe src="emails/5-waitlist-spot.html" title="Waitlist Spot Available" loading="lazy"></iframe></div>
+      <a class="open" href="emails/5-waitlist-spot.html" target="_blank">Open full →</a>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="num">06</span><span class="title">Booking Reminder</span><span class="sub">24h Before</span></div>
+      <div class="frame"><iframe src="emails/6-booking-reminder.html" title="Booking Reminder" loading="lazy"></iframe></div>
+      <a class="open" href="emails/6-booking-reminder.html" target="_blank">Open full →</a>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="num">07</span><span class="title">Admin — New Booking</span><span class="sub">Internal</span></div>
+      <div class="frame"><iframe src="emails/7-admin-new-booking.html" title="Admin New Booking" loading="lazy"></iframe></div>
+      <a class="open" href="emails/7-admin-new-booking.html" target="_blank">Open full →</a>
+    </div>
+  </div>
+
+  <footer>© 2026 Zoblends · Nepean, Ottawa, ON · Email-safe HTML, inline CSS, 480px max-width</footer>
+</div>
+</body>
+</html>
