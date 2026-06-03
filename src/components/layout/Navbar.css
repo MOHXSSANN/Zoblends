@@ -23,18 +23,15 @@
 /* ── Logo ─────────────────────────────────────────── */
 .navbar__logo {
   display: flex;
-  align-items: baseline;
-  gap: 6px;
+  align-items: center;
   text-decoration: none;
+  flex-shrink: 0;
 }
 
-.navbar__logo {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--gold);
-  text-decoration: none;
+.navbar__logo-paint {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
 }
 
 /* ── Links ────────────────────────────────────────── */

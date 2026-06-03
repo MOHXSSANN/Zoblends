@@ -34,25 +34,26 @@ export default function HeroSection() {
       >
         <MetallicPaint
           imageSrc="/zoLogo.png"
-          seed={12}
-          scale={3}
-          liquid={0.6}
-          speed={0.25}
-          brightness={2.6}
-          contrast={0.55}
-          fresnel={1.8}
-          refraction={0.018}
-          blur={0.012}
-          chromaticSpread={1.8}
-          waveAmplitude={0.9}
-          noiseScale={0.45}
-          patternSharpness={1.2}
-          distortion={0.6}
-          contour={0.25}
-          lightColor="#ffe97a"
-          darkColor="#4a2e00"
+          seed={42}
+          scale={4}
+          patternSharpness={1}
+          noiseScale={0.5}
+          speed={0.3}
+          liquid={0.75}
+          mouseAnimation={false}
+          brightness={2}
+          contrast={0.5}
+          refraction={0.01}
+          blur={0.015}
+          chromaticSpread={2}
+          fresnel={1}
+          angle={0}
+          waveAmplitude={1}
+          distortion={1}
+          contour={0.2}
+          lightColor="#b1902a"
+          darkColor="#000000"
           tintColor="#ffffff"
-          mouseAnimation
         />
       </motion.div>
 

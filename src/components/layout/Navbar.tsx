@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '../../lib/CartContext'
 import { useAuth } from '../../lib/AuthContext'
 import { PRODUCTS } from '../../lib/products'
+import MetallicPaint from '../ui/MetallicPaint'
 import './Navbar.css'
 
 const NAV_LINKS = [
@@ -61,7 +62,33 @@ export default function Navbar() {
         animate={{ y: navHidden ? '-100%' : 0, opacity: navHidden ? 0 : 1 }}
         transition={{ duration: 0.35, ease: EASE, delay: navHidden ? 0 : 0.2 }}
       >
-        <Link to="/" className="navbar__logo" aria-label="Zoblends home">ZoBlends</Link>
+        <Link to="/" className="navbar__logo" aria-label="Zoblends home">
+          <div className="navbar__logo-paint">
+            <MetallicPaint
+              imageSrc="/zoLogo.png"
+              seed={42}
+              scale={4}
+              patternSharpness={1}
+              noiseScale={0.5}
+              speed={0.3}
+              liquid={0.75}
+              mouseAnimation={false}
+              brightness={2}
+              contrast={0.5}
+              refraction={0.01}
+              blur={0.015}
+              chromaticSpread={2}
+              fresnel={1}
+              angle={0}
+              waveAmplitude={1}
+              distortion={1}
+              contour={0.2}
+              lightColor="#b1902a"
+              darkColor="#000000"
+              tintColor="#ffffff"
+            />
+          </div>
+        </Link>
 
         <nav className="navbar__links" aria-label="Primary navigation">
           {NAV_LINKS.map((link) => (
