@@ -1,3 +1,42 @@
+/* ── Step dots ───────────────────────────────────── */
+.book__steps {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.book__step-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(212,175,55,0.2);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.book__step-dot--active {
+  background: var(--gold);
+  transform: scale(1.3);
+}
+
+/* ── Back button ─────────────────────────────────── */
+.book__back {
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(245,244,240,0.35);
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 28px;
+  transition: color 0.2s;
+}
+.book__back:hover { color: var(--gold); }
+
+/* ── Policy block ────────────────────────────────── */
 .book__policy {
   background: var(--concrete);
   border-left: 2px solid var(--gold);
@@ -25,16 +64,42 @@
   margin: 0;
 }
 
-.book__policy a {
-  color: var(--gold);
-  text-decoration: none;
+.book__policy a { color: var(--gold); text-decoration: none; }
+
+/* ── Section label ───────────────────────────────── */
+.book__section-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(245,244,240,0.3);
+  margin-bottom: 14px;
 }
 
-.book__services {
+/* ── Chosen service pill ─────────────────────────── */
+.book__chosen-service {
   display: flex;
-  flex-direction: column;
-  gap: 0;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border: 1px solid rgba(212,175,55,0.25);
+  background: rgba(212,175,55,0.04);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--white);
 }
+
+.book__chosen-meta {
+  font-size: 12px;
+  color: var(--gold);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+/* ── Services list ───────────────────────────────── */
+.book__services { display: flex; flex-direction: column; gap: 0; }
 
 .book__service {
   display: flex;
@@ -45,11 +110,7 @@
   gap: 16px;
 }
 
-.book__service-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+.book__service-info { display: flex; flex-direction: column; gap: 4px; }
 
 .book__service-name {
   font-family: var(--font-body);
@@ -95,17 +156,267 @@
   cursor: pointer;
   transition: background 0.2s ease;
 }
+.book__service-btn:hover { background: var(--gold-light); }
 
-.book__service-btn:active {
-  background: var(--gold-light);
+/* ── Date picker ─────────────────────────────────── */
+.book__dates {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: none;
+}
+.book__dates::-webkit-scrollbar { display: none; }
+
+.book__date-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 12px 14px;
+  border: 1px solid rgba(212,175,55,0.15);
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.2s, background 0.2s;
+}
+.book__date-btn:hover { border-color: rgba(212,175,55,0.4); }
+.book__date-btn--active {
+  border-color: var(--gold);
+  background: rgba(212,175,55,0.08);
 }
 
+.book__date-day {
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(245,244,240,0.35);
+}
+.book__date-btn--active .book__date-day { color: var(--gold); }
+
+.book__date-num {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1;
+}
+.book__date-btn--active .book__date-num { color: var(--gold); }
+
+.book__date-month {
+  font-family: var(--font-body);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(245,244,240,0.25);
+}
+
+/* ── Time slots ──────────────────────────────────── */
+.book__slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.book__slot {
+  padding: 9px 16px;
+  border: 1px solid rgba(212,175,55,0.15);
+  background: none;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: rgba(245,244,240,0.6);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.book__slot:hover { border-color: rgba(212,175,55,0.4); color: var(--white); }
+.book__slot--active {
+  border-color: var(--gold);
+  background: rgba(212,175,55,0.08);
+  color: var(--gold);
+}
+
+/* ── Next / CTA button ───────────────────────────── */
+.book__next-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 52px;
+  margin-top: 32px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--black);
+  background: var(--gold);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, opacity 0.2s;
+}
+.book__next-btn:hover { background: var(--gold-light); }
+.book__next-btn--disabled { opacity: 0.3; cursor: not-allowed; }
+.book__confirm-btn { background: var(--gold); }
+
+/* ── Guest form ──────────────────────────────────── */
+.book__google-note {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: rgba(245,244,240,0.3);
+  letter-spacing: 0.06em;
+  margin-bottom: 20px;
+}
+
+.book__form { display: flex; flex-direction: column; gap: 20px; }
+
+.book__field { display: flex; flex-direction: column; gap: 8px; }
+
+.book__label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(245,244,240,0.4);
+}
+
+.book__input {
+  background: rgba(245,244,240,0.04);
+  border: 1px solid rgba(212,175,55,0.15);
+  padding: 14px 16px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--white);
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.book__input::placeholder { color: rgba(245,244,240,0.2); }
+.book__input:focus { border-color: rgba(212,175,55,0.5); }
+.book__input--error { border-color: #e05555; }
+
+.book__error {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: #e05555;
+  letter-spacing: 0.06em;
+}
+
+/* ── Summary ─────────────────────────────────────── */
+.book__summary {
+  border: 1px solid rgba(212,175,55,0.15);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.book__summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.book__summary-key {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(245,244,240,0.3);
+}
+
+.book__summary-val {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(245,244,240,0.85);
+  text-align: right;
+}
+
+.book__summary-price {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.book__summary-divider {
+  height: 1px;
+  background: rgba(212,175,55,0.08);
+}
+
+.book__summary-note {
+  font-family: var(--font-body);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(245,244,240,0.15);
+  margin: 0;
+  text-align: center;
+}
+
+/* ── Done screen ─────────────────────────────────── */
+.book__done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 40px 0;
+  gap: 12px;
+}
+
+.book__done-icon {
+  font-size: 32px;
+  color: var(--gold);
+  margin-bottom: 8px;
+  animation: spin 6s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.book__done-title {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.book__done-sub {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: rgba(245,244,240,0.6);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.book__done-note {
+  font-family: var(--font-body);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(245,244,240,0.2);
+  margin: 0;
+}
+
+/* ── Footer note ─────────────────────────────────── */
 .book__footer-note {
   font-family: var(--font-body);
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(245, 244, 240, 0.2);
+  color: rgba(245,244,240,0.2);
   text-align: center;
   margin-top: 40px;
 }

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import MetallicPaint from '../ui/MetallicPaint'
-import BookNowKey from '../ui/BookNowKey'
+import { Link } from 'react-router-dom'
 import './HeroSection.css'
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
@@ -64,7 +64,7 @@ export default function HeroSection() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.7, duration: 0.8 }}
       >
-        Precision Cuts · Ottawa, Ontario
+        Your Barber's Favourite Barber
       </motion.p>
 
       {/* ── Bottom CTA ── */}
@@ -74,7 +74,7 @@ export default function HeroSection() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9, duration: 0.7, ease: EASE }}
       >
-        <BookNowKey />
+        <Link to="/book" className="hero-section__cta">Book Now</Link>
         <a
           href="https://instagram.com/zo_blendz_"
           target="_blank"

@@ -7,13 +7,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 40px;
+  padding: 18px 6px;
   transition: padding 0.4s var(--ease-out-expo), background 0.4s ease, border-color 0.4s ease;
   border-bottom: 1px solid transparent;
 }
 
 .navbar--scrolled {
-  padding: 16px 40px;
+  padding: 12px 6px;
   background: rgba(10, 9, 8, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -22,16 +22,66 @@
 
 /* ── Logo ─────────────────────────────────────────── */
 .navbar__logo {
+  position: relative;
   display: flex;
   align-items: center;
   text-decoration: none;
   flex-shrink: 0;
 }
 
+/* Text state (menu closed) */
+.navbar__logo-text {
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+
+/*
+ * MetallicPaint always renders an 800×800 square canvas.
+ * The text sits in the vertical center of the square source image.
+ * We window in on the text band using overflow:hidden + a larger canvas.
+ * Canvas at 320×320 → text band ≈ 40px tall (320 × 80/640).
+ */
+.navbar__logo-metallic-text {
+  position: relative;
+  width: 104px;
+  height: 13px;
+  overflow: hidden;
+}
+
+.navbar__logo-metallic-text canvas {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 107px !important;
+  height: 107px !important;
+}
+
+/* MetallicPaint canvas state (menu open) */
 .navbar__logo-paint {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
   width: 48px;
   height: 48px;
-  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.navbar__logo-paint canvas {
+  width: 48px !important;
+  height: 48px !important;
+}
+
+/* Swap on menu open */
+.navbar__logo--open .navbar__logo-text {
+  opacity: 0;
+}
+
+.navbar__logo--open .navbar__logo-paint {
+  opacity: 1;
 }
 
 /* ── Links ────────────────────────────────────────── */
@@ -81,6 +131,7 @@
   gap: 16px;
   position: relative;
   z-index: 1001;
+  flex-shrink: 0;
 }
 
 .navbar__cta {
@@ -517,8 +568,8 @@
 
 /* ── Responsive ───────────────────────────────────── */
 @media (max-width: 768px) {
-  .navbar { padding: 20px 24px; }
-  .navbar--scrolled { padding: 14px 24px; }
+  .navbar { padding: 16px 4px; }
+  .navbar--scrolled { padding: 10px 4px; }
   .navbar__links { display: none; }
   .navbar__cta { display: none; }
   .navbar__burger { display: flex; }

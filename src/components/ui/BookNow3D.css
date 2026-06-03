@@ -1,0 +1,295 @@
+/* ── BookNow3D — gold metallic 3D flip button ── */
+
+/* Custom props injected per-char: --i (1-based index) */
+
+/* ─── Keyframes ─────────────────────────────────────── */
+
+@keyframes b3dCharAppear {
+  0%   { transform: rotateX(-90deg); opacity: 0; }
+  60%  { opacity: 1; }
+  100% { transform: rotateX(0deg);   opacity: 1; }
+}
+
+@keyframes b3dCharDisappear {
+  0%   { transform: rotateX(0deg);   opacity: 1; }
+  40%  { opacity: 1; }
+  100% { transform: rotateX(90deg);  opacity: 0; }
+}
+
+@keyframes b3dArrow {
+  0%   { transform: translateX(0);    opacity: 1; }
+  45%  { transform: translateX(6px);  opacity: 0; }
+  55%  { transform: translateX(-6px); opacity: 0; }
+  100% { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes b3dSwingArrow {
+  0%   { transform: rotate(0deg); }
+  25%  { transform: rotate(-20deg) scale(1.15); }
+  75%  { transform: rotate(20deg)  scale(1.15); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes b3dPath {
+  0%   { stroke-dashoffset: 520; opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { stroke-dashoffset: 0;   opacity: 0; }
+}
+
+@keyframes b3dSplash {
+  0%   { stroke-dashoffset: 80; opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 0.6; }
+  100% { stroke-dashoffset: 0;  opacity: 0; }
+}
+
+/* ─── Button shell ───────────────────────────────────── */
+
+.b3d {
+  --gold:        #d4af37;
+  --gold-light:  #e8cc6a;
+  --gold-dim:    rgba(212,175,55,0.35);
+  --gold-glow:   rgba(212,175,55,0.18);
+  --black:       #080706;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+  /* size driven by inner wrap */
+  width: 342px;
+  height: 208px;
+  /* perspective for 3D char flips */
+  perspective: 500px;
+}
+
+/* ─── Radial glow background ─────────────────────────── */
+
+.b3d__bg {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(ellipse 60% 45% at 50% 60%, var(--gold-glow), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.b3d:hover .b3d__bg,
+.b3d:focus-visible .b3d__bg {
+  opacity: 1;
+}
+
+/* ─── Splash spark lines ─────────────────────────────── */
+
+.b3d__splash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.b3d__splash path {
+  stroke: var(--gold);
+  stroke-dasharray: 80;
+  stroke-dashoffset: 80;
+}
+
+.b3d:hover .b3d__splash,
+.b3d:focus-visible .b3d__splash {
+  opacity: 1;
+}
+
+.b3d:hover .b3d__splash path,
+.b3d:focus-visible .b3d__splash path {
+  animation: b3dSplash 0.55s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+/* stagger each spark */
+.b3d__splash path:nth-child(1)  { animation-delay: 0.00s; }
+.b3d__splash path:nth-child(2)  { animation-delay: 0.02s; }
+.b3d__splash path:nth-child(3)  { animation-delay: 0.04s; }
+.b3d__splash path:nth-child(4)  { animation-delay: 0.06s; }
+.b3d__splash path:nth-child(5)  { animation-delay: 0.08s; }
+.b3d__splash path:nth-child(6)  { animation-delay: 0.10s; }
+.b3d__splash path:nth-child(7)  { animation-delay: 0.12s; }
+.b3d__splash path:nth-child(8)  { animation-delay: 0.14s; }
+.b3d__splash path:nth-child(9)  { animation-delay: 0.16s; }
+.b3d__splash path:nth-child(10) { animation-delay: 0.18s; }
+.b3d__splash path:nth-child(11) { animation-delay: 0.20s; }
+.b3d__splash path:nth-child(12) { animation-delay: 0.22s; }
+
+/* ─── Pill wrap (the actual button face) ─────────────── */
+
+.b3d__wrap {
+  position: relative;
+  width: 221px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* solid border fill */
+.b3d__outline {
+  position: absolute;
+  inset: 0;
+  border-radius: 21px;
+  border: 1px solid var(--gold-dim);
+  background: rgba(8,7,6,0.7);
+  backdrop-filter: blur(6px);
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.b3d:hover .b3d__outline,
+.b3d:focus-visible .b3d__outline {
+  border-color: var(--gold);
+  background: rgba(8,7,6,0.85);
+}
+
+/* animated SVG border path */
+.b3d__path {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.b3d__path path {
+  stroke: var(--gold);
+  stroke-dasharray: 520;
+  stroke-dashoffset: 520;
+  opacity: 0;
+}
+
+.b3d:hover .b3d__path path,
+.b3d:focus-visible .b3d__path path {
+  animation: b3dPath 0.65s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+/* ─── Content row ────────────────────────────────────── */
+
+.b3d__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─── Char groups ────────────────────────────────────── */
+
+.b3d__chars {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 18px; /* clip 3D rotations that bleed outside */
+}
+
+.b3d__chars span {
+  display: inline-block;
+  font-family: var(--font-body, 'Space Grotesk', sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  transform-style: preserve-3d;
+  transform-origin: 50% 100%;
+  white-space: pre;
+}
+
+/* ── State 1 (BOOK NOW) — visible by default ── */
+.b3d__chars--1 span {
+  animation: none;
+  transform: rotateX(0deg);
+  opacity: 1;
+}
+
+/* ── State 2 (RESERVE) — hidden by default ── */
+.b3d__chars--2 span {
+  transform: rotateX(-90deg);
+  opacity: 0;
+}
+
+/* On hover: state-1 disappears, state-2 appears */
+.b3d:hover .b3d__chars--1 span,
+.b3d:focus-visible .b3d__chars--1 span {
+  animation: b3dCharDisappear 0.38s cubic-bezier(0.16,1,0.3,1) forwards;
+  animation-delay: calc(var(--i) * 0.035s);
+}
+
+.b3d:hover .b3d__chars--2 span,
+.b3d:focus-visible .b3d__chars--2 span {
+  animation: b3dCharAppear 0.45s cubic-bezier(0.16,1,0.3,1) forwards;
+  animation-delay: calc(0.08s + var(--i) * 0.035s);
+}
+
+/* ─── Icon (scissors) ────────────────────────────────── */
+
+.b3d__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  font-size: 13px;
+  line-height: 1;
+  animation: b3dSwingArrow 2.4s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+/* Use a CSS scissors-like shape via pseudo — or a ✂ glyph */
+.b3d__icon div {
+  width: 14px;
+  height: 14px;
+  position: relative;
+}
+
+.b3d__icon div::before {
+  content: '✦';
+  font-size: 11px;
+  color: var(--gold);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.b3d:hover .b3d__icon,
+.b3d:focus-visible .b3d__icon {
+  animation-play-state: running;
+}
+
+.b3d:hover .b3d__icon div::before,
+.b3d:focus-visible .b3d__icon div::before {
+  color: var(--gold-light);
+  transform: scale(1.3) rotate(45deg);
+}
+
+/* ─── Active / press ─────────────────────────────────── */
+
+.b3d:active .b3d__wrap {
+  transform: scale(0.97);
+}
+
+/* ─── Reduced motion ─────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .b3d__chars span,
+  .b3d__path path,
+  .b3d__splash path,
+  .b3d__icon { animation: none !important; }
+  .b3d__chars--2 span { opacity: 0; }
+}

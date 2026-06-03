@@ -5,6 +5,7 @@ import { useCart } from '../../lib/CartContext'
 import { useAuth } from '../../lib/AuthContext'
 import { PRODUCTS } from '../../lib/products'
 import MetallicPaint from '../ui/MetallicPaint'
+import NavbarLogoText from '../ui/NavbarLogoText'
 import './Navbar.css'
 
 const NAV_LINKS = [
@@ -62,7 +63,8 @@ export default function Navbar() {
         animate={{ y: navHidden ? '-100%' : 0, opacity: navHidden ? 0 : 1 }}
         transition={{ duration: 0.35, ease: EASE, delay: navHidden ? 0 : 0.2 }}
       >
-        <Link to="/" className="navbar__logo" aria-label="Zoblends home">
+        <Link to="/" className={`navbar__logo${menuOpen ? ' navbar__logo--open' : ''}`} aria-label="Zoblends home">
+          <div className="navbar__logo-text"><NavbarLogoText /></div>
           <div className="navbar__logo-paint">
             <MetallicPaint
               imageSrc="/zoLogo.png"
