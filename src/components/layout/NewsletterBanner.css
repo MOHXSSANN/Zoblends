@@ -45,17 +45,24 @@
 /* form */
 .nl__form {
   display: flex;
-  gap: 0;
+  flex-direction: column;
+  gap: 10px;
   width: 100%;
-  max-width: 480px;
+  max-width: 400px;
   margin-bottom: 28px;
+}
+
+@media (min-width: 520px) {
+  .nl__form {
+    flex-direction: row;
+    gap: 0;
+  }
 }
 
 .nl__input {
   flex: 1;
   background: #0f0e0c;
   border: 1px solid rgba(212,175,55,0.2);
-  border-right: none;
   color: #f5f4f0;
   font-family: var(--font-body);
   font-size: 13px;
@@ -63,6 +70,14 @@
   padding: 14px 18px;
   outline: none;
   transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 520px) {
+  .nl__input {
+    border-right: none;
+  }
 }
 
 .nl__input::placeholder { color: rgba(245,244,240,0.2); }
@@ -81,6 +96,11 @@
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
   white-space: nowrap;
+  width: 100%;
+}
+
+@media (min-width: 520px) {
+  .nl__btn { width: auto; }
 }
 
 .nl__btn:hover {
