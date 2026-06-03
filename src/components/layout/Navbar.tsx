@@ -75,7 +75,7 @@ export default function Navbar() {
               speed={0.3}
               liquid={0.75}
               mouseAnimation={false}
-              brightness={2}
+              brightness={2.8}
               contrast={0.5}
               refraction={0.01}
               blur={0.015}
