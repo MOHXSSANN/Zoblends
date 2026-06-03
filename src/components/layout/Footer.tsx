@@ -43,7 +43,7 @@ export default function Footer() {
         </div>
 
         {/* Hours */}
-        <div className="footer__col">
+        <div className="footer__col footer__col--hours">
           <span className="footer__col-label">Hours</span>
           {HOURS.map(h => (
             <div key={h.day} className="footer__hours-row">

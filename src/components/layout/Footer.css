@@ -92,10 +92,19 @@
 .footer__text--dim { color: rgba(245,244,240,0.25); font-size: 11px; }
 .footer__text--gold { color: #d4af37; }
 
+.footer__col--hours {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 640px) {
+  .footer__col--hours { grid-column: auto; }
+}
+
 .footer__hours-row {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
+  gap: 16px;
+  white-space: nowrap;
 }
 
 /* Bottom bar */
