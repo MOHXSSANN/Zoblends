@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import BookNowKey from '../ui/BookNowKey'
 import './HeroSection.css'
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
@@ -50,11 +51,9 @@ export default function HeroSection() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9, duration: 0.7, ease: EASE }}
       >
-        <a href="/book" className="hero-section__cta">
-          Secure a Spot
-        </a>
+        <BookNowKey />
         <a
-          href="https://instagram.com"
+          href="https://instagram.com/zo_blendz_"
           target="_blank"
           rel="noopener noreferrer"
           className="hero-section__instagram"
