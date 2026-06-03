@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
 import './Page.css'
@@ -14,12 +14,15 @@ interface Booking {
   service_duration: string
   starts_at: string
   status: 'confirmed' | 'cancelled' | 'completed' | 'no_show'
+  name: string
+  email: string
+  phone: string
+  confirmation_number: string | null
   created_at: string
 }
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
-
-const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+const DAY_NAMES   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December']
 
 function formatDate(iso: string) {
@@ -29,22 +32,20 @@ function formatDate(iso: string) {
 
 function formatTime(iso: string) {
   const d = new Date(iso)
-  const h = d.getHours()
-  const m = d.getMinutes()
+  const h = d.getHours(), mn = d.getMinutes()
   const ampm = h >= 12 ? 'PM' : 'AM'
-  const h12 = h > 12 ? h - 12 : h === 0 ? 12 : h
-  return `${h12}:${m === 0 ? '00' : String(m).padStart(2, '0')} ${ampm}`
+  const h12  = h > 12 ? h - 12 : h === 0 ? 12 : h
+  return `${h12}:${mn === 0 ? '00' : String(mn).padStart(2,'0')} ${ampm}`
 }
 
-function isPast(iso: string) {
-  return new Date(iso) < new Date()
-}
+function isPast(iso: string) { return new Date(iso) < new Date() }
 
 export default function MyBookings() {
   const { user } = useAuth()
-  const [bookings, setBookings] = useState<Booking[]>([])
-  const [loading, setLoading] = useState(true)
-  const [cancelling, setCancelling] = useState<string | null>(null)
+  const [bookings, setBookings]   = useState<Booking[]>([])
+  const [loading, setLoading]     = useState(true)
+  const [selected, setSelected]   = useState<Booking | null>(null)
+  const [cancelling, setCancelling] = useState(false)
 
   useEffect(() => {
     if (!user) { setLoading(false); return }
@@ -52,33 +53,29 @@ export default function MyBookings() {
       .from('bookings')
       .select('*')
       .order('starts_at', { ascending: false })
-      .then(({ data }) => {
-        setBookings((data as Booking[]) ?? [])
-        setLoading(false)
-      })
+      .then(({ data }) => { setBookings((data as Booking[]) ?? []); setLoading(false) })
   }, [user])
 
-  async function handleCancel(id: string) {
-    setCancelling(id)
-    await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', id)
-    setBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'cancelled' } : b))
-    setCancelling(null)
+  async function handleCancel(b: Booking) {
+    setCancelling(true)
+    await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', b.id)
+    const updated = { ...b, status: 'cancelled' as const }
+    setBookings(prev => prev.map(x => x.id === b.id ? updated : x))
+    setSelected(updated)
+    setCancelling(false)
   }
 
   const upcoming = bookings.filter(b => !isPast(b.starts_at) && b.status === 'confirmed')
-  const past     = bookings.filter(b => isPast(b.starts_at) || b.status !== 'confirmed')
+  const past     = bookings.filter(b => isPast(b.starts_at)  || b.status !== 'confirmed')
 
   return (
     <>
-      <Helmet>
-        <title>My Bookings | Zoblends</title>
-      </Helmet>
+      <Helmet><title>My Bookings | Zoblends</title></Helmet>
 
       <div className="page">
         <motion.div
           className="page__header"
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: EASE }}
         >
           <span className="page__eyebrow">Account</span>
@@ -87,37 +84,28 @@ export default function MyBookings() {
         </motion.div>
 
         {!user ? (
-          <motion.div
-            className="mybookings__empty"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
+          <div className="mybookings__empty">
             <p className="mybookings__empty-text">Sign in to view your bookings.</p>
             <Link to="/book" className="mybookings__cta">Book Now</Link>
-          </motion.div>
+          </div>
         ) : loading ? (
           <div className="mybookings__loading">Loading…</div>
         ) : bookings.length === 0 ? (
-          <motion.div
-            className="mybookings__empty"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
+          <div className="mybookings__empty">
             <p className="mybookings__empty-text">No bookings yet.</p>
             <Link to="/book" className="mybookings__cta">Book Now</Link>
-          </motion.div>
+          </div>
         ) : (
           <>
             {upcoming.length > 0 && (
               <section className="mybookings__section">
                 <div className="mybookings__section-label">Upcoming</div>
                 {upcoming.map((b, i) => (
-                  <motion.div
-                    key={b.id}
-                    className="mybookings__card"
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
+                  <motion.button
+                    key={b.id} className="mybookings__card"
+                    initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.07, duration: 0.45, ease: EASE }}
+                    onClick={() => setSelected(b)}
                   >
                     <div className="mybookings__card-info">
                       <span className="mybookings__service">{b.service_name}</span>
@@ -126,15 +114,9 @@ export default function MyBookings() {
                     </div>
                     <div className="mybookings__card-right">
                       <span className="mybookings__status mybookings__status--confirmed">Confirmed</span>
-                      <button
-                        className="mybookings__cancel"
-                        onClick={() => handleCancel(b.id)}
-                        disabled={cancelling === b.id}
-                      >
-                        {cancelling === b.id ? 'Cancelling…' : 'Cancel'}
-                      </button>
+                      <span className="mybookings__view-link">View →</span>
                     </div>
-                  </motion.div>
+                  </motion.button>
                 ))}
               </section>
             )}
@@ -143,12 +125,11 @@ export default function MyBookings() {
               <section className="mybookings__section mybookings__section--past">
                 <div className="mybookings__section-label">Past</div>
                 {past.map((b, i) => (
-                  <motion.div
-                    key={b.id}
-                    className="mybookings__card mybookings__card--past"
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
+                  <motion.button
+                    key={b.id} className="mybookings__card mybookings__card--past"
+                    initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.07, duration: 0.45, ease: EASE }}
+                    onClick={() => setSelected(b)}
                   >
                     <div className="mybookings__card-info">
                       <span className="mybookings__service">{b.service_name}</span>
@@ -157,16 +138,75 @@ export default function MyBookings() {
                     </div>
                     <div className="mybookings__card-right">
                       <span className={`mybookings__status mybookings__status--${b.status}`}>
-                        {b.status.charAt(0).toUpperCase() + b.status.slice(1).replace('_', ' ')}
+                        {b.status.charAt(0).toUpperCase() + b.status.slice(1).replace('_',' ')}
                       </span>
+                      <span className="mybookings__view-link">View →</span>
                     </div>
-                  </motion.div>
+                  </motion.button>
                 ))}
               </section>
             )}
           </>
         )}
       </div>
+
+      {/* ── Booking detail modal ── */}
+      <AnimatePresence>
+        {selected && (
+          <>
+            <motion.div
+              className="mybookings__backdrop"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setSelected(null)}
+            />
+            <motion.div
+              className="mybookings__modal"
+              initial={{ opacity: 0, y: 40, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 24, scale: 0.97 }}
+              transition={{ duration: 0.35, ease: EASE }}
+            >
+              <button className="mybookings__modal-close" onClick={() => setSelected(null)}>✕</button>
+
+              <div className="mybookings__modal-header">
+                <span className="mybookings__modal-eyebrow">Booking Confirmation</span>
+                {selected.confirmation_number && (
+                  <div className="mybookings__modal-confnum">{selected.confirmation_number}</div>
+                )}
+                <span className={`mybookings__status mybookings__status--${selected.status}`} style={{ marginTop: 8 }}>
+                  {selected.status.charAt(0).toUpperCase() + selected.status.slice(1).replace('_',' ')}
+                </span>
+              </div>
+
+              <div className="mybookings__modal-rows">
+                <div className="mybookings__modal-row"><span>Service</span><span>{selected.service_name}</span></div>
+                <div className="mybookings__modal-row"><span>Date</span><span>{formatDate(selected.starts_at)}</span></div>
+                <div className="mybookings__modal-row"><span>Time</span><span>{formatTime(selected.starts_at)}</span></div>
+                <div className="mybookings__modal-row"><span>Duration</span><span>{selected.service_duration}</span></div>
+                <div className="mybookings__modal-divider" />
+                <div className="mybookings__modal-row"><span>Name</span><span>{selected.name}</span></div>
+                <div className="mybookings__modal-row"><span>Email</span><span>{selected.email}</span></div>
+                <div className="mybookings__modal-row"><span>Phone</span><span>{selected.phone}</span></div>
+                <div className="mybookings__modal-divider" />
+                <div className="mybookings__modal-row mybookings__modal-total">
+                  <span>Total</span><span>{selected.service_price}</span>
+                </div>
+                <p className="mybookings__modal-note">Payment due in person at the appointment.</p>
+              </div>
+
+              {selected.status === 'confirmed' && !isPast(selected.starts_at) && (
+                <button
+                  className="mybookings__modal-cancel"
+                  onClick={() => handleCancel(selected)}
+                  disabled={cancelling}
+                >
+                  {cancelling ? 'Cancelling…' : 'Cancel Appointment'}
+                </button>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   )
 }

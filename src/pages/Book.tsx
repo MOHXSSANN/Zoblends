@@ -55,7 +55,8 @@ export default function Book() {
   const [time, setTime]             = useState<string | null>(null)
   const [info, setInfo]             = useState<GuestInfo>({ name: '', email: '', phone: '' })
   const [errors, setErrors]         = useState<Partial<GuestInfo>>({})
-  const [submitting, setSubmitting] = useState(false)
+  const [submitting, setSubmitting]         = useState(false)
+  const [confirmationNum, setConfirmationNum] = useState<string | null>(null)
   const datesRef = useRef<HTMLDivElement>(null)
 
   const dates = getAvailableDates()
@@ -98,11 +99,17 @@ export default function Book() {
     setStep('confirm')
   }
 
+  function genConfirmationNumber() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+    let code = 'ZB'
+    for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)]
+    return code
+  }
+
   async function handleSubmit() {
     if (!service || !date || !time) return
     setSubmitting(true)
 
-    // Parse "10:00 AM" / "2:30 PM" into a proper timestamp
     const [timePart, period] = time.split(' ')
     const [h, m] = timePart.split(':').map(Number)
     let hours = h
@@ -110,6 +117,8 @@ export default function Book() {
     if (period === 'AM' && h === 12) hours = 0
     const startsAt = new Date(date)
     startsAt.setHours(hours, m, 0, 0)
+
+    const confNum = genConfirmationNumber()
 
     const { error } = await supabase.from('bookings').insert({
       user_id: user?.id ?? null,
@@ -122,10 +131,14 @@ export default function Book() {
       service_duration: service.duration,
       starts_at: startsAt.toISOString(),
       status: 'confirmed',
+      confirmation_number: confNum,
     })
 
     setSubmitting(false)
-    if (!error) setStep('done')
+    if (!error) {
+      setConfirmationNum(confNum)
+      setStep('done')
+    }
   }
 
   function reset() {
@@ -135,6 +148,7 @@ export default function Book() {
     setTime(null)
     setInfo({ name: '', email: '', phone: '' })
     setErrors({})
+    setConfirmationNum(null)
   }
 
   const formatDate = (d: Date) =>
@@ -371,6 +385,12 @@ export default function Book() {
             >
               <div className="book__done-icon">✦</div>
               <h2 className="book__done-title">You're booked.</h2>
+              {confirmationNum && (
+                <div className="book__done-conf">
+                  <span className="book__done-conf-label">Confirmation</span>
+                  <span className="book__done-conf-num">{confirmationNum}</span>
+                </div>
+              )}
               <p className="book__done-sub">
                 {service.name} on {formatDate(date)} at {time}.<br />
                 A confirmation will be sent to {info.email}.
