@@ -46,50 +46,55 @@ export default function Navbar() {
     return () => { document.body.style.overflow = '' }
   }, [menuOpen, cartOpen])
 
+  // Always show navbar when menu or cart is open
+  const navHidden = hidden && !menuOpen && !cartOpen
+
   function handleAdd(p: typeof PRODUCTS[0]) {
     add({ id: p.id, name: p.name, price: p.price })
   }
 
   return (
-    <motion.header
-      className={`navbar${scrolled ? ' navbar--scrolled' : ''}`}
-      initial={{ y: -80, opacity: 0 }}
-      animate={{ y: hidden ? '-100%' : 0, opacity: hidden ? 0 : 1 }}
-      transition={{ duration: 0.35, ease: EASE, delay: hidden ? 0 : 0.2 }}
-    >
-      <Link to="/" className="navbar__logo" aria-label="Zoblends home">ZoBlends</Link>
+    <>
+      <motion.header
+        className={`navbar${scrolled ? ' navbar--scrolled' : ''}`}
+        initial={{ y: -80, opacity: 0 }}
+        animate={{ y: navHidden ? '-100%' : 0, opacity: navHidden ? 0 : 1 }}
+        transition={{ duration: 0.35, ease: EASE, delay: navHidden ? 0 : 0.2 }}
+      >
+        <Link to="/" className="navbar__logo" aria-label="Zoblends home">ZoBlends</Link>
 
-      <nav className="navbar__links" aria-label="Primary navigation">
-        {NAV_LINKS.map((link) => (
-          <Link key={link.href} to={link.href} className="navbar__link">{link.label}</Link>
-        ))}
-      </nav>
+        <nav className="navbar__links" aria-label="Primary navigation">
+          {NAV_LINKS.map((link) => (
+            <Link key={link.href} to={link.href} className="navbar__link">{link.label}</Link>
+          ))}
+        </nav>
 
-      <div className="navbar__actions">
-        <Link to="/book" className="navbar__cta">Book Now</Link>
-        <button
-          className="navbar__cart-icon"
-          aria-label="Open cart"
-          onClick={() => setCartOpen(true)}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <path d="M16 10a4 4 0 01-8 0"/>
-          </svg>
-          {count > 0 && <span className="navbar__cart-count">{count}</span>}
-        </button>
-        <button
-          className={`navbar__burger${menuOpen ? ' navbar__burger--open' : ''}`}
-          onClick={() => setMenuOpen((v) => !v)}
-          aria-label="Toggle menu"
-          aria-expanded={menuOpen}
-        >
-          <span /><span /><span />
-        </button>
-      </div>
+        <div className="navbar__actions">
+          <Link to="/book" className="navbar__cta">Book Now</Link>
+          <button
+            className="navbar__cart-icon"
+            aria-label="Open cart"
+            onClick={() => setCartOpen(true)}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 01-8 0"/>
+            </svg>
+            {count > 0 && <span className="navbar__cart-count">{count}</span>}
+          </button>
+          <button
+            className={`navbar__burger${menuOpen ? ' navbar__burger--open' : ''}`}
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="Toggle menu"
+            aria-expanded={menuOpen}
+          >
+            <span /><span /><span />
+          </button>
+        </div>
+      </motion.header>
 
-      {/* ── Cart drawer ── */}
+      {/* ── Cart drawer — outside header so transform doesn't clip it ── */}
       <AnimatePresence>
         {cartOpen && (
           <>
@@ -160,7 +165,7 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      {/* ── Full-screen mobile menu ── */}
+      {/* ── Full-screen menu — outside header so transform doesn't clip it ── */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -225,6 +230,6 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.header>
+    </>
   )
 }
