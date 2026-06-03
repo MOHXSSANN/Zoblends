@@ -1,0 +1,139 @@
+.nl {
+  background: #080706;
+  border-top: 1px solid rgba(212,175,55,0.1);
+  padding: 80px 24px 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.nl__eyebrow {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #d4af37;
+  margin-bottom: 16px;
+}
+
+.nl__heading {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 8vw, 72px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #f5f4f0;
+  line-height: 1;
+  margin: 0 0 20px;
+}
+
+.nl__sub {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: rgba(245,244,240,0.4);
+  letter-spacing: 0.04em;
+  line-height: 1.7;
+  margin: 0 0 36px;
+  max-width: 420px;
+}
+
+.nl__br { display: none; }
+@media (min-width: 480px) { .nl__br { display: inline; } }
+
+/* form */
+.nl__form {
+  display: flex;
+  gap: 0;
+  width: 100%;
+  max-width: 480px;
+  margin-bottom: 28px;
+}
+
+.nl__input {
+  flex: 1;
+  background: #0f0e0c;
+  border: 1px solid rgba(212,175,55,0.2);
+  border-right: none;
+  color: #f5f4f0;
+  font-family: var(--font-body);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  padding: 14px 18px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.nl__input::placeholder { color: rgba(245,244,240,0.2); }
+.nl__input:focus { border-color: rgba(212,175,55,0.5); }
+
+.nl__btn {
+  background: #d4af37;
+  border: 1px solid #d4af37;
+  color: #080706;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 14px 24px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.nl__btn:hover {
+  background: #c9a52e;
+  border-color: #c9a52e;
+}
+
+.nl__thanks {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: #d4af37;
+  letter-spacing: 0.08em;
+  margin-bottom: 28px;
+}
+
+/* social */
+.nl__social-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(245,244,240,0.2);
+  margin: 0 0 16px;
+}
+
+.nl__socials {
+  display: flex;
+  gap: 12px;
+}
+
+.nl__social {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 11px 22px;
+  border: 1px solid transparent;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.nl__social--ig {
+  background: #d4af37;
+  color: #080706;
+  border-color: #d4af37;
+}
+
+.nl__social--ig:hover {
+  background: transparent;
+  color: #d4af37;
+  border-color: #d4af37;
+}
