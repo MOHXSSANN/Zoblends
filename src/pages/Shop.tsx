@@ -124,7 +124,32 @@ export default function Shop() {
               </div>
 
               {items.length === 0 ? (
-                <p className="shop__drawer-empty">Nothing here yet.</p>
+                <div className="shop__drawer-empty">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(245,244,240,0.2)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <path d="M16 10a4 4 0 01-8 0"/>
+                  </svg>
+                  <p className="shop__drawer-empty-title">Your cart is empty</p>
+                  <p className="shop__drawer-empty-sub">Add a product to get started</p>
+                  <div className="shop__drawer-recs">
+                    <p className="shop__drawer-recs-label">Recommended</p>
+                    {PRODUCTS.slice(0, 3).map(p => (
+                      <div key={p.id} className="shop__drawer-rec-item">
+                        <div className="shop__drawer-rec-info">
+                          <span className="shop__drawer-rec-name">{p.name}</span>
+                          <span className="shop__drawer-rec-price">{p.price}</span>
+                        </div>
+                        <button
+                          className="shop__drawer-rec-add"
+                          onClick={() => handleAdd(p)}
+                        >
+                          + Add
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               ) : (
                 <>
                   <div className="shop__drawer-items">
