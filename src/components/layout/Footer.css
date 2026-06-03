@@ -4,36 +4,42 @@
   padding: 48px 24px 32px;
 }
 
-/* Mobile: brand full-width, then 2+2 cols */
+/* Mobile: single centered column */
 .footer__top {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 32px;
   margin-bottom: 40px;
 }
 
 @media (min-width: 640px) {
   .footer__top {
+    display: grid;
     grid-template-columns: 1.4fr 1fr 1fr 1fr;
     gap: 24px;
+    align-items: start;
+    text-align: left;
   }
 }
 
-/* Brand spans full width on mobile only */
 .footer__brand {
-  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  align-items: center;
   padding-bottom: 24px;
   border-bottom: 1px solid rgba(212,175,55,0.08);
+  width: 100%;
 }
 
 @media (min-width: 640px) {
   .footer__brand {
-    grid-column: auto;
+    align-items: flex-start;
     padding-bottom: 0;
     border-bottom: none;
+    width: auto;
   }
 }
 
@@ -55,11 +61,16 @@
   margin: 0;
 }
 
-/* Columns — left-aligned always */
+/* Columns */
 .footer__col {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  align-items: center;
+}
+
+@media (min-width: 640px) {
+  .footer__col { align-items: flex-start; }
 }
 
 .footer__col-label {
@@ -93,27 +104,39 @@
 .footer__text--gold { color: #d4af37; }
 
 .footer__col--hours {
-  grid-column: 1 / -1;
+  width: 100%;
+  max-width: 220px;
 }
 
 @media (min-width: 640px) {
-  .footer__col--hours { grid-column: auto; }
+  .footer__col--hours { width: auto; max-width: none; }
 }
 
 .footer__hours-row {
   display: flex;
   justify-content: space-between;
-  gap: 16px;
+  gap: 24px;
   white-space: nowrap;
+  width: 100%;
 }
 
 /* Bottom bar */
 .footer__bottom {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  gap: 10px;
   padding-top: 24px;
   border-top: 1px solid rgba(212,175,55,0.08);
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .footer__bottom {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
 }
 
 .footer__copy {
