@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../lib/AuthContext'
+import { supabase } from '../lib/supabase'
 import './Page.css'
 import './Book.css'
 
@@ -98,11 +99,33 @@ export default function Book() {
   }
 
   async function handleSubmit() {
+    if (!service || !date || !time) return
     setSubmitting(true)
-    // TODO: call Edge Function create-hold + confirm-booking
-    await new Promise(r => setTimeout(r, 900))
+
+    // Parse "10:00 AM" / "2:30 PM" into a proper timestamp
+    const [timePart, period] = time.split(' ')
+    const [h, m] = timePart.split(':').map(Number)
+    let hours = h
+    if (period === 'PM' && h !== 12) hours += 12
+    if (period === 'AM' && h === 12) hours = 0
+    const startsAt = new Date(date)
+    startsAt.setHours(hours, m, 0, 0)
+
+    const { error } = await supabase.from('bookings').insert({
+      user_id: user?.id ?? null,
+      name: info.name,
+      email: info.email,
+      phone: info.phone,
+      service_id: service.id,
+      service_name: service.name,
+      service_price: service.price,
+      service_duration: service.duration,
+      starts_at: startsAt.toISOString(),
+      status: 'confirmed',
+    })
+
     setSubmitting(false)
-    setStep('done')
+    if (!error) setStep('done')
   }
 
   function reset() {

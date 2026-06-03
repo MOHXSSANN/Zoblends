@@ -241,7 +241,7 @@ export default function Navbar() {
                       {user.user_metadata?.full_name?.split(' ')[0] ?? 'Account'}
                     </span>
                   </div>
-                  <Link to="/book" className="navbar__overlay-account-link">My Bookings</Link>
+                  <Link to="/my-bookings" className="navbar__overlay-account-link">My Bookings</Link>
                   <button className="navbar__overlay-signout" onClick={signOut}>Sign Out</button>
                 </div>
               ) : (
