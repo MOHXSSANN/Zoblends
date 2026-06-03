@@ -25,13 +25,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   async function signInWithGoogle() {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: import.meta.env.VITE_SITE_URL ?? window.location.origin,
-        queryParams: { prompt: 'select_account' },
-      },
-    })
+    const isLocalhost = window.location.hostname === 'localhost'
+
+    if (isLocalhost) {
+      // Local dev: use Supabase's built-in OAuth flow
+      await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+          queryParams: { prompt: 'select_account' },
+        },
+      })
+    } else {
+      // Production: custom callback at zoblends.com so Google shows "zoblends.com"
+      const params = new URLSearchParams({
+        client_id: '61668975940-m4hvb7gdpikv700qcu4c9r5bpcr5crg4.apps.googleusercontent.com',
+        redirect_uri: `${import.meta.env.VITE_SITE_URL}/api/auth/google/callback`,
+        response_type: 'code',
+        scope: 'openid email profile',
+        prompt: 'select_account',
+        access_type: 'offline',
+      })
+      window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`
+    }
   }
 
   async function signOut() {
