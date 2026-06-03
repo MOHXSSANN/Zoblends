@@ -19,7 +19,7 @@ const PRODUCTS = [
 
 export default function Shop() {
   const { add, items, remove, total, count } = useCart()
-  const { user, signInWithGoogle, signOut }  = useAuth()
+  const { user, signInWithGoogle, signOut } = useAuth()
   const [cartOpen, setCartOpen]              = useState(false)
   const [added, setAdded]                    = useState<string | null>(null)
 
