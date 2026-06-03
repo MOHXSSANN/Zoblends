@@ -1,6 +1,5 @@
 import * as React from "react"
 import { Calendar } from "@/components/ui/calendar"
-import { cn } from "@/lib/utils"
 import { supabase } from "@/lib/supabase"
 
 interface Props {
@@ -74,8 +73,8 @@ export function BookDateTimePicker({ durationMin, onConfirm, onDateChange }: Pro
       .eq('status', 'confirmed')
       .gte('starts_at', `${dateStr}T00:00:00`)
       .lte('starts_at', `${dateStr}T23:59:59`)
-      .then(({ data }) => {
-        setTakenSlots(new Set((data ?? []).map(b => isoToSlot(b.starts_at))))
+      .then(({ data }: { data: { starts_at: string }[] | null }) => {
+        setTakenSlots(new Set((data ?? []).map((b: { starts_at: string }) => isoToSlot(b.starts_at))))
         setLoadingSlots(false)
       })
   }, [date])
@@ -117,7 +116,7 @@ export function BookDateTimePicker({ durationMin, onConfirm, onDateChange }: Pro
             </p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {slots.map((s, i) => {
+              {slots.map((s, idx) => {
                 const taken = takenSlots.has(s)
                 const selected = time === s
                 return (
@@ -133,7 +132,7 @@ export function BookDateTimePicker({ durationMin, onConfirm, onDateChange }: Pro
                         justifyContent: 'center',
                         gap: 12,
                         border: 'none',
-                        borderBottom: '1px solid rgba(212,175,55,0.07)',
+                        borderBottom: idx < slots.length - 1 ? '1px solid rgba(212,175,55,0.07)' : 'none',
                         background: selected ? 'rgba(212,175,55,0.1)' : 'transparent',
                         cursor: taken ? 'not-allowed' : 'pointer',
                         transition: 'background 0.15s',

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../lib/AuthContext'
@@ -24,37 +24,6 @@ const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
 const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
 const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
-function getAvailableDates(): Date[] {
-  const dates: Date[] = []
-  const d = new Date()
-  d.setHours(0,0,0,0)
-  d.setDate(d.getDate() + 1)
-  while (dates.length < 16) {
-    if (d.getDay() !== 0) dates.push(new Date(d)) // no Sundays
-    d.setDate(d.getDate() + 1)
-  }
-  return dates
-}
-
-function getTimeSlots(durationMin: number): string[] {
-  const slots: string[] = []
-  for (let total = 10 * 60; total + durationMin <= 18 * 60; total += durationMin) {
-    const h = Math.floor(total / 60)
-    const m = total % 60
-    const ampm = h >= 12 ? 'PM' : 'AM'
-    const h12 = h > 12 ? h - 12 : h === 0 ? 12 : h
-    slots.push(`${h12}:${m === 0 ? '00' : m} ${ampm}`)
-  }
-  return slots
-}
-
-function isoToSlot(iso: string): string {
-  const d = new Date(iso)
-  const h = d.getHours(), m = d.getMinutes()
-  const ampm = h >= 12 ? 'PM' : 'AM'
-  const h12 = h > 12 ? h - 12 : h === 0 ? 12 : h
-  return `${h12}:${m === 0 ? '00' : String(m).padStart(2,'0')} ${ampm}`
-}
 
 export default function Book() {
   const { user } = useAuth()
@@ -62,35 +31,13 @@ export default function Book() {
   const [service, setService]       = useState<typeof SERVICES[0] | null>(null)
   const [date, setDate]             = useState<Date | null>(null)
   const [time, setTime]             = useState<string | null>(null)
-  const [takenSlots, setTakenSlots] = useState<Set<string>>(new Set())
-  const [loadingSlots, setLoadingSlots] = useState(false)
   const [pickerDate, setPickerDate] = useState<Date | undefined>()
   const [info, setInfo]             = useState<GuestInfo>({ name: '', email: '', phone: '' })
   const [errors, setErrors]         = useState<Partial<GuestInfo>>({})
   const [submitting, setSubmitting]         = useState(false)
   const [confirmationNum, setConfirmationNum] = useState<string | null>(null)
-  const datesRef = useRef<HTMLDivElement>(null)
 
-  const dates = getAvailableDates()
-  const slots = service ? getTimeSlots(service.durationMin) : []
 
-  // Fetch booked slots whenever date changes
-  useEffect(() => {
-    if (!date) return
-    const dateStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`
-    setLoadingSlots(true)
-    supabase
-      .from('bookings')
-      .select('starts_at')
-      .eq('status', 'confirmed')
-      .gte('starts_at', `${dateStr}T00:00:00`)
-      .lte('starts_at', `${dateStr}T23:59:59`)
-      .then(({ data }) => {
-        const taken = new Set<string>((data ?? []).map(b => isoToSlot(b.starts_at)))
-        setTakenSlots(taken)
-        setLoadingSlots(false)
-      })
-  }, [date])
 
   // Pre-fill from Google account
   useEffect(() => {
@@ -108,11 +55,6 @@ export default function Book() {
     setDate(null)
     setTime(null)
     setStep('datetime')
-  }
-
-  function chooseDateTime() {
-    if (!date || !time) return
-    setStep('details')
   }
 
   function validate(): boolean {
