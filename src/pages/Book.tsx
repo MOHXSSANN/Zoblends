@@ -139,7 +139,7 @@ export default function Book() {
         {/* ── Step indicator ── */}
         {step !== 'done' && (
           <div className="book__steps">
-            {(['service','datetime','details','confirm'] as Step[]).map((s, i) => (
+            {(['service','datetime','details','confirm'] as Step[]).map((s) => (
               <div key={s} className={`book__step-dot${step === s ? ' book__step-dot--active' : ''}`} />
             ))}
           </div>
