@@ -84,11 +84,9 @@
   opacity: 1;
 }
 
-/* ── Links ────────────────────────────────────────── */
+/* ── Links — always hidden (burger used on all sizes) ─ */
 .navbar__links {
-  display: flex;
-  align-items: center;
-  gap: 36px;
+  display: none;
 }
 
 .navbar__link {
@@ -135,22 +133,7 @@
 }
 
 .navbar__cta {
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--gold);
-  text-decoration: none;
-  padding: 9px 20px;
-  border: 1px solid var(--border-gold);
-  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
-}
-
-.navbar__cta:hover {
-  background: var(--gold);
-  color: var(--black);
-  border-color: var(--gold);
+  display: none;
 }
 
 /* ── Cart icon ───────────────────────────────────── */
@@ -186,7 +169,7 @@
 
 /* ── Burger ───────────────────────────────────────── */
 .navbar__burger {
-  display: none;
+  display: flex;
   flex-direction: column;
   gap: 5px;
   padding: 6px;
@@ -570,7 +553,4 @@
 @media (max-width: 768px) {
   .navbar { padding: 16px 4px; }
   .navbar--scrolled { padding: 10px 4px; }
-  .navbar__links { display: none; }
-  .navbar__cta { display: none; }
-  .navbar__burger { display: flex; }
 }
