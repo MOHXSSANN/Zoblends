@@ -131,29 +131,42 @@
   gap: 12px;
 }
 
-.nl__social {
-  display: flex;
+/* Pill button — avatar circle + handle text */
+.nl__pill {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  text-decoration: none;
-  padding: 11px 22px;
-  border: 1px solid transparent;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
-}
-
-.nl__social--ig {
+  gap: 0;
+  border-radius: 9999px;
   background: #d4af37;
   color: #080706;
-  border-color: #d4af37;
+  text-decoration: none;
+  padding: 5px 16px 5px 5px;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 12px rgba(212,175,55,0.25);
 }
 
-.nl__social--ig:hover {
-  background: transparent;
-  color: #d4af37;
-  border-color: #d4af37;
+.nl__pill:hover {
+  background: #c9a52e;
+  box-shadow: 0 4px 20px rgba(212,175,55,0.4);
+}
+
+.nl__pill-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.18);
+  margin-right: 10px;
+  flex-shrink: 0;
+  color: #080706;
+}
+
+.nl__pill-handle {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #080706;
 }
