@@ -1,19 +1,15 @@
 .footer {
   background: #080706;
   border-top: 1px solid rgba(212,175,55,0.12);
-  padding: 56px 24px 32px;
+  padding: 48px 24px 32px;
 }
 
+/* Mobile: brand full-width, then 2+2 cols */
 .footer__top {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 40px;
-  margin-bottom: 48px;
-  text-align: center;
-}
-
-@media (min-width: 640px) {
-  .footer__top { text-align: left; }
+  grid-template-columns: 1fr 1fr;
+  gap: 32px 20px;
+  margin-bottom: 40px;
 }
 
 @media (min-width: 640px) {
@@ -23,16 +19,22 @@
   }
 }
 
-/* Brand */
+/* Brand spans full width on mobile only */
 .footer__brand {
+  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  align-items: center;
+  gap: 8px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(212,175,55,0.08);
 }
 
 @media (min-width: 640px) {
-  .footer__brand { align-items: flex-start; }
+  .footer__brand {
+    grid-column: auto;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
 }
 
 .footer__logo {
@@ -53,16 +55,11 @@
   margin: 0;
 }
 
-/* Columns */
+/* Columns — left-aligned always */
 .footer__col {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  align-items: center;
-}
-
-@media (min-width: 640px) {
-  .footer__col { align-items: flex-start; }
+  gap: 10px;
 }
 
 .footer__col-label {
@@ -72,7 +69,7 @@
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: rgba(245,244,240,0.25);
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .footer__link {
@@ -98,27 +95,16 @@
 .footer__hours-row {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
 }
 
 /* Bottom bar */
 .footer__bottom {
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 12px;
+  justify-content: space-between;
   padding-top: 24px;
   border-top: 1px solid rgba(212,175,55,0.08);
-  text-align: center;
-}
-
-@media (min-width: 640px) {
-  .footer__bottom {
-    flex-direction: row;
-    justify-content: space-between;
-    text-align: left;
-  }
 }
 
 .footer__copy {
