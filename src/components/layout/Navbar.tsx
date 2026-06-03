@@ -3,24 +3,26 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '../../lib/CartContext'
 import { useAuth } from '../../lib/AuthContext'
+import { PRODUCTS } from '../../lib/products'
 import './Navbar.css'
 
 const NAV_LINKS = [
-  { label: 'The Receipts',   href: '/gallery'  },
-  { label: 'The Barber',     href: '/about'    },
-  { label: 'Reviews',        href: '/reviews'  },
-  { label: 'Shop Products',  href: '/shop'     },
-  { label: 'Get in Touch',   href: '/contact'  },
+  { label: 'The Receipts',  href: '/gallery'  },
+  { label: 'The Barber',    href: '/about'    },
+  { label: 'Reviews',       href: '/reviews'  },
+  { label: 'Shop Products', href: '/shop'     },
+  { label: 'Get in Touch',  href: '/contact'  },
 ]
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false)
-  const [hidden, setHidden]     = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled]   = useState(false)
+  const [hidden, setHidden]       = useState(false)
+  const [menuOpen, setMenuOpen]   = useState(false)
+  const [cartOpen, setCartOpen]   = useState(false)
   const location = useLocation()
-  const { count } = useCart()
+  const { add, items, remove, total, count } = useCart()
   const { user, signInWithGoogle, signOut } = useAuth()
 
   useEffect(() => {
@@ -37,13 +39,16 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  useEffect(() => { setMenuOpen(false) }, [location])
+  useEffect(() => { setMenuOpen(false); setCartOpen(false) }, [location])
 
-  // lock body scroll when menu open
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : ''
+    document.body.style.overflow = (menuOpen || cartOpen) ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
-  }, [menuOpen])
+  }, [menuOpen, cartOpen])
+
+  function handleAdd(p: typeof PRODUCTS[0]) {
+    add({ id: p.id, name: p.name, price: p.price })
+  }
 
   return (
     <motion.header
@@ -52,28 +57,28 @@ export default function Navbar() {
       animate={{ y: hidden ? '-100%' : 0, opacity: hidden ? 0 : 1 }}
       transition={{ duration: 0.35, ease: EASE, delay: hidden ? 0 : 0.2 }}
     >
-      <Link to="/" className="navbar__logo" aria-label="Zoblends home">
-        ZoBlends
-      </Link>
+      <Link to="/" className="navbar__logo" aria-label="Zoblends home">ZoBlends</Link>
 
       <nav className="navbar__links" aria-label="Primary navigation">
         {NAV_LINKS.map((link) => (
-          <Link key={link.href} to={link.href} className="navbar__link">
-            {link.label}
-          </Link>
+          <Link key={link.href} to={link.href} className="navbar__link">{link.label}</Link>
         ))}
       </nav>
 
       <div className="navbar__actions">
         <Link to="/book" className="navbar__cta">Book Now</Link>
-        <Link to="/shop" className="navbar__cart-icon" aria-label="Cart">
+        <button
+          className="navbar__cart-icon"
+          aria-label="Open cart"
+          onClick={() => setCartOpen(true)}
+        >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
             <line x1="3" y1="6" x2="21" y2="6"/>
             <path d="M16 10a4 4 0 01-8 0"/>
           </svg>
           {count > 0 && <span className="navbar__cart-count">{count}</span>}
-        </Link>
+        </button>
         <button
           className={`navbar__burger${menuOpen ? ' navbar__burger--open' : ''}`}
           onClick={() => setMenuOpen((v) => !v)}
@@ -83,6 +88,77 @@ export default function Navbar() {
           <span /><span /><span />
         </button>
       </div>
+
+      {/* ── Cart drawer ── */}
+      <AnimatePresence>
+        {cartOpen && (
+          <>
+            <motion.div
+              className="navbar__cart-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setCartOpen(false)}
+            />
+            <motion.div
+              className="navbar__cart-drawer"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ duration: 0.35, ease: EASE }}
+            >
+              <div className="navbar__cart-header">
+                <span>Your Cart</span>
+                <button onClick={() => setCartOpen(false)}>✕</button>
+              </div>
+
+              {items.length === 0 ? (
+                <div className="navbar__cart-empty">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(245,244,240,0.2)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <path d="M16 10a4 4 0 01-8 0"/>
+                  </svg>
+                  <p className="navbar__cart-empty-title">Your cart is empty</p>
+                  <p className="navbar__cart-empty-sub">Add a product to get started</p>
+                  <div className="navbar__cart-recs">
+                    <p className="navbar__cart-recs-label">Recommended</p>
+                    {PRODUCTS.slice(0, 3).map(p => (
+                      <div key={p.id} className="navbar__cart-rec-item">
+                        <div className="navbar__cart-rec-info">
+                          <span className="navbar__cart-rec-name">{p.name}</span>
+                          <span className="navbar__cart-rec-price">{p.price}</span>
+                        </div>
+                        <button className="navbar__cart-rec-add" onClick={() => handleAdd(p)}>
+                          + Add
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="navbar__cart-items">
+                    {items.map(item => (
+                      <div key={item.id} className="navbar__cart-item">
+                        <div>
+                          <span className="navbar__cart-item-name">{item.name}</span>
+                          <span className="navbar__cart-item-meta">{item.price} × {item.qty}</span>
+                        </div>
+                        <button className="navbar__cart-remove" onClick={() => remove(item.id)}>✕</button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="navbar__cart-footer">
+                    <span className="navbar__cart-total">Total: ${total.toFixed(2)}</span>
+                    <p className="navbar__cart-note">Pay in person at your appointment.</p>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* ── Full-screen mobile menu ── */}
       <AnimatePresence>
@@ -94,7 +170,6 @@ export default function Navbar() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3, ease: EASE }}
           >
-            {/* Nav links */}
             <nav className="navbar__overlay-links">
               {NAV_LINKS.map((link, i) => (
                 <motion.div
@@ -103,9 +178,7 @@ export default function Navbar() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.05 + i * 0.06, duration: 0.35, ease: EASE }}
                 >
-                  <Link to={link.href} className="navbar__overlay-link">
-                    {link.label}
-                  </Link>
+                  <Link to={link.href} className="navbar__overlay-link">{link.label}</Link>
                 </motion.div>
               ))}
               <motion.div
@@ -117,7 +190,6 @@ export default function Navbar() {
               </motion.div>
             </nav>
 
-            {/* Bottom: account */}
             <motion.div
               className="navbar__overlay-footer"
               initial={{ opacity: 0, y: 12 }}
