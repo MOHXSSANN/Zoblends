@@ -43,8 +43,8 @@
  */
 .navbar__logo-metallic-text {
   position: relative;
-  width: 104px;
-  height: 13px;
+  width: 126px;
+  height: 16px;
   overflow: hidden;
 }
 
@@ -53,8 +53,8 @@
   top: 50% !important;
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
-  width: 107px !important;
-  height: 107px !important;
+  width: 130px !important;
+  height: 130px !important;
 }
 
 /* MetallicPaint canvas state (menu open) */
@@ -197,7 +197,7 @@
 
 .navbar__burger span {
   display: block;
-  width: 22px;
+  width: 28px;
   height: 1.5px;
   background: var(--white);
   transition: transform 0.3s var(--ease-out-expo), opacity 0.3s ease;
