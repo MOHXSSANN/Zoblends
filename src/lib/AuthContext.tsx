@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     function init() {
       window.google?.accounts.id.initialize({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID as string,
+        client_id: '61668975940-m4hvb7gdpikv700qcu4c9r5bpcr5crg4.apps.googleusercontent.com',
         callback: async ({ credential }: { credential: string }) => {
           await supabase.auth.signInWithIdToken({ provider: 'google', token: credential })
         },
