@@ -81,15 +81,6 @@ export default function Navbar() {
         transition={{ duration: 0.35, ease: EASE, delay: navHidden ? 0 : 0.2 }}
       >
         <div className="navbar__inner">
-        <Link to="/" className={`navbar__logo${menuOpen ? ' navbar__logo--open' : ''}`} aria-label="Zoblends home">
-          <div className="navbar__logo-text-wrap">
-            <span className="navbar__logo-shimmer">ZOBLENDS</span>
-          </div>
-          <div className="navbar__logo-paint-wrap">
-            <img src="/zoLogo.png" alt="Zoblends" draggable={false} />
-          </div>
-        </Link>
-
         <nav className="navbar__links" aria-label="Primary navigation">
           {NAV_LINKS.map((link) => (
             <Link key={link.href} to={link.href} className="navbar__link">{link.label}</Link>
