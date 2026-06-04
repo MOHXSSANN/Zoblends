@@ -61,24 +61,8 @@ export default function Navbar() {
   useEffect(() => { setMenuOpen(false); setCartOpen(false) }, [location])
 
   useEffect(() => {
-    const locked = menuOpen || cartOpen
-    if (locked) {
-      const scrollY = window.scrollY
-      document.body.style.position = 'fixed'
-      document.body.style.top = `-${scrollY}px`
-      document.body.style.width = '100%'
-    } else {
-      const top = document.body.style.top
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.width = ''
-      if (top) window.scrollTo(0, -parseInt(top, 10))
-    }
-    return () => {
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.width = ''
-    }
+    document.body.style.overflow = (menuOpen || cartOpen) ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
   }, [menuOpen, cartOpen])
 
   // Always show navbar when menu or cart is open
@@ -232,10 +216,10 @@ export default function Navbar() {
         {menuOpen && (
           <motion.div
             className="navbar__overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, ease: EASE }}
+            initial={{ clipPath: 'inset(0 0 100% 0)' }}
+            animate={{ clipPath: 'inset(0 0 0% 0)' }}
+            exit={{ clipPath: 'inset(0 0 100% 0)' }}
+            transition={{ duration: 0.35, ease: EASE }}
           >
             <nav className="navbar__overlay-links">
               {NAV_LINKS.map((link, i) => (
