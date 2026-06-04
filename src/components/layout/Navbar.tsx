@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '../../lib/CartContext'
 import { useAuth } from '../../lib/AuthContext'
 import { PRODUCTS } from '../../lib/products'
+import MetallicPaint from '../ui/MetallicPaint'
+import NavbarLogoText from '../ui/NavbarLogoText'
 import './Navbar.css'
 
 const NAV_LINKS = [
@@ -61,8 +63,24 @@ export default function Navbar() {
   useEffect(() => { setMenuOpen(false); setCartOpen(false) }, [location])
 
   useEffect(() => {
-    document.body.style.overflow = (menuOpen || cartOpen) ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
+    const locked = menuOpen || cartOpen
+    if (locked) {
+      const scrollY = window.scrollY
+      document.body.style.position = 'fixed'
+      document.body.style.top = `-${scrollY}px`
+      document.body.style.width = '100%'
+    } else {
+      const top = document.body.style.top
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.width = ''
+      if (top) window.scrollTo(0, -parseInt(top, 10))
+    }
+    return () => {
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.width = ''
+    }
   }, [menuOpen, cartOpen])
 
   // Always show navbar when menu or cart is open
@@ -82,13 +100,35 @@ export default function Navbar() {
       >
         <div className="navbar__inner">
         <Link to="/" className={`navbar__logo${menuOpen ? ' navbar__logo--open' : ''}`} aria-label="Zoblends home">
-          <span className="navbar__logo-wordmark">ZOBLENDS</span>
-          <img
-            src="/zoLogo.png"
-            alt="Zoblends"
-            className="navbar__logo-zb"
-            draggable={false}
-          />
+          {/* Both always mounted — CSS fades between them to avoid WebGL reinit flash */}
+          <div className="navbar__logo-text-wrap">
+            <NavbarLogoText />
+          </div>
+          <div className="navbar__logo-paint-wrap">
+            <MetallicPaint
+              imageSrc="/zoLogo.png"
+              seed={42}
+              scale={4}
+              patternSharpness={1}
+              noiseScale={0.5}
+              speed={0.3}
+              liquid={0.75}
+              mouseAnimation={false}
+              brightness={2}
+              contrast={0.5}
+              refraction={0.01}
+              blur={0.015}
+              chromaticSpread={2}
+              fresnel={1}
+              angle={0}
+              waveAmplitude={1}
+              distortion={1}
+              contour={0.2}
+              lightColor="#b1902a"
+              darkColor="#000000"
+              tintColor="#ffffff"
+            />
+          </div>
         </Link>
 
         <nav className="navbar__links" aria-label="Primary navigation">
