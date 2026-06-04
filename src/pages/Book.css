@@ -78,7 +78,7 @@
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(245,244,240,0.35);
+  color: rgba(245,244,240,0.7);
   cursor: pointer;
   padding: 0;
   margin-bottom: 28px;
@@ -123,7 +123,7 @@
   font-weight: 700;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: rgba(245,244,240,0.3);
+  color: rgba(245,244,240,0.75);
   margin-bottom: 14px;
 }
 
@@ -339,7 +339,7 @@
 .book__google-note {
   font-family: var(--font-body);
   font-size: 11px;
-  color: rgba(245,244,240,0.3);
+  color: rgba(245,244,240,0.65);
   letter-spacing: 0.06em;
   margin-bottom: 20px;
 }
@@ -443,6 +443,18 @@
   text-align: center;
   padding: 40px 0;
   gap: 12px;
+}
+
+.book__done-img-wrap {
+  margin: 0 auto 24px;
+  width: 360px;
+  filter: drop-shadow(0 8px 24px rgba(212,175,55,0.25));
+}
+
+.book__done-img {
+  width: 360px;
+  height: auto;
+  display: block;
 }
 
 .book__done-icon {

@@ -30,6 +30,7 @@
   align-items: center;
   text-decoration: none;
   flex-shrink: 0;
+  margin-left: 18px;
 }
 
 /* Text state (menu closed) */
@@ -49,6 +50,13 @@
   width: 126px;
   height: 16px;
   overflow: hidden;
+  background: transparent;
+  animation: logo-fadein 0.1s 0.4s both;
+}
+
+@keyframes logo-fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .navbar__logo-metallic-text canvas {
@@ -58,19 +66,24 @@
   transform: translate(-50%, -50%) !important;
   width: 130px !important;
   height: 130px !important;
+  background: transparent !important;
 }
 
 /* MetallicPaint canvas state (menu open) */
+.navbar__logo-text {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #d4af37;
+  text-decoration: none;
+}
+
 .navbar__logo-paint {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
   width: 54px;
   height: 54px;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  pointer-events: none;
+  flex-shrink: 0;
 }
 
 .navbar__logo-paint canvas {
@@ -79,6 +92,10 @@
 }
 
 /* Swap on menu open */
+.navbar__logo--open {
+  margin-top: 10px;
+}
+
 .navbar__logo--open .navbar__logo-text {
   opacity: 0;
 }
@@ -210,6 +227,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   flex: 1;
   gap: 0;
 }

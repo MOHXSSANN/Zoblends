@@ -181,7 +181,7 @@ export default function Book() {
         <meta name="description" content="Book your chair with Zoblends." />
       </Helmet>
 
-      <div className="book__hero">
+      {step !== 'done' && step !== 'waitlist-done' && <div className="book__hero">
         <video
           className="book__hero-video"
           src="/ZobOOKING.mp4"
@@ -201,7 +201,7 @@ export default function Book() {
           <h1 className="page__title">Secure a Spot</h1>
           <p className="page__sub">Pick your service. Lock it in.</p>
         </motion.div>
-      </div>
+      </div>}
 
       <div className="page page--no-header">
 
@@ -461,7 +461,13 @@ export default function Book() {
               transition={{ duration: 0.5, ease: EASE }}
               className="book__done"
             >
-              <div className="book__done-icon">✦</div>
+              <motion.div
+                className="book__done-img-wrap"
+                animate={{ y: [0, -9, 0] }}
+                transition={{ duration: 3, ease: 'easeInOut', repeat: Infinity, repeatType: 'loop' }}
+              >
+                <img src="/Clipperconfirm.png" alt="Booking confirmed" className="book__done-img" />
+              </motion.div>
               <h2 className="book__done-title">You're booked.</h2>
               {confirmationNum && (
                 <div className="book__done-conf">
