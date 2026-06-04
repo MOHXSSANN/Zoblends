@@ -41,6 +41,9 @@ export default function BeforeAfter({ before, after, label }: Props) {
       onMouseMove={(e) => { if (dragging.current) move(e.clientX) }}
       onMouseUp={() => { dragging.current = false }}
       onMouseLeave={() => { dragging.current = false }}
+      onTouchStart={(e) => { dragging.current = true; lastClientX.current = e.touches[0].clientX }}
+      onTouchMove={(e) => { if (dragging.current) { e.preventDefault(); move(e.touches[0].clientX) } }}
+      onTouchEnd={() => { dragging.current = false }}
     >
       <img className="ba__img--after" src={after} alt="After" draggable={false} />
 
@@ -57,8 +60,8 @@ export default function BeforeAfter({ before, after, label }: Props) {
           '--scissors-scale': Math.max(0.35, pos / 50),
         } as React.CSSProperties}
         onMouseDown={(e) => { e.preventDefault(); dragging.current = true; lastClientX.current = e.clientX }}
-        onTouchStart={(e) => { e.preventDefault(); lastClientX.current = e.touches[0].clientX }}
-        onTouchMove={(e) => { e.preventDefault(); move(e.touches[0].clientX) }}
+        onTouchStart={(e) => { dragging.current = true; lastClientX.current = e.touches[0].clientX }}
+        onTouchMove={(e) => { if (dragging.current) { e.preventDefault(); move(e.touches[0].clientX) } }}
       >
         <img
           className="ba__scissors-img"
