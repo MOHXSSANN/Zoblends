@@ -50,8 +50,10 @@ function StatDisplay({ slide, active }: { slide: typeof SLIDES[0]; active: boole
 
 export default function ShopScroll() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const stickyRef    = useRef<HTMLDivElement>(null)
   const [current, setCurrent] = useState(0)
   const touchStartX = useRef(0)
+  const touchStartY = useRef(0)
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
 
   const { scrollYProgress } = useScroll({
@@ -60,24 +62,45 @@ export default function ShopScroll() {
   })
 
   useMotionValueEvent(scrollYProgress, 'change', (v) => {
-    if (isMobile) return // swipe handles nav on mobile
+    if (isMobile) return
     const idx = Math.min(Math.floor(v * TOTAL), TOTAL - 1)
     setCurrent(idx)
   })
 
-  function handleTouchStart(e: React.TouchEvent) {
-    touchStartX.current = e.touches[0].clientX
-  }
-  function handleTouchEnd(e: React.TouchEvent) {
-    const delta = touchStartX.current - e.changedTouches[0].clientX
-    if (Math.abs(delta) < 40) return // not a real swipe
-    if (delta > 0) setCurrent(c => Math.min(c + 1, TOTAL - 1)) // swipe left → next
-    else           setCurrent(c => Math.max(c - 1, 0))          // swipe right → prev
-  }
+  // Non-passive touch handlers so we can preventDefault on horizontal swipes
+  useEffect(() => {
+    const el = stickyRef.current
+    if (!el) return
+
+    const onStart = (e: TouchEvent) => {
+      touchStartX.current = e.touches[0].clientX
+      touchStartY.current = e.touches[0].clientY
+    }
+    const onMove = (e: TouchEvent) => {
+      const dx = Math.abs(e.touches[0].clientX - touchStartX.current)
+      const dy = Math.abs(e.touches[0].clientY - touchStartY.current)
+      if (dx > dy && dx > 8) e.preventDefault() // horizontal — block page scroll
+    }
+    const onEnd = (e: TouchEvent) => {
+      const delta = touchStartX.current - e.changedTouches[0].clientX
+      if (Math.abs(delta) < 40) return
+      if (delta > 0) setCurrent(c => Math.min(c + 1, TOTAL - 1))
+      else           setCurrent(c => Math.max(c - 1, 0))
+    }
+
+    el.addEventListener('touchstart', onStart, { passive: true })
+    el.addEventListener('touchmove',  onMove,  { passive: false })
+    el.addEventListener('touchend',   onEnd,   { passive: true })
+    return () => {
+      el.removeEventListener('touchstart', onStart)
+      el.removeEventListener('touchmove',  onMove)
+      el.removeEventListener('touchend',   onEnd)
+    }
+  }, [])
 
   return (
     <div className="shop-scroll" ref={containerRef}>
-      <div className="shop-scroll__sticky" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+      <div className="shop-scroll__sticky" ref={stickyRef}>
 
         {/* Images */}
         <div className="shop-scroll__images">
