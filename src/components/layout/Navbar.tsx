@@ -63,24 +63,8 @@ export default function Navbar() {
   useEffect(() => { setMenuOpen(false); setCartOpen(false) }, [location])
 
   useEffect(() => {
-    const locked = menuOpen || cartOpen
-    if (locked) {
-      const scrollY = window.scrollY
-      document.body.style.position = 'fixed'
-      document.body.style.top = `-${scrollY}px`
-      document.body.style.width = '100%'
-    } else {
-      const top = document.body.style.top
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.width = ''
-      if (top) window.scrollTo(0, -parseInt(top, 10))
-    }
-    return () => {
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.width = ''
-    }
+    document.body.style.overflow = (menuOpen || cartOpen) ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
   }, [menuOpen, cartOpen])
 
   // Always show navbar when menu or cart is open

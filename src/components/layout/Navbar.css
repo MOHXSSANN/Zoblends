@@ -105,6 +105,7 @@
   width: 126px;
   height: 16px;
   overflow: hidden;
+  clip-path: inset(0);
   background: transparent;
   animation: logo-fadein 0.1s 0.4s both;
 }
