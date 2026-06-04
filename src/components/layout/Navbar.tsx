@@ -205,6 +205,9 @@ export default function Navbar() {
       {/* ── Full-screen menu — pure CSS transitions, no JS animation overhead ── */}
       <div className={`navbar__overlay${menuOpen ? ' navbar__overlay--open' : ''}`} aria-hidden={!menuOpen}>
         <nav className="navbar__overlay-links">
+          {location.pathname !== '/' && (
+            <Link to="/" className="navbar__overlay-link">Home</Link>
+          )}
           {NAV_LINKS.map((link) => (
             <Link key={link.href} to={link.href} className="navbar__overlay-link">{link.label}</Link>
           ))}
