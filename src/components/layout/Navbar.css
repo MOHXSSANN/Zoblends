@@ -38,25 +38,63 @@
 }
 
 /* ── Logo ─────────────────────────────────────────── */
+/* Logo container — fixed size so layout never shifts during crossfade */
 .navbar__logo {
   position: relative;
   display: flex;
   align-items: center;
   text-decoration: none;
   flex-shrink: 0;
+  width: 126px;
+  height: 54px;
 }
 
-/* Text state (menu closed) */
-.navbar__logo-text {
+/* Text wrap — visible when menu closed */
+.navbar__logo-text-wrap {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
   opacity: 1;
   transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+/* ZB metallic wrap — hidden when menu closed, revealed on open */
+.navbar__logo-paint-wrap {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 54px;
+  height: 54px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.navbar__logo-paint-wrap canvas {
+  width: 54px !important;
+  height: 54px !important;
+}
+
+/* On menu open: crossfade */
+.navbar__logo--open {
+  margin-top: 10px;
+}
+
+.navbar__logo--open .navbar__logo-text-wrap {
+  opacity: 0;
+}
+
+.navbar__logo--open .navbar__logo-paint-wrap {
+  opacity: 1;
 }
 
 /*
- * MetallicPaint always renders an 800×800 square canvas.
- * The text sits in the vertical center of the square source image.
- * We window in on the text band using overflow:hidden + a larger canvas.
- * Canvas at 320×320 → text band ≈ 40px tall (320 × 80/640).
+ * MetallicPaint ZOBLENDS text canvas windowing.
+ * Canvas is 800×800; text occupies vertical center band (~80px of 640).
+ * We clip to the text band with overflow:hidden.
  */
 .navbar__logo-metallic-text {
   position: relative;
@@ -80,48 +118,6 @@
   width: 130px !important;
   height: 130px !important;
   background: transparent !important;
-}
-
-/* MetallicPaint canvas state (menu open) */
-.navbar__logo-text {
-  font-family: 'Cinzel', serif;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #d4af37;
-  text-decoration: none;
-}
-
-.navbar__logo-paint {
-  width: 54px;
-  height: 54px;
-  flex-shrink: 0;
-}
-
-.navbar__logo-paint canvas {
-  width: 54px !important;
-  height: 54px !important;
-}
-
-.navbar__logo-img {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-
-/* Swap on menu open */
-.navbar__logo--open {
-  margin-top: 10px;
-}
-
-.navbar__logo--open .navbar__logo-text {
-  opacity: 0;
-}
-
-.navbar__logo--open .navbar__logo-paint {
-  opacity: 1;
 }
 
 /* ── Links — always hidden (burger used on all sizes) ─ */
