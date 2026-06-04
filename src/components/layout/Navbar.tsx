@@ -5,7 +5,6 @@ import { useCart } from '../../lib/CartContext'
 import { useAuth } from '../../lib/AuthContext'
 import { PRODUCTS } from '../../lib/products'
 import MetallicPaint from '../ui/MetallicPaint'
-import NavbarLogoText from '../ui/NavbarLogoText'
 import './Navbar.css'
 
 const NAV_LINKS = [
@@ -101,9 +100,8 @@ export default function Navbar() {
       >
         <div className="navbar__inner">
         <Link to="/" className={`navbar__logo${menuOpen ? ' navbar__logo--open' : ''}`} aria-label="Zoblends home">
-          {/* Both always mounted — CSS fades between them to avoid WebGL reinit flash */}
           <div className="navbar__logo-text-wrap">
-            <NavbarLogoText />
+            <span className="navbar__logo-shimmer">ZOBLENDS</span>
           </div>
           <div className="navbar__logo-paint-wrap">
             {zbMounted && (

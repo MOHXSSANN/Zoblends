@@ -91,33 +91,37 @@
   opacity: 1;
 }
 
-/*
- * MetallicPaint ZOBLENDS text canvas windowing.
- * Canvas is 800×800; text occupies vertical center band (~80px of 640).
- * We clip to the text band with overflow:hidden.
- */
-.navbar__logo-metallic-text {
-  position: relative;
-  width: 126px;
-  height: 16px;
-  overflow: hidden;
-  background: transparent;
-  animation: logo-fadein 0.1s 0.4s both;
+/* CSS metallic shimmer — composited by browser, zero WebGL overhead */
+.navbar__logo-shimmer {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: linear-gradient(
+    105deg,
+    #6b4e12 0%,
+    #b1902a 18%,
+    #d4af37 30%,
+    #f0d060 42%,
+    #ffffff 50%,
+    #f0d060 58%,
+    #d4af37 70%,
+    #b1902a 82%,
+    #6b4e12 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: logo-shimmer 4s ease-in-out infinite;
 }
 
-@keyframes logo-fadein {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-.navbar__logo-metallic-text canvas {
-  position: absolute !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  width: 130px !important;
-  height: 130px !important;
-  background: transparent !important;
+@keyframes logo-shimmer {
+  0%   { background-position: 150% 0; }
+  50%  { background-position: -50% 0; }
+  100% { background-position: 150% 0; }
 }
 
 /* ── Links — always hidden (burger used on all sizes) ─ */
