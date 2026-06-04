@@ -10,6 +10,18 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: #0a0908;
+}
+
+@media (max-width: 768px) {
+  .shop-scroll {
+    height: auto;
+  }
+  .shop-scroll__sticky {
+    position: relative;
+    top: 0;
+    height: 100dvh;
+  }
 }
 
 /* ── Image area ── */
@@ -138,6 +150,20 @@
 .shop-scroll__dot--active {
   background: var(--gold);
   transform: scale(1.4);
+}
+
+.shop-scroll__swipe-hint {
+  display: none;
+  font-family: var(--font-body);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.5);
+}
+
+@media (max-width: 768px) {
+  .shop-scroll__swipe-hint { display: block; }
+  .shop-scroll__arrow { display: none; } /* scroll arrow irrelevant on mobile */
 }
 
 /* ── Scroll arrow ── */

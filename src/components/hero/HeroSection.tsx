@@ -74,7 +74,7 @@ export default function HeroSection() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9, duration: 0.7, ease: EASE }}
       >
-        <Link to="/book" className="hero-section__cta heartbeateffect">Book Now</Link>
+        <Link to="/book" className="hero-section__cta">Book Now</Link>
       </motion.div>
 
     </section>

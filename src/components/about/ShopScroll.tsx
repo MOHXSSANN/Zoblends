@@ -106,7 +106,7 @@ export default function ShopScroll() {
             </motion.div>
           </AnimatePresence>
 
-          {/* Dots + arrow */}
+          {/* Dots + swipe hint + arrow */}
           <div className="shop-scroll__bottom">
             <div className="shop-scroll__dots">
               {SLIDES.map((_, i) => (
@@ -116,6 +116,7 @@ export default function ShopScroll() {
                 />
               ))}
             </div>
+            <span className="shop-scroll__swipe-hint">← swipe →</span>
             <div className="shop-scroll__arrow">
               <svg viewBox="0 0 24 24">
                 <polyline points="6 9 12 15 18 9" />
