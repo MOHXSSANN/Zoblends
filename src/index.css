@@ -1,2 +1,13 @@
 @import "tailwindcss";
 @import './styles/global.css';
+
+@keyframes heartbeat {
+  0%   { box-shadow: 0 0 0 0 var(--heartbeat-color, #d4af37); transform: scale(1); }
+  50%  { box-shadow: 0 0 0 8px transparent; transform: scale(1.03); }
+  100% { box-shadow: 0 0 0 0 transparent; transform: scale(1); }
+}
+
+.heartbeateffect {
+  --heartbeat-color: #d4af37;
+  animation: heartbeat 3s ease-in-out infinite;
+}
