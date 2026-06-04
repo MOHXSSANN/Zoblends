@@ -19,13 +19,32 @@ const NAV_LINKS = [
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
 export default function Navbar() {
-  const [scrolled, setScrolled]   = useState(false)
-  const [hidden, setHidden]       = useState(false)
-  const [menuOpen, setMenuOpen]   = useState(false)
-  const [cartOpen, setCartOpen]   = useState(false)
+  const [scrolled, setScrolled]         = useState(false)
+  const [hidden, setHidden]             = useState(false)
+  const [menuOpen, setMenuOpen]         = useState(false)
+  const [cartOpen, setCartOpen]         = useState(false)
+  const [checkingOut, setCheckingOut]   = useState(false)
   const location = useLocation()
   const { add, items, remove, total, count } = useCart()
   const { user, signInWithGoogle, signOut } = useAuth()
+
+  async function handleCheckout() {
+    if (!items.length || checkingOut) return
+    setCheckingOut(true)
+    try {
+      const res = await fetch('/api/create-shop-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items, customerEmail: user?.email }),
+      })
+      const { url } = await res.json()
+      if (url) window.location.href = url
+    } catch {
+      alert('Checkout failed. Please try again.')
+    } finally {
+      setCheckingOut(false)
+    }
+  }
 
   useEffect(() => {
     let lastY = window.scrollY
@@ -63,6 +82,7 @@ export default function Navbar() {
         animate={{ y: navHidden ? '-100%' : 0, opacity: navHidden ? 0 : 1 }}
         transition={{ duration: 0.35, ease: EASE, delay: navHidden ? 0 : 0.2 }}
       >
+        <div className="navbar__inner">
         <Link to="/" className="navbar__logo" aria-label="Zoblends home">
           {menuOpen ? (
             <motion.div
@@ -107,7 +127,7 @@ export default function Navbar() {
         </nav>
 
         <div className="navbar__actions">
-          <Link to="/book" className="navbar__cta">Book Now</Link>
+          <Link to="/book" className="navbar__cta heartbeateffect">Book Now</Link>
           <button
             className="navbar__cart-icon"
             aria-label="Open cart"
@@ -128,6 +148,7 @@ export default function Navbar() {
           >
             <span /><span /><span />
           </button>
+        </div>
         </div>
       </motion.header>
 
@@ -192,8 +213,26 @@ export default function Navbar() {
                     ))}
                   </div>
                   <div className="navbar__cart-footer">
-                    <span className="navbar__cart-total">Total: ${total.toFixed(2)}</span>
-                    <p className="navbar__cart-note">Pay in person at your appointment.</p>
+                    <div className="navbar__cart-total-row">
+                      <span className="navbar__cart-total-label">Total</span>
+                      <span className="navbar__cart-total">${total.toFixed(2)} CAD</span>
+                    </div>
+                    <button
+                      className="navbar__checkout-btn"
+                      onClick={handleCheckout}
+                      disabled={checkingOut}
+                    >
+                      {checkingOut ? (
+                        <span className="navbar__checkout-btn-inner">
+                          <span className="navbar__checkout-spinner" />
+                          Redirecting…
+                        </span>
+                      ) : (
+                        <span className="navbar__checkout-btn-inner" style={{ padding: '16px 20px' }}>
+                          PLACE ORDER →
+                        </span>
+                      )}
+                    </button>
                   </div>
                 </>
               )}
@@ -228,7 +267,7 @@ export default function Navbar() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.05 + NAV_LINKS.length * 0.06, duration: 0.35, ease: EASE }}
               >
-                <Link to="/book" className="navbar__overlay-cta">Book Now</Link>
+                <Link to="/book" className="navbar__overlay-cta heartbeateffect">Book Now</Link>
               </motion.div>
             </nav>
 

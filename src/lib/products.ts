@@ -1,8 +1,8 @@
 export const PRODUCTS = [
-  { id: 'p1', name: 'Gold Hold Pomade',  price: '$22', desc: 'Medium hold, high shine. All day control.',        image: '' },
-  { id: 'p2', name: 'Matte Clay',         price: '$20', desc: 'Strong hold, natural finish. No residue.',         image: '' },
-  { id: 'p3', name: 'Beard Oil',          price: '$18', desc: 'Lightweight blend. Conditions and softens.',       image: '' },
-  { id: 'p4', name: 'Edge Control',       price: '$16', desc: 'Crisp lines that last. No flaking.',               image: '' },
-  { id: 'p5', name: 'Pre-Shave Scrub',    price: '$19', desc: 'Exfoliating prep scrub for a clean shave.',       image: '' },
-  { id: 'p6', name: 'Aftershave Balm',    price: '$21', desc: 'Soothes and hydrates. No sting.',                  image: '' },
+  { id: 'p1', name: 'L3VEL3 Cream Gel',       price: '$22', desc: 'Medium hold, flake-free. Infused with Vitamin B5 for all-day control.',        image: '/L3G3L.png' },
+  { id: 'p2', name: 'Aftershave Cologne',      price: '$28', desc: 'Refreshing and revitalizing. Moisturizing formula for all skin types. Royale.',  image: '/13.png'    },
+  { id: 'p3', name: 'Straight Razor',          price: '$35', desc: 'Professional-grade straight razor. Clean cuts, smooth finish.',                  image: '/14.png'    },
+  { id: 'p4', name: 'Beard Oil',               price: '$24', desc: 'Argan oil infused. Strengthens, softens and stops frizziness.',                  image: '/15.png'    },
+  { id: 'p5', name: 'Nitrile Gloves',           price: '$16', desc: 'L3VEL3 Reddish nitrile gloves. Available in S/M/L/XL. 100 per box.',            image: '/16.png'    },
+  { id: 'p6', name: 'Texturizing Salt Spray',  price: '$24', desc: 'Volumize and define. Natural look with light hold. Sea salt infused.',            image: '/17.png'    },
 ]

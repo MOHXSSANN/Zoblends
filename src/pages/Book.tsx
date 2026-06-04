@@ -480,6 +480,12 @@ export default function Book() {
                 A confirmation will be sent to {info.email}.
               </p>
               <p className="book__done-note">Payment due in person. See you there.</p>
+              <p className="book__done-address">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6, verticalAlign: 'middle' }}>
+                  <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+                </svg>
+                340 Claridge Dr, Nepean, ON K2J 5C2
+              </p>
               <button className="book__next-btn" style={{ marginTop: 32 }} onClick={reset}>
                 Book Another
               </button>

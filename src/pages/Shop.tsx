@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
 import { useCart } from '../lib/CartContext'
 import { PRODUCTS } from '../lib/products'
+import ShelfDisplay from '../components/ui/ShelfDisplay'
 import './Page.css'
 import './Shop.css'
 
@@ -37,34 +38,11 @@ export default function Shop() {
           <p className="page__sub">Stay fresh between cuts.</p>
         </motion.div>
 
-        <div className="shop__grid">
-          {PRODUCTS.map((p, i) => (
-            <motion.div
-              key={p.id}
-              className="shop__card"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.07, duration: 0.5, ease: EASE }}
-            >
-              <div className="shop__card-img">
-                {p.image ? <img src={p.image} alt={p.name} /> : <span className="shop__card-placeholder">ZB</span>}
-              </div>
-              <div className="shop__card-info">
-                <span className="shop__card-name">{p.name}</span>
-                <span className="shop__card-desc">{p.desc}</span>
-                <div className="shop__card-bottom">
-                  <span className="shop__card-price">{p.price}</span>
-                  <button
-                    className={`shop__add-btn${added === p.id ? ' shop__add-btn--added' : ''}`}
-                    onClick={() => handleAdd(p)}
-                  >
-                    {added === p.id ? 'Added' : '+ Add'}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        <ShelfDisplay
+          products={PRODUCTS}
+          onAdd={handleAdd}
+          added={added}
+        />
       </div>
     </>
   )

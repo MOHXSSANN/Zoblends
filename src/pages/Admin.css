@@ -90,6 +90,39 @@
   border-radius: 20px;
 }
 
+/* Search */
+.admin__search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #0f0e0c;
+  border: 1px solid rgba(212,175,55,0.15);
+  padding: 11px 14px;
+  margin-bottom: 8px;
+  color: rgba(245,244,240,0.3);
+}
+.admin__search:focus-within { border-color: rgba(212,175,55,0.4); }
+.admin__search-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: #f5f4f0;
+  letter-spacing: 0.04em;
+}
+.admin__search-input::placeholder { color: rgba(245,244,240,0.25); }
+.admin__search-clear {
+  background: none;
+  border: none;
+  color: rgba(245,244,240,0.3);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+}
+.admin__search-clear:hover { color: rgba(245,244,240,0.7); }
+
 /* List */
 .admin__list { display: flex; flex-direction: column; }
 .admin__empty, .admin__loading {
@@ -118,9 +151,29 @@
   transition: background 0.15s;
 }
 .admin__row:hover { background: rgba(212,175,55,0.03); }
-.admin__row--dim { opacity: 0.4; }
+.admin__row--dim { opacity: 1; }
 .admin__row--waitlist { cursor: default; }
 .admin__row--waitlist:hover { background: none; }
+
+.admin__waitlist-badge {
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 2px;
+}
+.admin__waitlist-badge--waiting {
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: #d4af37;
+}
+.admin__waitlist-badge--cancelled {
+  background: rgba(224, 85, 85, 0.12);
+  border: 1px solid rgba(224, 85, 85, 0.35);
+  color: #e05555;
+}
 
 .admin__row-main { display: flex; flex-direction: column; gap: 4px; }
 .admin__row-name {
@@ -156,10 +209,11 @@
   text-transform: uppercase;
 }
 .admin__row-conf {
-  font-family: var(--font-body);
-  font-size: 10px;
-  color: rgba(245,244,240,0.2);
-  letter-spacing: 0.08em;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(245,244,240,0.55);
+  letter-spacing: 0.12em;
 }
 .admin__row-action {
   background: none;
