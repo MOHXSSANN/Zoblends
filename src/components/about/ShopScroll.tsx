@@ -51,6 +51,8 @@ function StatDisplay({ slide, active }: { slide: typeof SLIDES[0]; active: boole
 export default function ShopScroll() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [current, setCurrent] = useState(0)
+  const touchStartX = useRef(0)
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -58,13 +60,24 @@ export default function ShopScroll() {
   })
 
   useMotionValueEvent(scrollYProgress, 'change', (v) => {
+    if (isMobile) return // swipe handles nav on mobile
     const idx = Math.min(Math.floor(v * TOTAL), TOTAL - 1)
     setCurrent(idx)
   })
 
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX
+  }
+  function handleTouchEnd(e: React.TouchEvent) {
+    const delta = touchStartX.current - e.changedTouches[0].clientX
+    if (Math.abs(delta) < 40) return // not a real swipe
+    if (delta > 0) setCurrent(c => Math.min(c + 1, TOTAL - 1)) // swipe left → next
+    else           setCurrent(c => Math.max(c - 1, 0))          // swipe right → prev
+  }
+
   return (
     <div className="shop-scroll" ref={containerRef}>
-      <div className="shop-scroll__sticky">
+      <div className="shop-scroll__sticky" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
 
         {/* Images */}
         <div className="shop-scroll__images">

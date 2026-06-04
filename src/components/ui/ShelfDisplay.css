@@ -42,12 +42,10 @@
 .shelf-list {
   display: flex;
   flex-direction: column;
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  overflow-x: hidden;
-  /* mobile scroll performance */
-  -webkit-overflow-scrolling: touch;
-  will-change: scroll-position;
+  width: calc(100% + 48px);
+  margin-left: -24px;
+  overflow-x: clip; /* clip not hidden — doesn't create scroll context on iOS */
+  touch-action: pan-y;
 }
 
 .shelf-empty {

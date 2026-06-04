@@ -74,15 +74,7 @@ export default function HeroSection() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9, duration: 0.7, ease: EASE }}
       >
-        <Link to="/book" className="hero-section__cta">Book Now</Link>
-        <a
-          href="https://instagram.com/zo_blendz_"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hero-section__instagram"
-        >
-          ✦ Instagram
-        </a>
+        <Link to="/book" className="hero-section__cta heartbeateffect">Book Now</Link>
       </motion.div>
 
     </section>

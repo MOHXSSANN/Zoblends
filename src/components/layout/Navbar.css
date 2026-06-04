@@ -104,6 +104,13 @@
   height: 54px !important;
 }
 
+.navbar__logo-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 /* Swap on menu open */
 .navbar__logo--open {
   margin-top: 10px;

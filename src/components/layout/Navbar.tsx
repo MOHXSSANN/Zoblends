@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '../../lib/CartContext'
 import { useAuth } from '../../lib/AuthContext'
 import { PRODUCTS } from '../../lib/products'
-import MetallicPaint from '../ui/MetallicPaint'
 import NavbarLogoText from '../ui/NavbarLogoText'
 import './Navbar.css'
 
@@ -85,36 +84,15 @@ export default function Navbar() {
         <div className="navbar__inner">
         <Link to="/" className="navbar__logo" aria-label="Zoblends home">
           {menuOpen ? (
-            <motion.div
-              className="navbar__logo-paint"
+            <motion.img
+              src="/zoLogo.png"
+              alt="Zoblends"
+              className="navbar__logo-img"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.25, duration: 0.3 }}
-            >
-              <MetallicPaint
-                imageSrc="/zoLogo.png"
-                seed={42}
-                scale={4}
-                patternSharpness={1}
-                noiseScale={0.5}
-                speed={0.3}
-                liquid={0.75}
-                mouseAnimation={false}
-                brightness={2}
-                contrast={0.5}
-                refraction={0.01}
-                blur={0.015}
-                chromaticSpread={2}
-                fresnel={1}
-                angle={0}
-                waveAmplitude={1}
-                distortion={1}
-                contour={0.2}
-                lightColor="#b1902a"
-                darkColor="#000000"
-                tintColor="#ffffff"
-              />
-            </motion.div>
+              transition={{ duration: 0.2 }}
+              draggable={false}
+            />
           ) : (
             <NavbarLogoText />
           )}
