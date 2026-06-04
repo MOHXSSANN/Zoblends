@@ -362,7 +362,7 @@
   border: 1px solid rgba(212,175,55,0.15);
   padding: 14px 16px;
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: 16px;
   color: var(--white);
   outline: none;
   transition: border-color 0.2s;
