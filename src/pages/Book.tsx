@@ -36,6 +36,7 @@ export default function Book() {
   const [errors, setErrors]         = useState<Partial<GuestInfo>>({})
   const [submitting, setSubmitting]         = useState(false)
   const [confirmationNum, setConfirmationNum] = useState<string | null>(null)
+  const [submitError, setSubmitError]       = useState<string | null>(null)
 
 
 
@@ -81,6 +82,7 @@ export default function Book() {
   async function handleSubmit() {
     if (!service || !date || !time) return
     setSubmitting(true)
+    setSubmitError(null)
 
     const [timePart, period] = time.split(' ')
     const [h, m] = timePart.split(':').map(Number)
@@ -105,6 +107,12 @@ export default function Book() {
       status: 'confirmed',
       confirmation_number: confNum,
     })
+
+    if (error) {
+      setSubmitError('Something went wrong. Please try again.')
+      setSubmitting(false)
+      return
+    }
 
     if (!error) {
       // Send confirmation email to client
@@ -368,6 +376,7 @@ export default function Book() {
                 <p className="book__summary-note">Payment due in person at the appointment.</p>
               </div>
 
+              {submitError && <p className="book__submit-error">{submitError}</p>}
               <button className="book__next-btn book__confirm-btn" onClick={handleSubmit} disabled={submitting}>
                 {submitting ? 'Confirming…' : 'Confirm Booking'}
               </button>
