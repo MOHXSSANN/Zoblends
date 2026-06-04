@@ -122,7 +122,7 @@ interface MetallicPaintProps {
   angle?: number; fresnel?: number; lightColor?: string; darkColor?: string;
   patternSharpness?: number; waveAmplitude?: number; noiseScale?: number;
   chromaticSpread?: number; mouseAnimation?: boolean; distortion?: number;
-  contour?: number; tintColor?: string;
+  contour?: number; tintColor?: string; maxSize?: number;
 }
 
 export default function MetallicPaint({
@@ -130,7 +130,7 @@ export default function MetallicPaint({
   liquid=0.75, speed=0.3, brightness=2, contrast=0.5, angle=0, fresnel=1,
   lightColor='#ffffff', darkColor='#000000', patternSharpness=1,
   waveAmplitude=1, noiseScale=0.5, chromaticSpread=2, mouseAnimation=false,
-  distortion=1, contour=0.2, tintColor='#ffffff'
+  distortion=1, contour=0.2, tintColor='#ffffff', maxSize=800
 }: MetallicPaintProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGL2RenderingContext | null>(null);
@@ -198,7 +198,7 @@ export default function MetallicPaint({
   useEffect(() => {
     if (!initGL()) return;
     const canvas = canvasRef.current!; const gl = glRef.current!;
-    const side = 800 * devicePixelRatio;
+    const side = Math.min(maxSize, 800) * devicePixelRatio;
     canvas.width = side; canvas.height = side;
     gl.viewport(0, 0, side, side);
     setReady(true);

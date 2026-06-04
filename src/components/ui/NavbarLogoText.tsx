@@ -59,6 +59,7 @@ export default function NavbarLogoText() {
               lightColor="#b1902a"
               darkColor="#000000"
               tintColor="#ffffff"
+              maxSize={200}
             />
           </motion.div>
         ) : (

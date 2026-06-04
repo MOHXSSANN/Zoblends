@@ -184,7 +184,7 @@ export default function Book() {
       {step !== 'done' && step !== 'waitlist-done' && <div className="book__hero">
         <video
           className="book__hero-video"
-          src="/ZobOOKING.mp4"
+          src="/ZobOOKING_compressed.mp4"
           autoPlay
           loop
           muted
