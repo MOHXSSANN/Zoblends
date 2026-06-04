@@ -38,91 +38,57 @@
 }
 
 /* ── Logo ─────────────────────────────────────────── */
-/* Logo container — fixed size so layout never shifts during crossfade */
 .navbar__logo {
   position: relative;
   display: flex;
   align-items: center;
   text-decoration: none;
   flex-shrink: 0;
-  width: 126px;
   height: 54px;
 }
 
-/* Text wrap — visible when menu closed */
-.navbar__logo-text-wrap {
+/* ZOBLENDS wordmark — visible when menu closed */
+.navbar__logo-wordmark {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #8a6914 0%, #d4af37 35%, #f5e27a 55%, #d4af37 70%, #8a6914 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 1;
+  transition: opacity 0.25s ease;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ZB logo image — hidden when menu closed, shown on open */
+.navbar__logo-zb {
   position: absolute;
   top: 50%;
   left: 0;
   transform: translateY(-50%);
-  opacity: 1;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  opacity: 0;
   transition: opacity 0.25s ease;
   pointer-events: none;
 }
 
-/* ZB metallic wrap — physically off-screen when menu closed.
-   iOS Safari WebGL ignores CSS opacity on canvases, so translate off-screen
-   instead. Transition delays the move until after the fade completes. */
-.navbar__logo-paint-wrap {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translate(-9999px, -50%);
-  width: 54px;
-  height: 54px;
-  opacity: 0;
-  transition: opacity 0.25s ease, transform 0s 0.25s;
-  pointer-events: none;
-}
-
-.navbar__logo-paint-wrap canvas {
-  width: 54px !important;
-  height: 54px !important;
-}
-
-/* On menu open: snap into position first, then fade in */
+/* Menu open: swap wordmark → ZB image */
 .navbar__logo--open {
   margin-top: 10px;
 }
 
-.navbar__logo--open .navbar__logo-text-wrap {
+.navbar__logo--open .navbar__logo-wordmark {
   opacity: 0;
 }
 
-.navbar__logo--open .navbar__logo-paint-wrap {
-  transform: translateY(-50%);
+.navbar__logo--open .navbar__logo-zb {
   opacity: 1;
-  transition: opacity 0.25s ease, transform 0s;
-}
-
-/*
- * MetallicPaint ZOBLENDS text canvas windowing.
- * Canvas is 800×800; text occupies vertical center band (~80px of 640).
- * We clip to the text band with overflow:hidden.
- */
-.navbar__logo-metallic-text {
-  position: relative;
-  width: 126px;
-  height: 16px;
-  overflow: hidden;
-  clip-path: inset(0);
-  background: transparent;
-  animation: logo-fadein 0.1s 0.4s both;
-}
-
-@keyframes logo-fadein {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-.navbar__logo-metallic-text canvas {
-  position: absolute !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  width: 130px !important;
-  height: 130px !important;
-  background: transparent !important;
 }
 
 /* ── Links — always hidden (burger used on all sizes) ─ */
