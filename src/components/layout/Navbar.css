@@ -60,16 +60,18 @@
   pointer-events: none;
 }
 
-/* ZB metallic wrap — hidden when menu closed, revealed on open */
+/* ZB metallic wrap — physically off-screen when menu closed.
+   iOS Safari WebGL ignores CSS opacity on canvases, so translate off-screen
+   instead. Transition delays the move until after the fade completes. */
 .navbar__logo-paint-wrap {
   position: absolute;
   top: 50%;
   left: 0;
-  transform: translateY(-50%);
+  transform: translate(-9999px, -50%);
   width: 54px;
   height: 54px;
   opacity: 0;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.25s ease, transform 0s 0.25s;
   pointer-events: none;
 }
 
@@ -78,7 +80,7 @@
   height: 54px !important;
 }
 
-/* On menu open: crossfade */
+/* On menu open: snap into position first, then fade in */
 .navbar__logo--open {
   margin-top: 10px;
 }
@@ -88,7 +90,9 @@
 }
 
 .navbar__logo--open .navbar__logo-paint-wrap {
+  transform: translateY(-50%);
   opacity: 1;
+  transition: opacity 0.25s ease, transform 0s;
 }
 
 /*
