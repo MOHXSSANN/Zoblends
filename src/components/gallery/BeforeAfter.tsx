@@ -10,11 +10,10 @@ interface Props {
 export default function BeforeAfter({ before, after, label }: Props) {
   const [pos, setPos]       = useState(50)
   const [goingRight, setGoingRight] = useState(true)
-  const [snipping, setSnipping]     = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const dragging     = useRef(false)
   const lastClientX  = useRef<number>(0)
-  const snipTimer    = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const rafId        = useRef<number | null>(null)
 
   function getPercent(clientX: number) {
     if (!containerRef.current) return 50
@@ -23,15 +22,16 @@ export default function BeforeAfter({ before, after, label }: Props) {
   }
 
   function move(clientX: number) {
-    const delta = clientX - lastClientX.current
-    if (Math.abs(delta) > 2) {
-      setGoingRight(delta > 0)
-      lastClientX.current = clientX
-    }
-    setPos(getPercent(clientX))
-    setSnipping(true)
-    if (snipTimer.current) clearTimeout(snipTimer.current)
-    snipTimer.current = setTimeout(() => setSnipping(false), 260)
+    if (rafId.current) return // throttle to one update per frame
+    rafId.current = requestAnimationFrame(() => {
+      rafId.current = null
+      const delta = clientX - lastClientX.current
+      if (Math.abs(delta) > 2) {
+        setGoingRight(delta > 0)
+        lastClientX.current = clientX
+      }
+      setPos(getPercent(clientX))
+    })
   }
 
   return (
@@ -54,7 +54,7 @@ export default function BeforeAfter({ before, after, label }: Props) {
       <div className="ba__divider" style={{ left: `${pos}%` }} />
 
       <div
-        className={`ba__handle${snipping ? ' ba__handle--snip' : ''}`}
+        className="ba__handle"
         style={{
           left: `${pos}%`,
           '--scissors-scale': Math.max(0.35, pos / 50),
