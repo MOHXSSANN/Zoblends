@@ -73,9 +73,11 @@
   pointer-events: none;
 }
 
-.navbar__logo-paint-wrap canvas {
-  width: 54px !important;
-  height: 54px !important;
+.navbar__logo-paint-wrap img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  display: block;
 }
 
 /* On menu open: crossfade */

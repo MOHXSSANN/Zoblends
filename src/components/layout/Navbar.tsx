@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '../../lib/CartContext'
 import { useAuth } from '../../lib/AuthContext'
 import { PRODUCTS } from '../../lib/products'
-import MetallicPaint from '../ui/MetallicPaint'
 import './Navbar.css'
 
 const NAV_LINKS = [
@@ -23,7 +22,6 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen]         = useState(false)
   const [cartOpen, setCartOpen]         = useState(false)
   const [checkingOut, setCheckingOut]   = useState(false)
-  const [zbMounted, setZbMounted]       = useState(false)
   const location = useLocation()
   const { add, items, remove, total, count } = useCart()
   const { user, signInWithGoogle, signOut } = useAuth()
@@ -104,31 +102,7 @@ export default function Navbar() {
             <span className="navbar__logo-shimmer">ZOBLENDS</span>
           </div>
           <div className="navbar__logo-paint-wrap">
-            {zbMounted && (
-              <MetallicPaint
-                imageSrc="/zoLogo.png"
-                seed={42}
-                scale={4}
-                patternSharpness={1}
-                noiseScale={0.5}
-                speed={0.3}
-                liquid={0.75}
-                mouseAnimation={false}
-                brightness={2}
-                contrast={0.5}
-                refraction={0.01}
-                blur={0.015}
-                chromaticSpread={2}
-                fresnel={1}
-                angle={0}
-                waveAmplitude={1}
-                distortion={1}
-                contour={0.2}
-                lightColor="#b1902a"
-                darkColor="#000000"
-                tintColor="#ffffff"
-              />
-            )}
+            <img src="/zoLogo.png" alt="Zoblends" draggable={false} />
           </div>
         </Link>
 
@@ -154,7 +128,7 @@ export default function Navbar() {
           </button>
           <button
             className={`navbar__burger${menuOpen ? ' navbar__burger--open' : ''}`}
-            onClick={() => { setZbMounted(true); setMenuOpen((v) => !v) }}
+            onClick={() => setMenuOpen((v) => !v)}
             aria-label="Toggle menu"
             aria-expanded={menuOpen}
           >
