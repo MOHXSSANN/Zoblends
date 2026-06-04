@@ -122,7 +122,7 @@ interface MetallicPaintProps {
   angle?: number; fresnel?: number; lightColor?: string; darkColor?: string;
   patternSharpness?: number; waveAmplitude?: number; noiseScale?: number;
   chromaticSpread?: number; mouseAnimation?: boolean; distortion?: number;
-  contour?: number; tintColor?: string; maxSize?: number;
+  contour?: number; tintColor?: string; maxSize?: number; targetFPS?: number;
 }
 
 export default function MetallicPaint({
@@ -130,7 +130,7 @@ export default function MetallicPaint({
   liquid=0.75, speed=0.3, brightness=2, contrast=0.5, angle=0, fresnel=1,
   lightColor='#ffffff', darkColor='#000000', patternSharpness=1,
   waveAmplitude=1, noiseScale=0.5, chromaticSpread=2, mouseAnimation=false,
-  distortion=1, contour=0.2, tintColor='#ffffff', maxSize=800
+  distortion=1, contour=0.2, tintColor='#ffffff', maxSize=800, targetFPS=60
 }: MetallicPaintProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGL2RenderingContext | null>(null);
@@ -240,8 +240,12 @@ export default function MetallicPaint({
       mouse.targetY = (e.clientY - rect.top) / rect.height;
     };
     canvas.addEventListener('mousemove', onMove);
+    const frameInterval = 1000 / targetFPS;
     const render = (time: number) => {
-      const delta = time - lastTimeRef.current; lastTimeRef.current = time;
+      rafRef.current = requestAnimationFrame(render);
+      const delta = time - lastTimeRef.current;
+      if (delta < frameInterval) return; // throttle to targetFPS
+      lastTimeRef.current = time - (delta % frameInterval);
       if (mouseAnimRef.current) {
         mouse.x += (mouse.targetX - mouse.x) * 0.08;
         mouse.y += (mouse.targetY - mouse.y) * 0.08;
@@ -251,7 +255,6 @@ export default function MetallicPaint({
       }
       gl.uniform1f(u.u_time, animTimeRef.current);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-      rafRef.current = requestAnimationFrame(render);
     };
     lastTimeRef.current = performance.now();
     rafRef.current = requestAnimationFrame(render);

@@ -60,6 +60,7 @@ export default function NavbarLogoText() {
               darkColor="#000000"
               tintColor="#ffffff"
               maxSize={200}
+              targetFPS={15}
             />
           </motion.div>
         ) : (
