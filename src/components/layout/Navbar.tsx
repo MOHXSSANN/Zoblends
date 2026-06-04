@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '../../lib/CartContext'
 import { useAuth } from '../../lib/AuthContext'
 import { PRODUCTS } from '../../lib/products'
-import NavbarLogoText from '../ui/NavbarLogoText'
 import './Navbar.css'
 
 const NAV_LINKS = [
@@ -99,19 +98,7 @@ export default function Navbar() {
       >
         <div className="navbar__inner">
         <Link to="/" className="navbar__logo" aria-label="Zoblends home">
-          {menuOpen ? (
-            <motion.img
-              src="/zoLogo.png"
-              alt="Zoblends"
-              className="navbar__logo-img"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.2 }}
-              draggable={false}
-            />
-          ) : (
-            <NavbarLogoText />
-          )}
+          <span className="navbar__logo-text">ZOBLENDS</span>
         </Link>
 
         <nav className="navbar__links" aria-label="Primary navigation">
