@@ -32,8 +32,7 @@ export default function Shop() {
           stock:            p.stock,
           cost_price_cents: p.cost_price_cents,
         })))
-      })
-      .catch(() => {})
+      }, () => {})
   }, [])
 
   function handleAdd(p: Product) {

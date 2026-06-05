@@ -38,14 +38,6 @@ function minToLabel(m: number): string {
   return `${h12}:${min === 0 ? '00' : String(min).padStart(2,'0')} ${ap}`
 }
 
-function labelToMin(label: string): number {
-  const [timePart, period] = label.split(' ')
-  const [h, m] = timePart.split(':').map(Number)
-  let hours = h
-  if (period === 'PM' && h !== 12) hours += 12
-  if (period === 'AM' && h === 12) hours = 0
-  return hours * 60 + m
-}
 
 function buildSlots(durationMin: number, date: Date): Slot[] {
   const now    = new Date()
@@ -132,8 +124,7 @@ export function BookDateTimePicker({ durationMin, onConfirm, onDateChange }: Pro
         setDailyCount(rows.length)
         setTakenSlots(new Set(rows.map(b => isoToLabel(b.starts_at))))
         setLoading(false)
-      })
-      .catch(() => setLoading(false))
+      }, () => setLoading(false))
   }, [date])
 
   const isDisabled = (d: Date) => {

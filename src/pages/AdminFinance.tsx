@@ -32,10 +32,8 @@ interface ShopOrder {
 }
 
 const GOLD    = '#d4af37'
-const GOLD2   = '#b1902a'
 const GREEN   = '#6bd6a3'
 const RED     = '#e05555'
-const DIM     = 'rgba(245,244,240,0.15)'
 
 const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 

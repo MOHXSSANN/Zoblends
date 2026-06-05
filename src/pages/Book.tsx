@@ -70,16 +70,14 @@ export default function Book() {
       .limit(1)
       .single()
       .then(({ data }) => {
-        if (!data) return
-        if (data.service_name) setLastService(data.service_name)
+        if (data?.service_name) setLastService(data.service_name)
         setInfo(prev => ({
           ...prev,
-          name:  prev.name  || data.name  || user.user_metadata?.full_name || '',
-          email: prev.email || data.email || user.email || '',
-          phone: prev.phone || data.phone || '',
+          name:  prev.name  || data?.name  || user.user_metadata?.full_name || '',
+          email: prev.email || data?.email || user.email || '',
+          phone: prev.phone || data?.phone || '',
         }))
-      })
-      .catch(() => {
+      }, () => {
         setInfo(prev => ({
           ...prev,
           name:  prev.name  || user.user_metadata?.full_name || '',
