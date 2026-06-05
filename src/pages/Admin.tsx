@@ -178,18 +178,51 @@ export default function Admin() {
   // Analytics
   const completed = bookings.filter(b => b.status === 'completed')
   const totalRevenue = completed.reduce((sum, b) => sum + parseInt(b.service_price.replace(/\D/g,''), 10), 0)
+  const cashRevenue = completed.filter(b => b.payment_method === 'cash').reduce((s,b) => s + parseInt(b.service_price.replace(/\D/g,''),10), 0)
+  const etRevenue   = completed.filter(b => !b.payment_method || b.payment_method === 'etransfer').reduce((s,b) => s + parseInt(b.service_price.replace(/\D/g,''),10), 0)
   const revByMonth: Record<string, number> = {}
   completed.forEach(b => {
-    const key = b.starts_at.slice(0, 7) // YYYY-MM
+    const key = b.starts_at.slice(0, 7)
     revByMonth[key] = (revByMonth[key] ?? 0) + parseInt(b.service_price.replace(/\D/g,''), 10)
   })
   const busyDays: Record<string, number> = { Sun:0, Mon:0, Tue:0, Wed:0, Thu:0, Fri:0, Sat:0 }
+  const busyHours: Record<string, number> = {}
   const DAY_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
-  bookings.forEach(b => { busyDays[DAY_SHORT[new Date(b.starts_at).getDay()]]++ })
+  bookings.forEach(b => {
+    busyDays[DAY_SHORT[new Date(b.starts_at).getDay()]]++
+    const h = new Date(b.starts_at).getHours()
+    const label = h === 0 ? '12 AM' : h < 12 ? `${h} AM` : h === 12 ? '12 PM' : `${h-12} PM`
+    busyHours[label] = (busyHours[label] ?? 0) + 1
+  })
   const topServices: Record<string, number> = {}
   completed.forEach(b => { topServices[b.service_name] = (topServices[b.service_name] ?? 0) + 1 })
-  const cashCount = bookings.filter(b => b.payment_method === 'cash').length
-  const etransferCount = bookings.filter(b => b.payment_method === 'etransfer').length
+  const cashCount     = bookings.filter(b => b.payment_method === 'cash').length
+  const etransferCount = bookings.filter(b => !b.payment_method || b.payment_method === 'etransfer').length
+
+  function exportCSV() {
+    const rows = [
+      ['Confirmation','Name','Email','Phone','Service','Date','Time','Price','Payment','Status','Notes'],
+      ...bookings.map(b => {
+        const d = new Date(b.starts_at)
+        return [
+          b.confirmation_number ?? '',
+          b.name, b.email, b.phone,
+          b.service_name,
+          `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`,
+          fmtTime(b.starts_at),
+          b.service_price,
+          b.payment_method ?? 'etransfer',
+          b.status,
+          (b.notes ?? '').replace(/,/g, ' '),
+        ]
+      })
+    ]
+    const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n')
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
+    a.download = `zoblends-bookings-${new Date().toISOString().slice(0,10)}.csv`
+    a.click()
+  }
 
   const q = search.toLowerCase().trim()
   const filterBookings = (list: Booking[]) => !q ? list : list.filter(b =>
@@ -314,11 +347,38 @@ export default function Admin() {
               {Object.keys(topServices).length === 0 && <p className="admin__empty">No data yet.</p>}
             </div>
             <div className="admin__analytics-section">
-              <div className="admin__analytics-title">Payment Methods</div>
-              <div className="admin__analytics-row"><span>Cash</span><span className="admin__analytics-val">{cashCount}</span></div>
-              <div className="admin__analytics-row"><span>E-Transfer</span><span className="admin__analytics-val">{etransferCount}</span></div>
-              <div className="admin__analytics-row"><span>Not logged</span><span className="admin__analytics-val">{bookings.length - cashCount - etransferCount}</span></div>
+              <div className="admin__analytics-title">Revenue by Payment Method</div>
+              <div className="admin__analytics-row">
+                <span>E-Transfer ({etransferCount} cuts)</span>
+                <span className="admin__analytics-val">${etRevenue}</span>
+              </div>
+              <div className="admin__analytics-row">
+                <span>Cash ({cashCount} cuts)</span>
+                <span className="admin__analytics-val">${cashRevenue}</span>
+              </div>
+              <div className="admin__analytics-row" style={{ borderTop: '1px solid rgba(212,175,55,0.15)', marginTop: 4, paddingTop: 12 }}>
+                <span style={{ color: '#d4af37', fontWeight: 700 }}>Total Revenue</span>
+                <span className="admin__analytics-val" style={{ color: '#d4af37', fontSize: 18 }}>${totalRevenue}</span>
+              </div>
             </div>
+
+            <div className="admin__analytics-section">
+              <div className="admin__analytics-title">Busiest Times</div>
+              {Object.entries(busyHours).sort((a,b) => b[1]-a[1]).slice(0,6).map(([hour, count]) => (
+                <div key={hour} className="admin__analytics-row">
+                  <span>{hour}</span>
+                  <div className="admin__analytics-bar-wrap">
+                    <div className="admin__analytics-bar" style={{ width: `${Math.max(4, (count / Math.max(...Object.values(busyHours), 1)) * 100)}%` }} />
+                    <span className="admin__analytics-val">{count}</span>
+                  </div>
+                </div>
+              ))}
+              {Object.keys(busyHours).length === 0 && <p className="admin__empty">No data yet.</p>}
+            </div>
+
+            <button className="admin__export-btn" onClick={exportCSV}>
+              ↓ Export All Bookings as CSV
+            </button>
           </div>
         ) : tab === 'orders' ? (
           <div className="admin__list">
