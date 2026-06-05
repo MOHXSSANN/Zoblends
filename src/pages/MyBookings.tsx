@@ -50,8 +50,9 @@ export default function MyBookings() {
   const [bookings, setBookings]   = useState<Booking[]>([])
   const [loading, setLoading]     = useState(true)
   const [selected, setSelected]   = useState<Booking | null>(null)
-  const [cancelling, setCancelling] = useState(false)
+  const [cancelling, setCancelling]   = useState(false)
   const [cancelError, setCancelError] = useState<string | null>(null)
+  const [confirmCancel, setConfirmCancel] = useState(false)
 
   useEffect(() => {
     if (!user) { setLoading(false); return }
@@ -63,10 +64,6 @@ export default function MyBookings() {
   }, [user])
 
   async function handleCancel(b: Booking) {
-    if (!canCancel(b.starts_at)) {
-      setCancelError(`Cancellations must be made at least ${CANCEL_WINDOW_HRS} hours before your appointment.`)
-      return
-    }
     setCancelError(null)
     setCancelling(true)
     await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', b.id)
@@ -180,8 +177,8 @@ export default function MyBookings() {
                       <span className="mybookings__meta">{b.service_duration} · {b.service_price}</span>
                     </div>
                     <div className="mybookings__card-right">
-                      <span className={`mybookings__status mybookings__status--${b.status}`}>
-                        {b.status.charAt(0).toUpperCase() + b.status.slice(1).replace('_',' ')}
+                      <span className={`mybookings__status mybookings__status--${isPast(b.starts_at) && b.status === 'confirmed' ? 'past' : b.status}`}>
+                        {isPast(b.starts_at) && b.status === 'confirmed' ? 'Passed' : b.status.charAt(0).toUpperCase() + b.status.slice(1).replace('_',' ')}
                       </span>
                       <span className="mybookings__view-link">View →</span>
                     </div>
@@ -209,7 +206,7 @@ export default function MyBookings() {
               exit={{ opacity: 0, y: 24, scale: 0.97 }}
               transition={{ duration: 0.35, ease: EASE }}
             >
-              <button className="mybookings__modal-close" onClick={() => setSelected(null)}>✕</button>
+              <button className="mybookings__modal-close" onClick={() => { setSelected(null); setConfirmCancel(false) }}>✕</button>
 
               <div className="mybookings__modal-header">
                 <span className="mybookings__modal-eyebrow">Booking Confirmation</span>
@@ -245,21 +242,42 @@ export default function MyBookings() {
                   >
                     Reschedule →
                   </button>
-                  {canCancel(selected.starts_at) ? (
-                    <>
-                      {cancelError && <p className="mybookings__cancel-error">{cancelError}</p>}
-                      <button
-                        className="mybookings__modal-cancel"
-                        onClick={() => handleCancel(selected)}
-                        disabled={cancelling}
-                      >
-                        {cancelling ? 'Cancelling…' : 'Cancel Appointment'}
-                      </button>
-                    </>
+
+                  {!confirmCancel ? (
+                    <button
+                      className="mybookings__modal-cancel"
+                      onClick={() => setConfirmCancel(true)}
+                    >
+                      Cancel Appointment
+                    </button>
                   ) : (
-                    <p className="mybookings__cancel-locked">
-                      Cancellations close {CANCEL_WINDOW_HRS} hours before your appointment.
-                    </p>
+                    <div className="mybookings__cancel-confirm">
+                      {!canCancel(selected.starts_at) && (
+                        <p className="mybookings__cancel-warning">
+                          ⚠ This booking is within the {CANCEL_WINDOW_HRS}-hour cancellation window. It's not recommended to cancel this close to your appointment.
+                        </p>
+                      )}
+                      <p className="mybookings__cancel-confirm-text">
+                        Are you sure you want to cancel your <strong>{selected.service_name}</strong> on {formatDate(selected.starts_at)} at {formatTime(selected.starts_at)}?
+                      </p>
+                      {cancelError && <p className="mybookings__cancel-error">{cancelError}</p>}
+                      <div className="mybookings__cancel-confirm-btns">
+                        <button
+                          className="mybookings__cancel-confirm-no"
+                          onClick={() => setConfirmCancel(false)}
+                          disabled={cancelling}
+                        >
+                          Keep It
+                        </button>
+                        <button
+                          className="mybookings__modal-cancel mybookings__cancel-confirm-yes"
+                          onClick={() => handleCancel(selected)}
+                          disabled={cancelling}
+                        >
+                          {cancelling ? 'Cancelling…' : 'Yes, Cancel'}
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
               )}

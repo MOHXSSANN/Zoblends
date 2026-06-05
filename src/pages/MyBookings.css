@@ -297,3 +297,52 @@
   letter-spacing: 0.04em;
 }
 .mybookings__modal-cancel { margin-top: 0; }
+
+.mybookings__status--past {
+  font-family: var(--font-body);
+  font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(245,244,240,0.3);
+}
+
+.mybookings__cancel-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(224,85,85,0.2);
+  background: rgba(224,85,85,0.04);
+}
+.mybookings__cancel-warning {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: #e05555;
+  line-height: 1.6;
+  margin: 0;
+}
+.mybookings__cancel-confirm-text {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: rgba(245,244,240,0.7);
+  line-height: 1.6;
+  margin: 0;
+}
+.mybookings__cancel-confirm-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.mybookings__cancel-confirm-no {
+  padding: 12px;
+  background: rgba(245,244,240,0.06);
+  border: 1px solid rgba(245,244,240,0.12);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(245,244,240,0.5);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.mybookings__cancel-confirm-no:hover { border-color: rgba(245,244,240,0.3); color: var(--white); }
+.mybookings__cancel-confirm-yes { margin-top: 0 !important; }

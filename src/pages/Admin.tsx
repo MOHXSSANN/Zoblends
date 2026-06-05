@@ -375,18 +375,17 @@ export default function Admin() {
               <button key={b.id} className="admin__row" onClick={() => setSelected(b)}>
                 <div className="admin__row-main">
                   <span className="admin__row-name">{b.name}</span>
-                  <span className="admin__row-service">{b.service_name} · {b.service_price}</span>
+                  <span className="admin__row-service">
+                    {b.service_name} · {b.service_price}
+                    {b.last_minute_fee && <span className="admin__fee-badge admin__fee-badge--lm">+$25</span>}
+                    {b.late_night_fee  && <span className="admin__fee-badge admin__fee-badge--ln">🌙</span>}
+                  </span>
                   <span className="admin__row-meta">{fmt(b.starts_at)}</span>
                 </div>
                 <div className="admin__row-right">
                   <span style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: 9,
-                    fontWeight: 800,
-                    letterSpacing: '0.16em',
-                    textTransform: 'uppercase',
-                    padding: '4px 8px',
-                    borderRadius: 2,
+                    fontFamily: 'var(--font-body)', fontSize: 9, fontWeight: 800,
+                    letterSpacing: '0.16em', textTransform: 'uppercase', padding: '4px 8px', borderRadius: 2,
                     background: (STATUS_BADGE[b.status] ?? STATUS_BADGE.confirmed).bg,
                     border: `1px solid ${(STATUS_BADGE[b.status] ?? STATUS_BADGE.confirmed).border}`,
                     color: (STATUS_BADGE[b.status] ?? STATUS_BADGE.confirmed).color,
@@ -407,7 +406,7 @@ export default function Admin() {
       {selected && (
         <div className="admin__panel-backdrop" onClick={() => setSelected(null)}>
           <div className="admin__panel" onClick={e => e.stopPropagation()}>
-            <button className="admin__panel-close" onClick={() => setSelected(null)}>✕</button>
+            <button className="admin__panel-close" onClick={() => setSelected(null)}>← Back</button>
             <p className="admin__panel-eyebrow">Booking Detail</p>
             {selected.confirmation_number && (
               <p className="admin__panel-conf">{selected.confirmation_number}</p>
@@ -447,14 +446,17 @@ export default function Admin() {
             <div className="admin__panel-payment">
               <span className="admin__panel-payment-label">Payment</span>
               <div className="admin__panel-payment-btns">
-                {['cash','etransfer','unknown'].map(m => (
-                  <button key={m}
-                    className={`admin__panel-payment-btn${selected.payment_method===m?' active':''}`}
-                    onClick={() => updatePaymentMethod(selected.id, m)}
-                  >
-                    {m === 'etransfer' ? 'E-Transfer' : m.charAt(0).toUpperCase()+m.slice(1)}
-                  </button>
-                ))}
+                {['cash','etransfer'].map(m => {
+                  const effective = (!selected.payment_method || selected.payment_method === 'unknown') ? 'etransfer' : selected.payment_method
+                  return (
+                    <button key={m}
+                      className={`admin__panel-payment-btn${effective===m?' active':''}`}
+                      onClick={() => updatePaymentMethod(selected.id, m)}
+                    >
+                      {m === 'etransfer' ? 'E-Transfer' : 'Cash'}
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
