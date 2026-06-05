@@ -372,6 +372,8 @@
 .book__input::placeholder { color: rgba(245,244,240,0.5); }
 .book__input:focus { border-color: rgba(212,175,55,0.5); }
 .book__input--error { border-color: #e05555; }
+.book__textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+.book__label-optional { font-weight: 400; opacity: 0.5; margin-left: 4px; }
 
 .book__error {
   font-family: var(--font-body);

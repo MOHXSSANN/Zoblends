@@ -8,9 +8,10 @@ type EmailType =
   | { type: 'booking-confirmation';  to: string; name: string; service: string; date: string; time: string; duration: string; price: string; confirmationNumber: string }
   | { type: 'booking-cancellation';  to: string; name: string; service: string; date: string; time: string; confirmationNumber: string }
   | { type: 'review-request';        to: string; name: string; service: string; date: string }
+  | { type: 'receipt-and-review';    to: string; name: string; service: string; date: string; time: string; price: string; confirmationNumber: string }
   | { type: 'no-show-warning';       to: string; name: string; service: string; date: string; time: string }
   | { type: 'waitlist-spot-open';    to: string; name: string; date: string }
-  | { type: 'booking-reminder';      to: string; name: string; service: string; date: string; time: string; duration: string; confirmationNumber: string }
+  | { type: 'booking-reminder';      to: string; name: string; service: string; date: string; time: string; duration: string; confirmationNumber: string; hoursUntil: number }
   | { type: 'admin-new-booking';     name: string; service: string; date: string; time: string; phone: string; email: string; confirmationNumber: string }
 
 // ─── Shared helpers ──────────────────────────────────────────────────────────
@@ -107,6 +108,35 @@ function reviewRequestHtml(d: Extract<EmailType, { type: 'review-request' }>) {
   `)
 }
 
+// ─── 3b. Receipt + Review (after completed) ──────────────────────────────────
+
+function receiptAndReviewHtml(d: Extract<EmailType, { type: 'receipt-and-review' }>) {
+  return shell(`
+    <p style="font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:rgba(212,175,55,0.6);margin:0 0 8px;">Receipt</p>
+    <h1 style="font-size:24px;font-weight:700;color:#f5f4f0;margin:0 0 8px;">Thanks for coming in, ${d.name.split(' ')[0]}.</h1>
+    <p style="font-size:13px;color:rgba(245,244,240,0.4);margin:0 0 24px;">Here's your receipt. Hope the cut was exactly what you wanted.</p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid rgba(212,175,55,0.1);">
+      ${row('Service', d.service)}
+      ${row('Date',    d.date)}
+      ${row('Time',    d.time)}
+    </table>
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid rgba(212,175,55,0.1);margin-top:8px;">
+      ${row('Total Paid', d.price, true)}
+    </table>
+    <div style="text-align:center;padding:16px 0 4px;">
+      <p style="font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:rgba(212,175,55,0.4);margin:0 0 4px;">Confirmation</p>
+      <p style="font-family:Georgia,serif;font-size:20px;font-weight:700;letter-spacing:0.2em;color:#d4af37;margin:0;">${d.confirmationNumber}</p>
+    </div>
+    <div style="margin-top:28px;padding-top:24px;border-top:1px solid rgba(212,175,55,0.08);">
+      <p style="font-size:14px;color:rgba(245,244,240,0.55);line-height:1.7;margin:0 0 4px;">
+        If you've got a minute, a Google review helps other people find Zoblends and means a lot to Zowad.
+      </p>
+    </div>
+    ${btn('Leave a Google Review →', 'https://g.page/r/REPLACE_WITH_GOOGLE_REVIEW_LINK/review')}
+    ${btn('Book Again →', 'https://zoblends.com/book', 'outline')}
+  `)
+}
+
 // ─── 4. No-Show Warning ───────────────────────────────────────────────────────
 
 function noShowWarningHtml(d: Extract<EmailType, { type: 'no-show-warning' }>) {
@@ -144,10 +174,11 @@ function waitlistSpotHtml(d: Extract<EmailType, { type: 'waitlist-spot-open' }>)
 // ─── 6. Booking Reminder (24h before) ────────────────────────────────────────
 
 function bookingReminderHtml(d: Extract<EmailType, { type: 'booking-reminder' }>) {
+  const soon = d.hoursUntil <= 4
   return shell(`
     <p style="font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:rgba(212,175,55,0.6);margin:0 0 8px;">Reminder</p>
-    <h1 style="font-size:24px;font-weight:700;color:#f5f4f0;margin:0 0 8px;">Your cut is tomorrow, ${d.name.split(' ')[0]}.</h1>
-    <p style="font-size:13px;color:rgba(245,244,240,0.4);margin:0 0 24px;letter-spacing:0.04em;">See you at the chair.</p>
+    <h1 style="font-size:24px;font-weight:700;color:#f5f4f0;margin:0 0 8px;">${soon ? `Your cut is in a few hours, ${d.name.split(' ')[0]}.` : `Your cut is tomorrow, ${d.name.split(' ')[0]}.`}</h1>
+    <p style="font-size:13px;color:rgba(245,244,240,0.4);margin:0 0 24px;letter-spacing:0.04em;">${soon ? 'Getting close — see you soon.' : 'See you at the chair.'}</p>
     <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid rgba(212,175,55,0.1);">
       ${row('Service',  d.service)}
       ${row('Date',     d.date)}
@@ -205,6 +236,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     case 'review-request':
       subject = `How was the cut, ${data.name.split(' ')[0]}? Leave us a review.`
       html    = reviewRequestHtml(data)
+      to      = data.to
+      break
+    case 'receipt-and-review':
+      subject = `Receipt + Thank You · ${data.confirmationNumber}`
+      html    = receiptAndReviewHtml(data)
       to      = data.to
       break
     case 'no-show-warning':

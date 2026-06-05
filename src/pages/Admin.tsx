@@ -13,6 +13,8 @@ interface Booking {
   id: string; confirmation_number: string | null; name: string; email: string; phone: string
   service_name: string; service_price: string; service_duration: string
   starts_at: string; status: string; created_at: string
+  notes?: string | null; late_night_fee?: boolean; last_minute_fee?: boolean
+  payment_method?: string | null
 }
 interface WaitlistEntry {
   id: string; name: string; email: string; phone: string
@@ -38,7 +40,7 @@ const STATUS_BADGE: Record<string, { bg: string; border: string; color: string }
 
 export default function Admin() {
   const { user } = useAuth()
-  const [tab, setTab]           = useState<'upcoming'|'past'|'waitlist'|'orders'>('upcoming')
+  const [tab, setTab]           = useState<'upcoming'|'past'|'waitlist'|'orders'|'analytics'>('upcoming')
   const [bookings, setBookings] = useState<Booking[]>([])
   const [waitlist, setWaitlist] = useState<WaitlistEntry[]>([])
   const [orders, setOrders]     = useState<ShopOrder[]>([])
@@ -87,11 +89,14 @@ export default function Admin() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          type: 'review-request',
+          type: 'receipt-and-review',
           to: booking.email,
           name: booking.name,
           service: booking.service_name,
           date: dateStr,
+          time: timeStr,
+          price: booking.service_price,
+          confirmationNumber: booking.confirmation_number ?? '',
         }),
       }).catch(() => {})
     }
@@ -139,12 +144,52 @@ export default function Admin() {
     setWaitlist(prev => prev.map(w => w.id === id ? { ...w, status: 'cancelled' } : w))
   }
 
+  async function markAllComplete() {
+    setUpdating(true)
+    const toComplete = todayBookings.filter(b => b.status === 'confirmed')
+    await Promise.all(toComplete.map(b => supabase.from('bookings').update({ status: 'completed' }).eq('id', b.id)))
+    setBookings(prev => prev.map(b => toComplete.find(t => t.id === b.id) ? { ...b, status: 'completed' } : b))
+    toComplete.forEach(b => {
+      const d = new Date(b.starts_at)
+      const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+      const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December']
+      fetch('/api/send-email', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ type:'receipt-and-review', to:b.email, name:b.name, service:b.service_name,
+          date:`${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}`,
+          time: fmtTime(b.starts_at), price:b.service_price, confirmationNumber:b.confirmation_number??'' }),
+      }).catch(()=>{})
+    })
+    setUpdating(false)
+  }
+
+  async function updatePaymentMethod(id: string, method: string) {
+    await supabase.from('bookings').update({ payment_method: method }).eq('id', id)
+    setBookings(prev => prev.map(b => b.id === id ? { ...b, payment_method: method } : b))
+    if (selected?.id === id) setSelected(prev => prev ? { ...prev, payment_method: method } : null)
+  }
+
   const now = new Date()
   const upcoming = bookings.filter(b => new Date(b.starts_at) >= now && b.status === 'confirmed')
   const past     = bookings.filter(b => new Date(b.starts_at) <  now || b.status !== 'confirmed')
   const todayStr = now.toISOString().split('T')[0]
   const todayBookings = upcoming.filter(b => b.starts_at.startsWith(todayStr))
   const activeWait = waitlist.filter(w => w.status === 'waiting')
+
+  // Analytics
+  const completed = bookings.filter(b => b.status === 'completed')
+  const totalRevenue = completed.reduce((sum, b) => sum + parseInt(b.service_price.replace(/\D/g,''), 10), 0)
+  const revByMonth: Record<string, number> = {}
+  completed.forEach(b => {
+    const key = b.starts_at.slice(0, 7) // YYYY-MM
+    revByMonth[key] = (revByMonth[key] ?? 0) + parseInt(b.service_price.replace(/\D/g,''), 10)
+  })
+  const busyDays: Record<string, number> = { Sun:0, Mon:0, Tue:0, Wed:0, Thu:0, Fri:0, Sat:0 }
+  const DAY_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+  bookings.forEach(b => { busyDays[DAY_SHORT[new Date(b.starts_at).getDay()]]++ })
+  const topServices: Record<string, number> = {}
+  completed.forEach(b => { topServices[b.service_name] = (topServices[b.service_name] ?? 0) + 1 })
+  const cashCount = bookings.filter(b => b.payment_method === 'cash').length
+  const etransferCount = bookings.filter(b => b.payment_method === 'etransfer').length
 
   const q = search.toLowerCase().trim()
   const filterBookings = (list: Booking[]) => !q ? list : list.filter(b =>
@@ -181,7 +226,7 @@ export default function Admin() {
             { label: "Today's Bookings", val: todayBookings.length },
             { label: 'Upcoming',         val: upcoming.length      },
             { label: 'Waitlist',         val: activeWait.length    },
-            { label: 'Shop Orders',      val: orders.length        },
+            { label: 'Total Revenue',    val: `$${totalRevenue}`   },
           ].map((s, i) => (
             <motion.div key={s.label} className="admin__stat"
               initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }}
@@ -193,9 +238,16 @@ export default function Admin() {
           ))}
         </div>
 
+        {/* Mark all today complete */}
+        {todayBookings.filter(b => b.status === 'confirmed').length > 0 && (
+          <button className="admin__mark-all" onClick={markAllComplete} disabled={updating}>
+            ✓ Mark All Today's Cuts Complete ({todayBookings.filter(b => b.status === 'confirmed').length}) — sends receipts
+          </button>
+        )}
+
         {/* Tabs */}
         <div className="admin__tabs">
-          {(['upcoming','past','waitlist','orders'] as const).map(t => (
+          {(['upcoming','past','waitlist','orders','analytics'] as const).map(t => (
             <button key={t} className={`admin__tab${tab===t?' admin__tab--active':''}`} onClick={() => setTab(t)}>
               {t.charAt(0).toUpperCase()+t.slice(1)}
               {t === 'waitlist' && activeWait.length > 0 && (
@@ -228,6 +280,46 @@ export default function Admin() {
 
         {loading ? (
           <p className="admin__loading">Loading…</p>
+        ) : tab === 'analytics' ? (
+          <div className="admin__analytics">
+            <div className="admin__analytics-section">
+              <div className="admin__analytics-title">Revenue by Month</div>
+              {Object.entries(revByMonth).sort().reverse().slice(0, 6).map(([month, rev]) => (
+                <div key={month} className="admin__analytics-row">
+                  <span>{month}</span>
+                  <span className="admin__analytics-val">${rev}</span>
+                </div>
+              ))}
+              {Object.keys(revByMonth).length === 0 && <p className="admin__empty">No completed bookings yet.</p>}
+            </div>
+            <div className="admin__analytics-section">
+              <div className="admin__analytics-title">Busiest Days</div>
+              {Object.entries(busyDays).sort((a,b) => b[1]-a[1]).map(([day, count]) => (
+                <div key={day} className="admin__analytics-row">
+                  <span>{day}</span>
+                  <div className="admin__analytics-bar-wrap">
+                    <div className="admin__analytics-bar" style={{ width: `${Math.max(4, (count / Math.max(...Object.values(busyDays), 1)) * 100)}%` }} />
+                    <span className="admin__analytics-val">{count}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="admin__analytics-section">
+              <div className="admin__analytics-title">Top Services</div>
+              {Object.entries(topServices).sort((a,b)=>b[1]-a[1]).map(([svc, count]) => (
+                <div key={svc} className="admin__analytics-row">
+                  <span>{svc}</span><span className="admin__analytics-val">{count} cuts</span>
+                </div>
+              ))}
+              {Object.keys(topServices).length === 0 && <p className="admin__empty">No data yet.</p>}
+            </div>
+            <div className="admin__analytics-section">
+              <div className="admin__analytics-title">Payment Methods</div>
+              <div className="admin__analytics-row"><span>Cash</span><span className="admin__analytics-val">{cashCount}</span></div>
+              <div className="admin__analytics-row"><span>E-Transfer</span><span className="admin__analytics-val">{etransferCount}</span></div>
+              <div className="admin__analytics-row"><span>Not logged</span><span className="admin__analytics-val">{bookings.length - cashCount - etransferCount}</span></div>
+            </div>
+          </div>
         ) : tab === 'orders' ? (
           <div className="admin__list">
             {filterOrders(orders).length === 0 ? (
@@ -335,7 +427,37 @@ export default function Admin() {
                   <span>{k}</span><span>{v}</span>
                 </div>
               ))}
+              {selected.notes && (
+                <div className="admin__panel-row admin__panel-notes">
+                  <span>Notes</span><span style={{ fontStyle:'italic', opacity:0.7 }}>{selected.notes}</span>
+                </div>
+              )}
+              {(selected.late_night_fee || selected.last_minute_fee) && (
+                <div className="admin__panel-row">
+                  <span>Fees</span>
+                  <span>
+                    {selected.late_night_fee && <span style={{color:'#d4af37', marginRight:8}}>Late Night +$15</span>}
+                    {selected.last_minute_fee && <span style={{color:'#e05555'}}>Last Minute +$25</span>}
+                  </span>
+                </div>
+              )}
             </div>
+
+            {/* Payment method */}
+            <div className="admin__panel-payment">
+              <span className="admin__panel-payment-label">Payment</span>
+              <div className="admin__panel-payment-btns">
+                {['cash','etransfer','unknown'].map(m => (
+                  <button key={m}
+                    className={`admin__panel-payment-btn${selected.payment_method===m?' active':''}`}
+                    onClick={() => updatePaymentMethod(selected.id, m)}
+                  >
+                    {m === 'etransfer' ? 'E-Transfer' : m.charAt(0).toUpperCase()+m.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="admin__panel-actions">
               {['confirmed','completed','no_show','cancelled'].map(s => (
                 <button

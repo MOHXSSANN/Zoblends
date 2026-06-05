@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
-import { BookDateTimePicker } from '../components/ui/BookDateTimePicker'
+import { BookDateTimePicker, LATE_NIGHT_FEE, LAST_MINUTE_FEE, type SlotFees } from '../components/ui/BookDateTimePicker'
 import './Page.css'
 import './Book.css'
 
@@ -17,7 +17,7 @@ const SERVICES = [
 
 type Step = 'service' | 'datetime' | 'details' | 'confirm' | 'done' | 'waitlist' | 'waitlist-done'
 
-interface GuestInfo { name: string; email: string; phone: string }
+interface GuestInfo { name: string; email: string; phone: string; notes: string }
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
@@ -32,8 +32,9 @@ export default function Book() {
   const [date, setDate]             = useState<Date | null>(null)
   const [time, setTime]             = useState<string | null>(null)
   const [pickerDate, setPickerDate] = useState<Date | undefined>()
-  const [info, setInfo]             = useState<GuestInfo>({ name: '', email: '', phone: '' })
+  const [info, setInfo]             = useState<GuestInfo>({ name: '', email: '', phone: '', notes: '' })
   const [errors, setErrors]         = useState<Partial<GuestInfo>>({})
+  const [fees, setFees]             = useState<SlotFees>({ lateNight: false, lastMinute: false })
   const [submitting, setSubmitting]         = useState(false)
   const [confirmationNum, setConfirmationNum] = useState<string | null>(null)
   const [submitError, setSubmitError]       = useState<string | null>(null)
@@ -94,18 +95,27 @@ export default function Book() {
 
     const confNum = genConfirmationNumber()
 
+    const effectivePrice = (() => {
+      const base = parseInt(service.price.replace(/\D/g,''), 10)
+      const extra = (fees.lateNight ? LATE_NIGHT_FEE : 0) + (fees.lastMinute ? LAST_MINUTE_FEE : 0)
+      return extra > 0 ? `$${base + extra}` : service.price
+    })()
+
     const { error } = await supabase.from('bookings').insert({
-      user_id: user?.id ?? null,
-      name: info.name,
-      email: info.email,
-      phone: info.phone,
-      service_id: service.id,
-      service_name: service.name,
-      service_price: service.price,
+      user_id:          user?.id ?? null,
+      name:             info.name,
+      email:            info.email,
+      phone:            info.phone,
+      service_id:       service.id,
+      service_name:     service.name,
+      service_price:    effectivePrice,
       service_duration: service.duration,
-      starts_at: startsAt.toISOString(),
-      status: 'confirmed',
+      starts_at:        startsAt.toISOString(),
+      status:           'confirmed',
       confirmation_number: confNum,
+      notes:            info.notes.trim() || null,
+      late_night_fee:   fees.lateNight,
+      last_minute_fee:  fees.lastMinute,
     })
 
     if (error) {
@@ -114,7 +124,7 @@ export default function Book() {
       return
     }
 
-    if (!error) {
+    {
       // Send confirmation email to client
       fetch('/api/send-email', {
         method: 'POST',
@@ -261,7 +271,7 @@ export default function Book() {
 
               <BookDateTimePicker
                 durationMin={service.durationMin}
-                onConfirm={(d, t) => { setDate(d); setTime(t); setStep('details'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                onConfirm={(d, t, f) => { setDate(d); setTime(t); setFees(f); setStep('details'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
                 onDateChange={(d) => setPickerDate(d)}
               />
 
@@ -321,6 +331,16 @@ export default function Book() {
                   />
                   {errors.phone && <span className="book__error">{errors.phone}</span>}
                 </div>
+                <div className="book__field">
+                  <label className="book__label">Notes <span className="book__label-optional">(optional)</span></label>
+                  <textarea
+                    className="book__input book__textarea"
+                    placeholder="e.g. I might be 5 mins late, I want a skin fade..."
+                    value={info.notes}
+                    rows={3}
+                    onChange={e => setInfo(p => ({ ...p, notes: e.target.value }))}
+                  />
+                </div>
               </div>
 
               <button className="book__next-btn" onClick={handleConfirm}>
@@ -368,10 +388,34 @@ export default function Book() {
                   <span className="book__summary-key">Phone</span>
                   <span className="book__summary-val">{info.phone}</span>
                 </div>
+                {info.notes.trim() && (
+                  <div className="book__summary-row">
+                    <span className="book__summary-key">Notes</span>
+                    <span className="book__summary-val" style={{ fontStyle: 'italic', opacity: 0.7 }}>{info.notes}</span>
+                  </div>
+                )}
                 <div className="book__summary-divider" />
                 <div className="book__summary-row">
+                  <span className="book__summary-key">Base price</span>
+                  <span className="book__summary-val">{service.price}</span>
+                </div>
+                {fees.lateNight && (
+                  <div className="book__summary-row">
+                    <span className="book__summary-key">Late night fee</span>
+                    <span className="book__summary-val" style={{ color: '#d4af37' }}>+${LATE_NIGHT_FEE}</span>
+                  </div>
+                )}
+                {fees.lastMinute && (
+                  <div className="book__summary-row">
+                    <span className="book__summary-key">Last-minute fee</span>
+                    <span className="book__summary-val" style={{ color: '#e05555' }}>+${LAST_MINUTE_FEE}</span>
+                  </div>
+                )}
+                <div className="book__summary-row">
                   <span className="book__summary-key">Total</span>
-                  <span className="book__summary-val book__summary-price">{service.price}</span>
+                  <span className="book__summary-val book__summary-price">
+                    ${parseInt(service.price.replace(/\D/g,''), 10) + (fees.lateNight ? LATE_NIGHT_FEE : 0) + (fees.lastMinute ? LAST_MINUTE_FEE : 0)}
+                  </span>
                 </div>
                 <p className="book__summary-note">Payment due in person at the appointment.</p>
               </div>

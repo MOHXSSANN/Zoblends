@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
 import './Page.css'
 import './MyBookings.css'
+
+const CANCEL_WINDOW_HRS = 6
 
 interface Booking {
   id: string
@@ -39,13 +41,17 @@ function formatTime(iso: string) {
 }
 
 function isPast(iso: string) { return new Date(iso) < new Date() }
+function hoursUntil(iso: string) { return (new Date(iso).getTime() - Date.now()) / 3_600_000 }
+function canCancel(iso: string) { return hoursUntil(iso) >= CANCEL_WINDOW_HRS }
 
 export default function MyBookings() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [bookings, setBookings]   = useState<Booking[]>([])
   const [loading, setLoading]     = useState(true)
   const [selected, setSelected]   = useState<Booking | null>(null)
   const [cancelling, setCancelling] = useState(false)
+  const [cancelError, setCancelError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!user) { setLoading(false); return }
@@ -57,6 +63,11 @@ export default function MyBookings() {
   }, [user])
 
   async function handleCancel(b: Booking) {
+    if (!canCancel(b.starts_at)) {
+      setCancelError(`Cancellations must be made at least ${CANCEL_WINDOW_HRS} hours before your appointment.`)
+      return
+    }
+    setCancelError(null)
     setCancelling(true)
     await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', b.id)
 
@@ -227,12 +238,37 @@ export default function MyBookings() {
               </div>
 
               {selected.status === 'confirmed' && !isPast(selected.starts_at) && (
+                <div className="mybookings__modal-actions">
+                  <button
+                    className="mybookings__modal-reschedule"
+                    onClick={() => { setSelected(null); navigate('/book') }}
+                  >
+                    Reschedule →
+                  </button>
+                  {canCancel(selected.starts_at) ? (
+                    <>
+                      {cancelError && <p className="mybookings__cancel-error">{cancelError}</p>}
+                      <button
+                        className="mybookings__modal-cancel"
+                        onClick={() => handleCancel(selected)}
+                        disabled={cancelling}
+                      >
+                        {cancelling ? 'Cancelling…' : 'Cancel Appointment'}
+                      </button>
+                    </>
+                  ) : (
+                    <p className="mybookings__cancel-locked">
+                      Cancellations close {CANCEL_WINDOW_HRS} hours before your appointment.
+                    </p>
+                  )}
+                </div>
+              )}
+              {(selected.status === 'completed' || isPast(selected.starts_at)) && (
                 <button
-                  className="mybookings__modal-cancel"
-                  onClick={() => handleCancel(selected)}
-                  disabled={cancelling}
+                  className="mybookings__modal-reschedule"
+                  onClick={() => { setSelected(null); navigate('/book') }}
                 >
-                  {cancelling ? 'Cancelling…' : 'Cancel Appointment'}
+                  Book Again →
                 </button>
               )}
             </motion.div>

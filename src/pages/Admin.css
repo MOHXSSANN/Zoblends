@@ -303,3 +303,83 @@
 .admin__panel-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
 .admin__panel-btn--active { border-color: var(--gold); color: var(--gold); }
 .admin__panel-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ── Mark all complete ── */
+.admin__mark-all {
+  width: 100%;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  background: rgba(107,214,163,0.08);
+  border: 1px solid rgba(107,214,163,0.3);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6bd6a3;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  text-align: left;
+}
+.admin__mark-all:hover:not(:disabled) { background: rgba(107,214,163,0.15); border-color: #6bd6a3; }
+.admin__mark-all:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Analytics ── */
+.admin__analytics { display: flex; flex-direction: column; gap: 32px; padding-bottom: 60px; }
+.admin__analytics-section { display: flex; flex-direction: column; gap: 10px; }
+.admin__analytics-title {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #d4af37;
+  margin-bottom: 4px;
+}
+.admin__analytics-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: rgba(245,244,240,0.7);
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(212,175,55,0.06);
+}
+.admin__analytics-val { color: var(--white); font-weight: 600; }
+.admin__analytics-bar-wrap { display: flex; align-items: center; gap: 10px; flex: 1; justify-content: flex-end; }
+.admin__analytics-bar { height: 4px; background: rgba(212,175,55,0.4); border-radius: 2px; min-width: 4px; }
+
+/* ── Payment method ── */
+.admin__panel-payment { margin: 16px 0; }
+.admin__panel-payment-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(245,244,240,0.4);
+  display: block;
+  margin-bottom: 10px;
+}
+.admin__panel-payment-btns { display: flex; gap: 8px; }
+.admin__panel-payment-btn {
+  flex: 1;
+  padding: 10px 8px;
+  background: none;
+  border: 1px solid rgba(245,244,240,0.1);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(245,244,240,0.4);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.admin__panel-payment-btn.active {
+  background: rgba(212,175,55,0.12);
+  border-color: rgba(212,175,55,0.5);
+  color: #d4af37;
+}
