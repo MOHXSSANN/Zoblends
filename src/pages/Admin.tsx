@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
-import { Navigate } from 'react-router-dom'
+import { Navigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -251,6 +251,7 @@ export default function Admin() {
         >
           <h1 className="admin__title">Dashboard</h1>
           <p className="admin__sub">Zoblends · {new Date().toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'})}</p>
+          <Link to="/admin/finance" className="admin__finance-link">View Finance →</Link>
         </motion.div>
 
         {/* Stats */}

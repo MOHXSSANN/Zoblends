@@ -8,21 +8,23 @@ import Contact    from './pages/Contact'
 import Book       from './pages/Book'
 import Shop       from './pages/Shop'
 import MyBookings from './pages/MyBookings'
-import Admin      from './pages/Admin'
+import Admin        from './pages/Admin'
+import AdminFinance  from './pages/AdminFinance'
 
 export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/"           element={<Home />}       />
-        <Route path="/gallery"    element={<Gallery />}    />
-        <Route path="/about"      element={<About />}      />
-        <Route path="/reviews"    element={<Reviews />}    />
-        <Route path="/contact"    element={<Contact />}    />
-        <Route path="/book"       element={<Book />}       />
-        <Route path="/shop"       element={<Shop />}       />
-        <Route path="/my-bookings" element={<MyBookings />} />
-        <Route path="/admin"      element={<Admin />}      />
+        <Route path="/"              element={<Home />}         />
+        <Route path="/gallery"       element={<Gallery />}      />
+        <Route path="/about"         element={<About />}        />
+        <Route path="/reviews"       element={<Reviews />}      />
+        <Route path="/contact"       element={<Contact />}      />
+        <Route path="/book"          element={<Book />}         />
+        <Route path="/shop"          element={<Shop />}         />
+        <Route path="/my-bookings"   element={<MyBookings />}   />
+        <Route path="/admin"         element={<Admin />}        />
+        <Route path="/admin/finance" element={<AdminFinance />} />
       </Route>
     </Routes>
   )
