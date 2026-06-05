@@ -49,10 +49,10 @@ export default function Admin() {
   const [updating, setUpdating] = useState(false)
   const [search, setSearch]     = useState('')
 
-  if (!user) return <Navigate to="/" replace />
-  if (user.email !== ADMIN_EMAIL) return <Navigate to="/" replace />
+  const isAdmin = !!user && user.email === ADMIN_EMAIL
 
   useEffect(() => {
+    if (!isAdmin) return
     Promise.all([
       supabase.from('bookings').select('*').order('starts_at', { ascending: true }),
       supabase.from('waitlist').select('*').order('created_at', { ascending: true }),
@@ -63,7 +63,10 @@ export default function Admin() {
       setOrders((o as ShopOrder[]) ?? [])
       setLoading(false)
     })
-  }, [])
+  }, [isAdmin])
+
+  if (!user) return <Navigate to="/" replace />
+  if (!isAdmin) return <Navigate to="/" replace />
 
   async function updateStatus(id: string, status: string) {
     setUpdating(true)

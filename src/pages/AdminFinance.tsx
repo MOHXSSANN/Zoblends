@@ -48,9 +48,10 @@ export default function AdminFinance() {
   const [adding,    setAdding]    = useState(false)
   const [showForm,  setShowForm]  = useState(false)
 
-  if (!user || user.email !== ADMIN_EMAIL) return <Navigate to="/" replace />
+  const isAdmin = !!user && user.email === ADMIN_EMAIL
 
   useEffect(() => {
+    if (!isAdmin) return
     Promise.all([
       supabase.from('bookings').select('service_name,service_price,starts_at,status,payment_method'),
       supabase.from('product_expenses').select('*').order('purchased_at', { ascending: false }),
@@ -59,7 +60,9 @@ export default function AdminFinance() {
       setExpenses((e as Expense[]) ?? [])
       setLoading(false)
     })
-  }, [])
+  }, [isAdmin])
+
+  if (!user || !isAdmin) return <Navigate to="/" replace />
 
   // ── Revenue calcs ─────────────────────────────────────────────────
   const completed   = bookings.filter(b => b.status === 'completed')
