@@ -61,16 +61,20 @@
   gap: 0;
   border-bottom: 1px solid rgba(212,175,55,0.1);
   margin-bottom: 24px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+.admin__tabs::-webkit-scrollbar { display: none; }
 .admin__tab {
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
-  padding: 10px 20px;
+  padding: 10px 14px;
   font-family: var(--font-body);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(245,244,240,0.35);
   cursor: pointer;
@@ -78,7 +82,9 @@
   transition: color 0.2s, border-color 0.2s;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .admin__tab--active { color: var(--gold); border-bottom-color: var(--gold); }
 .admin__tab-badge {
