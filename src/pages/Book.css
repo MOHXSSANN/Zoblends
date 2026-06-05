@@ -116,6 +116,58 @@
 
 .book__policy a { color: var(--gold); text-decoration: none; }
 
+/* ── Book again banner ───────────────────────────── */
+.book__rebook {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border: 1px solid rgba(212,175,55,0.2);
+  background: rgba(212,175,55,0.04);
+  margin-bottom: 24px;
+}
+
+.book__rebook-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.book__rebook-eyebrow {
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(245,244,240,0.3);
+}
+
+.book__rebook-service {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: 0.02em;
+}
+
+.book__rebook-btn {
+  flex-shrink: 0;
+  padding: 10px 20px;
+  background: #d4af37;
+  color: #000;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+.book__rebook-btn:hover { background: #c9a430; }
+
 /* ── Section label ───────────────────────────────── */
 .book__section-label {
   font-family: var(--font-body);
@@ -345,6 +397,62 @@
 }
 
 .book__form { display: flex; flex-direction: column; gap: 20px; }
+
+/* ── Pre-filled contact card ── */
+.book__prefilled {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(212,175,55,0.18);
+  background: rgba(212,175,55,0.04);
+  padding: 4px 0;
+}
+
+.book__prefilled-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(212,175,55,0.08);
+}
+.book__prefilled-row:last-of-type { border-bottom: none; }
+
+.book__prefilled-label {
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(245,244,240,0.3);
+  flex-shrink: 0;
+  width: 44px;
+}
+
+.book__prefilled-value {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: rgba(245,244,240,0.85);
+  text-align: right;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.book__prefilled-edit {
+  background: none;
+  border: none;
+  border-top: 1px solid rgba(212,175,55,0.08);
+  padding: 10px 16px;
+  text-align: right;
+  font-family: var(--font-body);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: rgba(245,244,240,0.3);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.book__prefilled-edit:hover { color: var(--gold); }
 
 .book__field { display: flex; flex-direction: column; gap: 8px; }
 
@@ -615,3 +723,55 @@
   animation: waitlist-float 3s ease-in-out infinite;
   filter: drop-shadow(0 8px 24px rgba(212,175,55,0.25));
 }
+
+/* ── Add-ons ─────────────────────────────────────── */
+.book__addons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.book__addon {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(245,244,240,0.03);
+  border: 1px solid rgba(245,244,240,0.08);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+}
+.book__addon:hover { background: rgba(212,175,55,0.05); border-color: rgba(212,175,55,0.2); }
+.book__addon--on {
+  background: rgba(212,175,55,0.08);
+  border-color: rgba(212,175,55,0.4);
+}
+
+.book__addon-name {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(245,244,240,0.85);
+  letter-spacing: 0.02em;
+}
+.book__addon--on .book__addon-name { color: #d4af37; }
+
+.book__addon-meta {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: rgba(245,244,240,0.6);
+  letter-spacing: 0.06em;
+  flex: 1;
+}
+
+.book__addon-check {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(245,244,240,0.25);
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.book__addon--on .book__addon-check { color: #d4af37; }

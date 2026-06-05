@@ -13,6 +13,7 @@ type EmailType =
   | { type: 'waitlist-spot-open';    to: string; name: string; date: string }
   | { type: 'booking-reminder';      to: string; name: string; service: string; date: string; time: string; duration: string; confirmationNumber: string; hoursUntil: number }
   | { type: 'admin-new-booking';     name: string; service: string; date: string; time: string; phone: string; email: string; confirmationNumber: string }
+  | { type: 're-engagement';         to: string; name: string }
 
 // ─── Shared helpers ──────────────────────────────────────────────────────────
 
@@ -212,6 +213,21 @@ function adminNewBookingHtml(d: Extract<EmailType, { type: 'admin-new-booking' }
   `)
 }
 
+function reEngagementHtml(d: Extract<EmailType, { type: 're-engagement' }>) {
+  const first = d.name.split(' ')[0]
+  return shell(`
+    <p style="font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:rgba(212,175,55,0.6);margin:0 0 8px;">Miss You</p>
+    <h1 style="font-size:26px;font-weight:700;color:#f5f4f0;margin:0 0 16px;">It's been a while, ${first}.</h1>
+    <p style="font-size:14px;color:rgba(245,244,240,0.55);margin:0 0 28px;line-height:1.7;">
+      Your last cut was over a month ago. The chair's open — come keep things sharp.
+    </p>
+    ${btn('Book a Spot →', 'https://zoblends.com/book')}
+    <p style="font-size:11px;color:rgba(245,244,240,0.2);margin:24px 0 0;text-align:center;">
+      340 Claridge Dr, Nepean · @zo_blendz_
+    </p>
+  `)
+}
+
 // ─── Handler ──────────────────────────────────────────────────────────────────
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -262,6 +278,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       subject = `New booking: ${data.name} · ${data.service} · ${data.date}`
       html    = adminNewBookingHtml(data)
       to      = ADMIN_EMAIL
+      break
+    case 're-engagement':
+      subject = `Hey ${data.name.split(' ')[0]}, it's been a while — book your next cut`
+      html    = reEngagementHtml(data)
+      to      = data.to
       break
     default:
       return res.status(400).json({ error: 'unknown type' })

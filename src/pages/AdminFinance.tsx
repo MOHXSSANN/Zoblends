@@ -25,6 +25,11 @@ interface Expense {
   category: string
   purchased_at: string
 }
+interface ShopOrder {
+  total_cents: number
+  status: string
+  created_at: string
+}
 
 const GOLD    = '#d4af37'
 const GOLD2   = '#b1902a'
@@ -40,6 +45,7 @@ export default function AdminFinance() {
   const { user } = useAuth()
   const [bookings,  setBookings]  = useState<Booking[]>([])
   const [expenses,  setExpenses]  = useState<Expense[]>([])
+  const [shopOrders, setShopOrders] = useState<ShopOrder[]>([])
   const [loading,   setLoading]   = useState(true)
   const [newDesc,   setNewDesc]   = useState('')
   const [newAmt,    setNewAmt]    = useState('')
@@ -50,27 +56,34 @@ export default function AdminFinance() {
 
   const isAdmin = !!user && user.email === ADMIN_EMAIL
 
-  useEffect(() => {
+  function fetchAll() {
     if (!isAdmin) return
+    setLoading(true)
     Promise.all([
       supabase.from('bookings').select('service_name,service_price,starts_at,status,payment_method'),
       supabase.from('product_expenses').select('*').order('purchased_at', { ascending: false }),
-    ]).then(([{ data: b }, { data: e }]) => {
+      supabase.from('shop_orders').select('total_cents,status,created_at'),
+    ]).then(([{ data: b }, { data: e }, { data: o }]) => {
       setBookings((b as Booking[]) ?? [])
       setExpenses((e as Expense[]) ?? [])
+      setShopOrders((o as ShopOrder[]) ?? [])
       setLoading(false)
     })
-  }, [isAdmin])
+  }
+
+  useEffect(() => { fetchAll() }, [isAdmin])
 
   if (!user || !isAdmin) return <Navigate to="/" replace />
 
   // ── Revenue calcs ─────────────────────────────────────────────────
-  const completed   = bookings.filter(b => b.status === 'completed')
-  const totalRev    = completed.reduce((s, b) => s + parsePrice(b.service_price), 0)
-  const etRev       = completed.filter(b => !b.payment_method || b.payment_method === 'etransfer').reduce((s,b) => s + parsePrice(b.service_price), 0)
-  const cashRev     = completed.filter(b => b.payment_method === 'cash').reduce((s,b) => s + parsePrice(b.service_price), 0)
-  const totalExp    = expenses.reduce((s, e) => s + Number(e.amount), 0)
-  const netProfit   = totalRev - totalExp
+  const completed    = bookings.filter(b => b.status === 'completed')
+  const bookingRev   = completed.reduce((s, b) => s + parsePrice(b.service_price), 0)
+  const shopRev      = shopOrders.filter(o => o.status === 'fulfilled' || o.status === 'paid').reduce((s, o) => s + o.total_cents / 100, 0)
+  const totalRev     = bookingRev + shopRev
+  const etRev        = completed.filter(b => !b.payment_method || b.payment_method === 'etransfer').reduce((s,b) => s + parsePrice(b.service_price), 0)
+  const cashRev      = completed.filter(b => b.payment_method === 'cash').reduce((s,b) => s + parsePrice(b.service_price), 0)
+  const totalExp     = expenses.reduce((s, e) => s + Number(e.amount), 0)
+  const netProfit    = totalRev - totalExp
 
   // Payment method donut
   const paymentData = [
@@ -90,6 +103,11 @@ export default function AdminFinance() {
     const d = new Date(b.starts_at)
     const key = `${MONTH_SHORT[d.getMonth()]} ${d.getFullYear()}`
     monthMap[key] = (monthMap[key]??0) + parsePrice(b.service_price)
+  })
+  shopOrders.filter(o => o.status === 'fulfilled' || o.status === 'paid').forEach(o => {
+    const d = new Date(o.created_at)
+    const key = `${MONTH_SHORT[d.getMonth()]} ${d.getFullYear()}`
+    monthMap[key] = (monthMap[key]??0) + o.total_cents / 100
   })
   const monthData = Object.entries(monthMap).slice(-6).map(([month, revenue]) => ({ month, revenue }))
 
@@ -127,6 +145,8 @@ export default function AdminFinance() {
   }
 
   if (loading) return <div className="af__loading">Loading…</div>
+  // DEBUG — remove after confirming
+  console.log('[Finance] shopOrders:', shopOrders, 'shopRev:', shopRev, 'bookingRev:', bookingRev)
 
   return (
     <>
@@ -136,6 +156,7 @@ export default function AdminFinance() {
         <div className="af__header">
           <h1 className="af__title">Finance</h1>
           <p className="af__sub">Revenue · Expenses · Profit</p>
+          <button className="af__refresh-btn" onClick={fetchAll}>↺ Refresh</button>
         </div>
 
         {/* ── KPI row ── */}
@@ -143,6 +164,12 @@ export default function AdminFinance() {
           <div className="af__kpi">
             <span className="af__kpi-val" style={{ color: GOLD }}>${totalRev.toLocaleString()}</span>
             <span className="af__kpi-label">Total Revenue</span>
+          </div>
+          <div className="af__kpi">
+            <span className="af__kpi-val" style={{ color: 'rgba(245,244,240,0.55)', fontSize: 18 }}>
+              ${bookingRev.toLocaleString()} + ${shopRev.toLocaleString()}
+            </span>
+            <span className="af__kpi-label">Bookings + Shop</span>
           </div>
           <div className="af__kpi">
             <span className="af__kpi-val" style={{ color: RED }}>-${totalExp.toLocaleString()}</span>

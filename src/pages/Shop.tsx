@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
 import { useCart } from '../lib/CartContext'
-import { PRODUCTS } from '../lib/products'
+import { PRODUCTS, type Product } from '../lib/products'
+import { supabase } from '../lib/supabase'
 import ShelfDisplay from '../components/ui/ShelfDisplay'
 import './Page.css'
 import './Shop.css'
@@ -11,9 +12,32 @@ const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
 export default function Shop() {
   const { add } = useCart()
-  const [added, setAdded] = useState<string | null>(null)
+  const [added, setAdded]       = useState<string | null>(null)
+  const [products, setProducts] = useState<Product[]>(PRODUCTS)
 
-  function handleAdd(p: typeof PRODUCTS[0]) {
+  useEffect(() => {
+    supabase
+      .from('products')
+      .select('id, name, price_cents, cost_price_cents, stock, description, image_url')
+      .eq('active', true)
+      .order('id')
+      .then(({ data }) => {
+        if (!data?.length) return
+        setProducts(data.map(p => ({
+          id:               p.id,
+          name:             p.name,
+          price:            `$${p.price_cents / 100}`,
+          desc:             p.description ?? '',
+          image:            p.image_url   ?? '',
+          stock:            p.stock,
+          cost_price_cents: p.cost_price_cents,
+        })))
+      })
+      .catch(() => {})
+  }, [])
+
+  function handleAdd(p: Product) {
+    if (p.stock === 0) return
     add({ id: p.id, name: p.name, price: p.price })
     setAdded(p.id)
     setTimeout(() => setAdded(null), 1200)
@@ -39,7 +63,7 @@ export default function Shop() {
         </motion.div>
 
         <ShelfDisplay
-          products={PRODUCTS}
+          products={products}
           onAdd={handleAdd}
           added={added}
         />

@@ -25,6 +25,10 @@ interface ShopOrder {
   items: { id: string; name: string; price: string; qty: number }[]
   total_cents: number; status: string; created_at: string
 }
+interface AdminProduct {
+  id: string; name: string; price_cents: number; cost_price_cents: number
+  stock: number; image_url?: string; active: boolean
+}
 
 const MONTH = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const fmt = (iso: string) => { const d = new Date(iso); return `${MONTH[d.getMonth()]} ${d.getDate()} · ${fmtTime(iso)}` }
@@ -40,11 +44,15 @@ const STATUS_BADGE: Record<string, { bg: string; border: string; color: string }
 
 export default function Admin() {
   const { user } = useAuth()
-  const [tab, setTab]           = useState<'upcoming'|'past'|'waitlist'|'orders'|'analytics'>('upcoming')
+  const [tab, setTab]           = useState<'upcoming'|'past'|'waitlist'|'orders'|'analytics'|'inventory'>('upcoming')
   const [bookings, setBookings] = useState<Booking[]>([])
   const [waitlist, setWaitlist] = useState<WaitlistEntry[]>([])
-  const [orders, setOrders]     = useState<ShopOrder[]>([])
-  const [loading, setLoading]   = useState(true)
+  const [orders, setOrders]         = useState<ShopOrder[]>([])
+  const [products, setProducts]     = useState<AdminProduct[]>([])
+  const [editStock, setEditStock]   = useState<Record<string, number>>({})
+  const [editCost, setEditCost]     = useState<Record<string, number>>({})
+  const [savingProd, setSavingProd] = useState<string | null>(null)
+  const [loading, setLoading]       = useState(true)
   const [selected, setSelected] = useState<Booking | null>(null)
   const [updating, setUpdating] = useState(false)
   const [search, setSearch]     = useState('')
@@ -57,13 +65,21 @@ export default function Admin() {
       supabase.from('bookings').select('*').order('starts_at', { ascending: true }),
       supabase.from('waitlist').select('*').order('created_at', { ascending: true }),
       supabase.from('shop_orders').select('*').order('created_at', { ascending: false }),
-    ]).then(([{ data: b }, { data: w }, { data: o }]) => {
+      supabase.from('products').select('*').order('id'),
+    ]).then(([{ data: b }, { data: w }, { data: o }, { data: p }]) => {
       setBookings((b as Booking[]) ?? [])
       setWaitlist((w as WaitlistEntry[]) ?? [])
       setOrders((o as ShopOrder[]) ?? [])
+      setProducts((p as AdminProduct[]) ?? [])
       setLoading(false)
     })
   }, [isAdmin])
+
+  useEffect(() => {
+    if (!isAdmin || tab !== 'orders') return
+    supabase.from('shop_orders').select('*').order('created_at', { ascending: false })
+      .then(({ data }) => { if (data) setOrders(data as ShopOrder[]) })
+  }, [isAdmin, tab])
 
   if (!user) return <Navigate to="/" replace />
   if (!isAdmin) return <Navigate to="/" replace />
@@ -165,6 +181,24 @@ export default function Admin() {
     setUpdating(false)
   }
 
+  async function fulfillOrder(id: string) {
+    const { error } = await supabase.from('shop_orders').update({ status: 'fulfilled' }).eq('id', id)
+    if (error) { alert(`Couldn't update order: ${error.message}`); return }
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, status: 'fulfilled' } : o))
+  }
+
+  async function saveProduct(id: string) {
+    setSavingProd(id)
+    const updates: Partial<AdminProduct> = {}
+    if (editStock[id] !== undefined) updates.stock            = editStock[id]
+    if (editCost[id]  !== undefined) updates.cost_price_cents = editCost[id] * 100
+    await supabase.from('products').update(updates).eq('id', id)
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p))
+    setEditStock(prev => { const n = { ...prev }; delete n[id]; return n })
+    setEditCost(prev  => { const n = { ...prev }; delete n[id]; return n })
+    setSavingProd(null)
+  }
+
   async function updatePaymentMethod(id: string, method: string) {
     await supabase.from('bookings').update({ payment_method: method }).eq('id', id)
     setBookings(prev => prev.map(b => b.id === id ? { ...b, payment_method: method } : b))
@@ -180,7 +214,9 @@ export default function Admin() {
 
   // Analytics
   const completed = bookings.filter(b => b.status === 'completed')
-  const totalRevenue = completed.reduce((sum, b) => sum + parseInt(b.service_price.replace(/\D/g,''), 10), 0)
+  const bookingRevenue = completed.reduce((sum, b) => sum + parseInt(b.service_price.replace(/\D/g,''), 10), 0)
+  const shopRevenue = orders.filter(o => o.status === 'fulfilled' || o.status === 'paid').reduce((s, o) => s + o.total_cents / 100, 0)
+  const totalRevenue = bookingRevenue + shopRevenue
   const cashRevenue = completed.filter(b => b.payment_method === 'cash').reduce((s,b) => s + parseInt(b.service_price.replace(/\D/g,''),10), 0)
   const etRevenue   = completed.filter(b => !b.payment_method || b.payment_method === 'etransfer').reduce((s,b) => s + parseInt(b.service_price.replace(/\D/g,''),10), 0)
   const revByMonth: Record<string, number> = {}
@@ -202,32 +238,80 @@ export default function Admin() {
   const cashCount     = bookings.filter(b => b.payment_method === 'cash').length
   const etransferCount = bookings.filter(b => !b.payment_method || b.payment_method === 'etransfer').length
 
-  function exportCSV() {
-    const rows = [
-      ['Confirmation','Name','Email','Phone','Service','Date','Time','Price','Payment','Status','Notes'],
-      ...bookings.map(b => {
-        const d = new Date(b.starts_at)
-        return [
-          b.confirmation_number ?? '',
-          b.name, b.email, b.phone,
-          b.service_name,
-          `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`,
-          fmtTime(b.starts_at),
-          b.service_price,
-          b.payment_method ?? 'etransfer',
-          b.status,
-          (b.notes ?? '').replace(/,/g, ' '),
-        ]
+  function exportXLSX() {
+    const statusMap: Record<string, string> = {
+      confirmed: 'Confirmed', completed: 'Completed',
+      cancelled: 'Cancelled', no_show: 'No Show',
+    }
+    const svcMap: Record<string, { name: string; price: number; dur: number; w: number }> = {}
+    const wbBookings = bookings.map(b => {
+      const d   = new Date(b.starts_at)
+      const price = parseInt(b.service_price.replace(/\D/g, ''), 10) || 0
+      const dur   = parseInt(b.service_duration, 10) || 30
+      if (!svcMap[b.service_name]) svcMap[b.service_name] = { name: b.service_name, price, dur, w: 1 }
+      const lateExtra = b.late_night_fee ? 10 : 0
+      const lmExtra   = b.last_minute_fee ? 8 : 0
+      return {
+        client: { name: b.name, email: b.email, phone: b.phone },
+        svc: { name: b.service_name, price, dur },
+        d: d.toISOString().slice(0, 10),
+        hour: d.getHours(), minute: d.getMinutes(),
+        lateNight: b.late_night_fee ? 'Y' : 'N',
+        lastMin:   b.last_minute_fee ? 'Y' : 'N',
+        payment:   b.payment_method === 'cash' ? 'Cash' : 'E-Transfer',
+        status:    statusMap[b.status] ?? 'Confirmed',
+        notes:     b.notes ?? '',
+        conf:      b.confirmation_number ?? '',
+        total:     price + lateExtra + lmExtra,
+      }
+    })
+
+    const clientMap: Record<string, { name: string; email: string; phone: string; visits: number; spent: number; svcCount: Record<string, number> }> = {}
+    wbBookings.forEach(bk => {
+      const key = bk.client.name
+      if (!clientMap[key]) clientMap[key] = { ...bk.client, visits: 0, spent: 0, svcCount: {} }
+      if (bk.status === 'Completed') {
+        clientMap[key].visits++
+        clientMap[key].spent += bk.total
+        clientMap[key].svcCount[bk.svc.name] = (clientMap[key].svcCount[bk.svc.name] ?? 0) + 1
+      }
+    })
+    const directory = Object.values(clientMap)
+      .sort((a, b) => b.visits - a.visits || b.spent - a.spent)
+      .map(c => {
+        let pref = '', best = -1
+        Object.entries(c.svcCount).forEach(([s, n]) => { if (n > best) { best = n; pref = s } })
+        return { name: c.name, email: c.email, phone: c.phone, preferred: pref }
       })
-    ]
-    const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n')
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
-    a.download = `zoblends-bookings-${new Date().toISOString().slice(0,10)}.csv`
-    a.click()
+
+    const wbWaitlist = waitlist.map(w => ({
+      name: w.name, email: w.email, phone: w.phone,
+      desired: w.desired_date,
+      added:   w.created_at.slice(0, 10),
+      status:  w.status.charAt(0).toUpperCase() + w.status.slice(1),
+      notes:   '',
+    }))
+
+    const SERVICES = Object.values(svcMap)
+    const payload = {
+      SERVICES: SERVICES.length ? SERVICES : [
+        { name:'Skin Fade',price:45,dur:45,w:1},{ name:'Classic Cut',price:35,dur:30,w:1},
+        { name:'Cut & Beard Combo',price:55,dur:60,w:1},{ name:'Beard Trim',price:20,dur:20,w:1},
+      ],
+      clients: Object.values(clientMap),
+      bookings: wbBookings,
+      directory,
+      agg: {},
+      income: [],
+      expenses: [],
+      waitlist: wbWaitlist,
+    }
+
+    sessionStorage.setItem('zbRealData', JSON.stringify(payload))
+    window.open('/xlsx/build.html', '_blank')
   }
 
-  const q = search.toLowerCase().trim()
+const q = search.toLowerCase().trim()
   const filterBookings = (list: Booking[]) => !q ? list : list.filter(b =>
     b.name.toLowerCase().includes(q) ||
     b.email.toLowerCase().includes(q) ||
@@ -284,7 +368,7 @@ export default function Admin() {
 
         {/* Tabs */}
         <div className="admin__tabs">
-          {(['upcoming','past','waitlist','orders','analytics'] as const).map(t => (
+          {(['upcoming','past','waitlist','orders','analytics','inventory'] as const).map(t => (
             <button key={t} className={`admin__tab${tab===t?' admin__tab--active':''}`} onClick={() => setTab(t)}>
               {t.charAt(0).toUpperCase()+t.slice(1)}
               {t === 'waitlist' && activeWait.length > 0 && (
@@ -380,9 +464,74 @@ export default function Admin() {
               {Object.keys(busyHours).length === 0 && <p className="admin__empty">No data yet.</p>}
             </div>
 
-            <button className="admin__export-btn" onClick={exportCSV}>
-              ↓ Export All Bookings as CSV
+            <button className="admin__export-btn" style={{ background:'rgba(212,175,55,0.12)', border:'1px solid rgba(212,175,55,0.45)', color:'#d4af37' }} onClick={exportXLSX}>
+              ↓ Export Excel (.xlsx)
             </button>
+          </div>
+        ) : tab === 'inventory' ? (
+          <div className="admin__inventory">
+            {products.length === 0 ? (
+              <p className="admin__empty">No products found. Run the products SQL migration first.</p>
+            ) : (
+              <>
+                <div className="admin__inventory-header">
+                  <span>Product</span>
+                  <span>Stock</span>
+                  <span>Cost</span>
+                  <span>Sale</span>
+                  <span>Margin</span>
+                  <span>Sold</span>
+                  <span></span>
+                </div>
+                {products.map(p => {
+                  const unitsSold = orders.reduce((sum, o) => {
+                    const found = o.items?.find(i => i.id === p.id)
+                    return sum + (found?.qty ?? 0)
+                  }, 0)
+                  const saleCents   = p.price_cents
+                  const costCents   = editCost[p.id] !== undefined ? editCost[p.id] * 100 : p.cost_price_cents
+                  const margin      = saleCents > 0 ? Math.round(((saleCents - costCents) / saleCents) * 100) : 0
+                  const stockVal    = editStock[p.id] !== undefined ? editStock[p.id] : p.stock
+                  const isDirty     = editStock[p.id] !== undefined || editCost[p.id] !== undefined
+                  return (
+                    <div key={p.id} className="admin__inventory-row">
+                      <span className="admin__inventory-name">{p.name}</span>
+                      <span className="admin__inventory-cell">
+                        <input
+                          className="admin__inventory-input"
+                          type="number" min={0}
+                          value={stockVal}
+                          onChange={e => setEditStock(prev => ({ ...prev, [p.id]: parseInt(e.target.value) || 0 }))}
+                          style={{ borderColor: stockVal <= 3 ? 'rgba(224,85,85,0.5)' : undefined }}
+                        />
+                        {stockVal <= 3 && stockVal > 0 && <span className="admin__inventory-low">Low</span>}
+                        {stockVal === 0 && <span className="admin__inventory-out">Out</span>}
+                      </span>
+                      <span className="admin__inventory-cell">
+                        $<input
+                          className="admin__inventory-input admin__inventory-input--sm"
+                          type="number" min={0} step="0.01"
+                          value={editCost[p.id] !== undefined ? editCost[p.id] : (p.cost_price_cents / 100).toFixed(2)}
+                          onChange={e => setEditCost(prev => ({ ...prev, [p.id]: parseFloat(e.target.value) || 0 }))}
+                        />
+                      </span>
+                      <span className="admin__inventory-val">${(saleCents / 100).toFixed(2)}</span>
+                      <span className="admin__inventory-val" style={{ color: margin >= 40 ? '#6bd6a3' : margin >= 20 ? '#d4af37' : '#e05555' }}>
+                        {margin}%
+                      </span>
+                      <span className="admin__inventory-val">{unitsSold}</span>
+                      <button
+                        className="admin__inventory-save"
+                        onClick={() => saveProduct(p.id)}
+                        disabled={!isDirty || savingProd === p.id}
+                      >
+                        {savingProd === p.id ? '…' : 'Save'}
+                      </button>
+                    </div>
+                  )
+                })}
+              </>
+            )}
           </div>
         ) : tab === 'orders' ? (
           <div className="admin__list">
@@ -402,9 +551,21 @@ export default function Admin() {
                   <span className="admin__row-status" style={{ color: '#6bd6a3' }}>
                     ${(o.total_cents / 100).toFixed(2)}
                   </span>
-                  <span className="admin__row-conf" style={{ color: o.status === 'paid' ? '#d4af37' : 'rgba(245,244,240,0.3)' }}>
+                  <span style={{
+                    fontFamily: 'var(--font-body)', fontSize: 9, fontWeight: 800,
+                    letterSpacing: '0.16em', textTransform: 'uppercase', padding: '4px 8px',
+                    background: o.status === 'fulfilled' ? 'rgba(107,214,163,0.12)' : 'rgba(212,175,55,0.12)',
+                    border: `1px solid ${o.status === 'fulfilled' ? 'rgba(107,214,163,0.4)' : 'rgba(212,175,55,0.4)'}`,
+                    color: o.status === 'fulfilled' ? '#6bd6a3' : '#d4af37',
+                  }}>
                     {o.status.toUpperCase()}
                   </span>
+                  {o.status === 'pending' && (
+                    <button className="admin__row-action" onClick={() => fulfillOrder(o.id)}
+                      style={{ marginTop: 4 }}>
+                      Mark Fulfilled
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

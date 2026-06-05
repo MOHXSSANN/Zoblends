@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
+import { useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -15,6 +16,11 @@ const SERVICES = [
   { id: 'lineup',        name: 'Line Up / Clean Up',   duration: '25 min', durationMin: 25, price: '$25' },
 ]
 
+const ADDONS = [
+  { id: 'hot-towel', name: 'Hot Towel',          price: 5, desc: 'Warm towel finish' },
+  { id: 'face-wash', name: 'Face Wash & Massage', price: 5, desc: 'Cleanse & relax'   },
+]
+
 type Step = 'service' | 'datetime' | 'details' | 'confirm' | 'done' | 'waitlist' | 'waitlist-done'
 
 interface GuestInfo { name: string; email: string; phone: string; notes: string }
@@ -27,6 +33,7 @@ const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct'
 
 export default function Book() {
   const { user } = useAuth()
+  const location = useLocation()
   const [step, setStep]             = useState<Step>('service')
   const [service, setService]       = useState<typeof SERVICES[0] | null>(null)
   const [date, setDate]             = useState<Date | null>(null)
@@ -35,35 +42,65 @@ export default function Book() {
   const [info, setInfo]             = useState<GuestInfo>({ name: '', email: '', phone: '', notes: '' })
   const [errors, setErrors]         = useState<Partial<GuestInfo>>({})
   const [fees, setFees]             = useState<SlotFees>({ lateNight: false, lastMinute: false })
-  const [submitting, setSubmitting]         = useState(false)
+  const [addons, setAddons]         = useState<string[]>([])
+  const [submitting, setSubmitting]           = useState(false)
   const [confirmationNum, setConfirmationNum] = useState<string | null>(null)
-  const [submitError, setSubmitError]       = useState<string | null>(null)
+  const [submitError, setSubmitError]         = useState<string | null>(null)
+  const [lastService, setLastService]         = useState<string | null>(null)
+  const [editingContact, setEditingContact]   = useState(false)
 
-
-
-  // Pre-fill from Google account
+  // Pre-select service from reschedule / "book again" navigation
   useEffect(() => {
-    if (user && step === 'details') {
-      setInfo(prev => ({
-        name:  prev.name  || user.user_metadata?.full_name  || '',
-        email: prev.email || user.email                      || '',
-        phone: prev.phone,
-      }))
+    const state = location.state as { preselectedService?: string } | null
+    if (state?.preselectedService) {
+      const svc = SERVICES.find(s => s.name === state.preselectedService)
+      if (svc) { setService(svc); setStep('datetime') }
+      window.history.replaceState({}, document.title)
     }
-  }, [user, step])
+  }, [])
+
+  // Fetch last booking: pre-fill contact info + last service
+  useEffect(() => {
+    if (!user) return
+    supabase
+      .from('bookings')
+      .select('service_name, name, email, phone')
+      .eq('user_id', user.id)
+      .order('starts_at', { ascending: false })
+      .limit(1)
+      .single()
+      .then(({ data }) => {
+        if (!data) return
+        if (data.service_name) setLastService(data.service_name)
+        setInfo(prev => ({
+          ...prev,
+          name:  prev.name  || data.name  || user.user_metadata?.full_name || '',
+          email: prev.email || data.email || user.email || '',
+          phone: prev.phone || data.phone || '',
+        }))
+      })
+      .catch(() => {
+        setInfo(prev => ({
+          ...prev,
+          name:  prev.name  || user.user_metadata?.full_name || '',
+          email: prev.email || user.email || '',
+        }))
+      })
+  }, [user])
 
   function chooseService(s: typeof SERVICES[0]) {
-    setService(s)
-    setDate(null)
-    setTime(null)
-    setStep('datetime')
+    setService(s); setDate(null); setTime(null); setAddons([]); setStep('datetime')
+  }
+
+  function toggleAddon(id: string) {
+    setAddons(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
   }
 
   function validate(): boolean {
     const e: Partial<GuestInfo> = {}
-    if (!info.name.trim())                          e.name  = 'Name is required'
-    if (!/\S+@\S+\.\S+/.test(info.email))           e.email = 'Valid email required'
-    if (!/^\+?[\d\s\-()]{7,}$/.test(info.phone))   e.phone = 'Valid phone required'
+    if (!info.name.trim())                         e.name  = 'Name is required'
+    if (!/\S+@\S+\.\S+/.test(info.email))          e.email = 'Valid email required'
+    if (!/^\+?[\d\s\-()]{7,}$/.test(info.phone))  e.phone = 'Valid phone required'
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -80,6 +117,17 @@ export default function Book() {
     return code
   }
 
+  const addonTotal = addons.reduce((sum, id) => {
+    const a = ADDONS.find(x => x.id === id)
+    return sum + (a?.price ?? 0)
+  }, 0)
+
+  const totalPrice = (s: typeof SERVICES[0]) =>
+    parseInt(s.price.replace(/\D/g,''), 10) +
+    (fees.lateNight ? LATE_NIGHT_FEE : 0) +
+    (fees.lastMinute ? LAST_MINUTE_FEE : 0) +
+    addonTotal
+
   async function handleSubmit() {
     if (!service || !date || !time) return
     setSubmitting(true)
@@ -94,14 +142,14 @@ export default function Book() {
     startsAt.setHours(hours, m, 0, 0)
 
     const confNum = genConfirmationNumber()
+    const total   = totalPrice(service)
+    const effectivePrice = (fees.lateNight || fees.lastMinute || addonTotal > 0)
+      ? `$${total}`
+      : service.price
 
-    const effectivePrice = (() => {
-      const base = parseInt(service.price.replace(/\D/g,''), 10)
-      const extra = (fees.lateNight ? LATE_NIGHT_FEE : 0) + (fees.lastMinute ? LAST_MINUTE_FEE : 0)
-      return extra > 0 ? `$${base + extra}` : service.price
-    })()
+    const addonNames = addons.map(id => ADDONS.find(x => x.id === id)?.name).filter(Boolean).join(', ')
 
-    const { error } = await supabase.from('bookings').insert({
+    const { data: inserted, error } = await supabase.from('bookings').insert({
       user_id:          user?.id ?? null,
       name:             info.name,
       email:            info.email,
@@ -116,77 +164,86 @@ export default function Book() {
       notes:            info.notes.trim() || null,
       late_night_fee:   fees.lateNight,
       last_minute_fee:  fees.lastMinute,
-    })
+      addons:           addonNames || null,
+    }).select('id').single()
 
     if (error) {
+      console.error('[booking insert error]', error)
       setSubmitError('Something went wrong. Please try again.')
       setSubmitting(false)
       return
     }
 
-    {
-      // Send confirmation email to client
-      fetch('/api/send-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+    // Google Calendar sync (fire-and-forget)
+    if (inserted?.id) {
+      fetch('/api/google-calendar', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          type: 'booking-confirmation',
-          to: info.email,
-          name: info.name,
-          service: service.name,
-          date: formatDate(date),
-          time,
-          duration: service.duration,
-          price: service.price,
-          confirmationNumber: confNum,
+          action: 'create',
+          bookingId: inserted.id,
+          booking: {
+            service: service.name, name: info.name, email: info.email, phone: info.phone,
+            starts_at: startsAt.toISOString(), durationMin: service.durationMin,
+            price: effectivePrice, confirmationNumber: confNum,
+            addons: addonNames || null, notes: info.notes.trim() || null,
+          },
         }),
       }).catch(() => {})
-
-      // Notify admin
-      fetch('/api/send-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'admin-new-booking',
-          name: info.name,
-          service: service.name,
-          date: formatDate(date),
-          time,
-          phone: info.phone,
-          email: info.email,
-          confirmationNumber: confNum,
-        }),
-      }).catch(() => {})
-
-      setConfirmationNum(confNum)
-      setStep('done')
     }
+
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'booking-confirmation',
+        to: info.email,
+        name: info.name,
+        service: service.name,
+        date: formatDate(date),
+        time,
+        duration: service.duration,
+        price: effectivePrice,
+        confirmationNumber: confNum,
+      }),
+    }).catch(() => {})
+
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'admin-new-booking',
+        name: info.name,
+        service: service.name,
+        date: formatDate(date),
+        time,
+        phone: info.phone,
+        email: info.email,
+        confirmationNumber: confNum,
+      }),
+    }).catch(() => {})
+
+    setConfirmationNum(confNum)
+    setStep('done')
     setSubmitting(false)
   }
 
   async function handleWaitlistSubmit() {
-    if (!date) return
+    const d = pickerDate ?? date
+    if (!d) return
     setSubmitting(true)
-    const dateStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
     const { error } = await supabase.from('waitlist').insert({
-      name: info.name,
-      email: info.email,
-      phone: info.phone,
-      desired_date: dateStr,
-      status: 'waiting',
+      name: info.name, email: info.email, phone: info.phone,
+      desired_date: dateStr, status: 'waiting',
     })
     setSubmitting(false)
     if (!error) setStep('waitlist-done')
   }
 
   function reset() {
-    setStep('service')
-    setService(null)
-    setDate(null)
-    setTime(null)
-    setInfo({ name: '', email: '', phone: '' })
-    setErrors({})
-    setConfirmationNum(null)
+    setStep('service'); setService(null); setDate(null); setTime(null)
+    setInfo({ name: '', email: '', phone: '', notes: '' })
+    setAddons([]); setErrors({}); setConfirmationNum(null)
   }
 
   const formatDate = (d: Date) =>
@@ -200,19 +257,11 @@ export default function Book() {
       </Helmet>
 
       {step !== 'done' && step !== 'waitlist-done' && <div className="book__hero">
-        <video
-          className="book__hero-video"
-          src="/ZobOOKING_compressed.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
+        <video className="book__hero-video" src="/ZobOOKING_compressed.mp4" autoPlay loop muted playsInline />
         <div className="book__hero-overlay" />
         <motion.div
           className="book__hero-text"
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: EASE }}
         >
           <span className="page__eyebrow">Book</span>
@@ -222,20 +271,39 @@ export default function Book() {
       </div>}
 
       <div className="page page--no-header">
-
-
         <AnimatePresence mode="wait">
 
           {/* ── Step 1: Service ── */}
           {step === 'service' && (
             <motion.div key="service"
-              initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }}
+              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.4, ease: EASE }}
             >
               <div className="book__policy">
                 <span className="book__policy-label">Booking Policy</span>
                 <p>If there are any changes, message <a href="https://instagram.com/zo_blendz_" target="_blank" rel="noopener noreferrer">@zo_blendz_</a> as soon as possible.</p>
               </div>
+              {lastService && SERVICES.find(s => s.name === lastService) && (
+                <motion.div className="book__rebook"
+                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, ease: EASE }}
+                >
+                  <div className="book__rebook-left">
+                    <span className="book__rebook-eyebrow">Last time</span>
+                    <span className="book__rebook-service">{lastService}</span>
+                  </div>
+                  <button
+                    className="book__rebook-btn"
+                    onClick={() => {
+                      const svc = SERVICES.find(s => s.name === lastService)!
+                      setService(svc); setStep('datetime')
+                    }}
+                  >
+                    Book Again
+                  </button>
+                </motion.div>
+              )}
+
               <div className="book__services">
                 {SERVICES.map((s, i) => (
                   <motion.div key={s.id} className="book__service"
@@ -260,7 +328,7 @@ export default function Book() {
           {/* ── Step 2: Date & Time ── */}
           {step === 'datetime' && service && (
             <motion.div key="datetime"
-              initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }}
+              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.4, ease: EASE }}
             >
               <button className="book__back" onClick={() => setStep('service')}>← Back</button>
@@ -268,13 +336,11 @@ export default function Book() {
                 <span>{service.name}</span>
                 <span className="book__chosen-meta">{service.duration} · {service.price}</span>
               </div>
-
               <BookDateTimePicker
                 durationMin={service.durationMin}
                 onConfirm={(d, t, f) => { setDate(d); setTime(t); setFees(f); setStep('details'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
                 onDateChange={(d) => setPickerDate(d)}
               />
-
               {pickerDate && (
                 <div className="book__waitlist-alt">
                   <span className="book__waitlist-alt-text">All times taken or none work?</span>
@@ -289,57 +355,91 @@ export default function Book() {
           {/* ── Step 3: Guest Details ── */}
           {step === 'details' && (
             <motion.div key="details"
-              initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }}
+              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.4, ease: EASE }}
             >
               <button className="book__back" onClick={() => setStep('datetime')}>← Back</button>
               <div className="book__section-label">Your Details</div>
-              {user && (
-                <p className="book__google-note">Signed in as {user.email} — fields pre-filled.</p>
-              )}
 
               <div className="book__form">
-                <div className="book__field">
-                  <label className="book__label">Full Name</label>
-                  <input
-                    className={`book__input${errors.name ? ' book__input--error' : ''}`}
-                    placeholder="Your name"
-                    value={info.name}
-                    onChange={e => setInfo(p => ({ ...p, name: e.target.value }))}
-                  />
-                  {errors.name && <span className="book__error">{errors.name}</span>}
-                </div>
-                <div className="book__field">
-                  <label className="book__label">Email</label>
-                  <input
-                    className={`book__input${errors.email ? ' book__input--error' : ''}`}
-                    type="email"
-                    placeholder="your@email.com"
-                    value={info.email}
-                    onChange={e => setInfo(p => ({ ...p, email: e.target.value }))}
-                  />
-                  {errors.email && <span className="book__error">{errors.email}</span>}
-                </div>
-                <div className="book__field">
-                  <label className="book__label">Phone</label>
-                  <input
-                    className={`book__input${errors.phone ? ' book__input--error' : ''}`}
-                    type="tel"
-                    placeholder="+1 (613) 000-0000"
-                    value={info.phone}
-                    onChange={e => setInfo(p => ({ ...p, phone: e.target.value }))}
-                  />
-                  {errors.phone && <span className="book__error">{errors.phone}</span>}
-                </div>
+                {user && info.name && info.email && info.phone && !editingContact ? (
+                  <div className="book__prefilled">
+                    <div className="book__prefilled-row">
+                      <span className="book__prefilled-label">Name</span>
+                      <span className="book__prefilled-value">{info.name}</span>
+                    </div>
+                    <div className="book__prefilled-row">
+                      <span className="book__prefilled-label">Email</span>
+                      <span className="book__prefilled-value">{info.email}</span>
+                    </div>
+                    <div className="book__prefilled-row">
+                      <span className="book__prefilled-label">Phone</span>
+                      <span className="book__prefilled-value">{info.phone}</span>
+                    </div>
+                    <button className="book__prefilled-edit" onClick={() => setEditingContact(true)}>
+                      Not you? Edit
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="book__field">
+                      <label className="book__label">Full Name</label>
+                      <input
+                        className={`book__input${errors.name ? ' book__input--error' : ''}`}
+                        placeholder="Your name" value={info.name}
+                        onChange={e => setInfo(p => ({ ...p, name: e.target.value }))}
+                      />
+                      {errors.name && <span className="book__error">{errors.name}</span>}
+                    </div>
+                    <div className="book__field">
+                      <label className="book__label">Email</label>
+                      <input
+                        className={`book__input${errors.email ? ' book__input--error' : ''}`}
+                        type="email" placeholder="your@email.com" value={info.email}
+                        onChange={e => setInfo(p => ({ ...p, email: e.target.value }))}
+                      />
+                      {errors.email && <span className="book__error">{errors.email}</span>}
+                    </div>
+                    <div className="book__field">
+                      <label className="book__label">Phone</label>
+                      <input
+                        className={`book__input${errors.phone ? ' book__input--error' : ''}`}
+                        type="tel" placeholder="+1 (613) 000-0000" value={info.phone}
+                        onChange={e => setInfo(p => ({ ...p, phone: e.target.value }))}
+                      />
+                      {errors.phone && <span className="book__error">{errors.phone}</span>}
+                    </div>
+                  </>
+                )}
                 <div className="book__field">
                   <label className="book__label">Notes <span className="book__label-optional">(optional)</span></label>
                   <textarea
                     className="book__input book__textarea"
-                    placeholder="e.g. I might be 5 mins late, I want a skin fade..."
-                    value={info.notes}
-                    rows={3}
+                    placeholder="e.g. I want a skin fade, keep it tight on the sides..."
+                    value={info.notes} rows={3}
                     onChange={e => setInfo(p => ({ ...p, notes: e.target.value }))}
                   />
+                </div>
+
+                {/* Add-ons */}
+                <div className="book__field">
+                  <label className="book__label">Add-ons <span className="book__label-optional">(optional)</span></label>
+                  <div className="book__addons">
+                    {ADDONS.map(a => {
+                      const on = addons.includes(a.id)
+                      return (
+                        <button
+                          key={a.id} type="button"
+                          className={`book__addon${on ? ' book__addon--on' : ''}`}
+                          onClick={() => toggleAddon(a.id)}
+                        >
+                          <span className="book__addon-name">{a.name}</span>
+                          <span className="book__addon-meta">{a.desc} · +${a.price}</span>
+                          <span className="book__addon-check">{on ? '✓' : '+'}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
 
@@ -352,7 +452,7 @@ export default function Book() {
           {/* ── Step 4: Confirm ── */}
           {step === 'confirm' && service && date && time && (
             <motion.div key="confirm"
-              initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }}
+              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.4, ease: EASE }}
             >
               <button className="book__back" onClick={() => setStep('details')}>← Back</button>
@@ -399,6 +499,15 @@ export default function Book() {
                   <span className="book__summary-key">Base price</span>
                   <span className="book__summary-val">{service.price}</span>
                 </div>
+                {addons.map(id => {
+                  const a = ADDONS.find(x => x.id === id)!
+                  return (
+                    <div key={id} className="book__summary-row">
+                      <span className="book__summary-key">{a.name}</span>
+                      <span className="book__summary-val" style={{ color: '#d4af37' }}>+${a.price}</span>
+                    </div>
+                  )
+                })}
                 {fees.lateNight && (
                   <div className="book__summary-row">
                     <span className="book__summary-key">Late night fee</span>
@@ -413,9 +522,7 @@ export default function Book() {
                 )}
                 <div className="book__summary-row">
                   <span className="book__summary-key">Total</span>
-                  <span className="book__summary-val book__summary-price">
-                    ${parseInt(service.price.replace(/\D/g,''), 10) + (fees.lateNight ? LATE_NIGHT_FEE : 0) + (fees.lastMinute ? LAST_MINUTE_FEE : 0)}
-                  </span>
+                  <span className="book__summary-val book__summary-price">${totalPrice(service)}</span>
                 </div>
                 <p className="book__summary-note">Payment due in person at the appointment.</p>
               </div>
@@ -428,9 +535,9 @@ export default function Book() {
           )}
 
           {/* ── Step: Waitlist Form ── */}
-          {step === 'waitlist' && date && (
+          {step === 'waitlist' && (pickerDate ?? date) && (
             <motion.div key="waitlist"
-              initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }}
+              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.4, ease: EASE }}
             >
               <button className="book__back" onClick={() => setStep('datetime')}>← Back</button>
@@ -438,57 +545,60 @@ export default function Book() {
                 <div className="book__section-label">Join Waitlist</div>
                 <p className="book__waitlist-desc">
                   We'll email you if a spot opens up on{' '}
-                  <strong>{DAY_NAMES[date.getDay()]}, {MONTH_NAMES[date.getMonth()]} {date.getDate()}</strong>.
+                  <strong>{(() => { const d = pickerDate ?? date!; return `${DAY_NAMES[d.getDay()]}, ${MONTH_NAMES[d.getMonth()]} ${d.getDate()}` })()}</strong>.
                 </p>
               </div>
-
               <div className="book__form">
-                <div className="book__field">
-                  <label className="book__label">Full Name</label>
-                  <input
-                    className={`book__input${errors.name ? ' book__input--error' : ''}`}
-                    placeholder="Your name"
-                    value={info.name}
-                    onChange={e => setInfo(p => ({ ...p, name: e.target.value }))}
-                  />
-                  {errors.name && <span className="book__error">{errors.name}</span>}
-                </div>
-                <div className="book__field">
-                  <label className="book__label">Email</label>
-                  <input
-                    className={`book__input${errors.email ? ' book__input--error' : ''}`}
-                    type="email"
-                    placeholder="your@email.com"
-                    value={info.email}
-                    onChange={e => setInfo(p => ({ ...p, email: e.target.value }))}
-                  />
-                  {errors.email && <span className="book__error">{errors.email}</span>}
-                </div>
-                <div className="book__field">
-                  <label className="book__label">Phone</label>
-                  <input
-                    className={`book__input${errors.phone ? ' book__input--error' : ''}`}
-                    type="tel"
-                    placeholder="+1 (613) 000-0000"
-                    value={info.phone}
-                    onChange={e => setInfo(p => ({ ...p, phone: e.target.value }))}
-                  />
-                  {errors.phone && <span className="book__error">{errors.phone}</span>}
-                </div>
+                {user && info.name && info.email && info.phone ? (
+                  <div className="book__prefilled">
+                    <div className="book__prefilled-row">
+                      <span className="book__prefilled-label">Name</span>
+                      <span className="book__prefilled-value">{info.name}</span>
+                    </div>
+                    <div className="book__prefilled-row">
+                      <span className="book__prefilled-label">Email</span>
+                      <span className="book__prefilled-value">{info.email}</span>
+                    </div>
+                    <div className="book__prefilled-row">
+                      <span className="book__prefilled-label">Phone</span>
+                      <span className="book__prefilled-value">{info.phone}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="book__field">
+                      <label className="book__label">Full Name</label>
+                      <input className={`book__input${errors.name ? ' book__input--error' : ''}`}
+                        placeholder="Your name" value={info.name}
+                        onChange={e => setInfo(p => ({ ...p, name: e.target.value }))} />
+                      {errors.name && <span className="book__error">{errors.name}</span>}
+                    </div>
+                    <div className="book__field">
+                      <label className="book__label">Email</label>
+                      <input className={`book__input${errors.email ? ' book__input--error' : ''}`}
+                        type="email" placeholder="your@email.com" value={info.email}
+                        onChange={e => setInfo(p => ({ ...p, email: e.target.value }))} />
+                      {errors.email && <span className="book__error">{errors.email}</span>}
+                    </div>
+                    <div className="book__field">
+                      <label className="book__label">Phone</label>
+                      <input className={`book__input${errors.phone ? ' book__input--error' : ''}`}
+                        type="tel" placeholder="+1 (613) 000-0000" value={info.phone}
+                        onChange={e => setInfo(p => ({ ...p, phone: e.target.value }))} />
+                      {errors.phone && <span className="book__error">{errors.phone}</span>}
+                    </div>
+                  </>
+                )}
               </div>
-
-              <button
-                className="book__next-btn"
-                onClick={() => { if (validate()) handleWaitlistSubmit() }}
-                disabled={submitting}
-              >
+              <button className="book__next-btn"
+                onClick={() => { if (validate()) handleWaitlistSubmit() }} disabled={submitting}>
                 {submitting ? 'Joining…' : 'Join Waitlist'}
               </button>
             </motion.div>
           )}
 
           {/* ── Step: Waitlist Done ── */}
-          {step === 'waitlist-done' && date && (
+          {step === 'waitlist-done' && (pickerDate ?? date) && (
             <motion.div key="waitlist-done"
               initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, ease: EASE }}
@@ -497,13 +607,10 @@ export default function Book() {
               <img src="/zowaitlistletter.png" alt="" className="book__waitlist-img" />
               <h2 className="book__done-title">You're on the list.</h2>
               <p className="book__done-sub">
-                We'll email <strong>{info.email}</strong> if a spot opens up on{' '}
-                {DAY_NAMES[date.getDay()]}, {MONTH_NAMES[date.getMonth()]} {date.getDate()}.
+                {(() => { const d = pickerDate ?? date!; return <>We'll email <strong>{info.email}</strong> if a spot opens up on{' '}{DAY_NAMES[d.getDay()]}, {MONTH_NAMES[d.getMonth()]} {d.getDate()}.</> })()}
               </p>
               <p className="book__done-note">Keep an eye on your inbox.</p>
-              <button className="book__next-btn" style={{ marginTop: 32 }} onClick={reset}>
-                Back to Services
-              </button>
+              <button className="book__next-btn" style={{ marginTop: 32 }} onClick={reset}>Back to Services</button>
             </motion.div>
           )}
 
@@ -514,8 +621,7 @@ export default function Book() {
               transition={{ duration: 0.5, ease: EASE }}
               className="book__done"
             >
-              <motion.div
-                className="book__done-img-wrap"
+              <motion.div className="book__done-img-wrap"
                 animate={{ y: [0, -9, 0] }}
                 transition={{ duration: 3, ease: 'easeInOut', repeat: Infinity, repeatType: 'loop' }}
               >
@@ -539,9 +645,7 @@ export default function Book() {
                 </svg>
                 340 Claridge Dr, Nepean, ON K2J 5C2
               </p>
-              <button className="book__next-btn" style={{ marginTop: 32 }} onClick={reset}>
-                Book Another
-              </button>
+              <button className="book__next-btn" style={{ marginTop: 32 }} onClick={reset}>Book Another</button>
             </motion.div>
           )}
 

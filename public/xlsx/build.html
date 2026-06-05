@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zoblends Workbook — Build &amp; Download</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<style>
+  :root{ --gold:#D4AF37; --charcoal:#1A1A1A; --muted:#888; --green:#6BD6A3; --red:#E05555; --cream:#FCFBF8; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:'Calibri','Segoe UI',system-ui,sans-serif; background:#101010; color:#eee;
+        min-height:100vh; display:flex; align-items:center; justify-content:center; padding:32px; }
+  .card{ width:min(680px,100%); background:var(--charcoal); border:1px solid rgba(212,175,55,.35);
+         border-radius:6px; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,.6); }
+  .top{ padding:48px 48px 36px; text-align:center; border-bottom:1px solid rgba(212,175,55,.25);
+        background:radial-gradient(120% 100% at 50% 0%, #232323 0%, #1A1A1A 70%); }
+  .brand{ font-size:46px; font-weight:800; letter-spacing:.04em; color:var(--gold); line-height:1; }
+  .sub{ margin-top:14px; font-size:12px; letter-spacing:.42em; color:#fff; font-weight:600; }
+  .meta{ margin-top:10px; font-size:12px; color:var(--muted); font-style:italic; }
+  .body{ padding:32px 48px 40px; }
+  .status{ font-size:13px; color:var(--muted); text-align:center; margin-bottom:22px; min-height:18px; }
+  .status.ok{ color:var(--green); } .status.err{ color:var(--red); }
+  .btn{ display:block; width:100%; padding:18px; border:none; border-radius:4px; cursor:pointer;
+        background:var(--gold); color:var(--charcoal); font-size:15px; font-weight:800; letter-spacing:.12em;
+        text-transform:uppercase; transition:filter .15s, transform .05s; font-family:inherit; }
+  .btn:hover{ filter:brightness(1.08); } .btn:active{ transform:translateY(1px); }
+  .btn:disabled{ opacity:.5; cursor:default; }
+  .btn--demo{ background:transparent; color:var(--gold); border:1px solid rgba(212,175,55,.45);
+              font-size:13px; padding:14px; letter-spacing:.1em; }
+  .btn--demo:hover{ background:rgba(212,175,55,.08); filter:none; }
+  .btn--demo:disabled{ opacity:.35; }
+  .sheets{ margin-top:30px; display:grid; grid-template-columns:1fr 1fr; gap:1px; background:rgba(212,175,55,.18);
+           border:1px solid rgba(212,175,55,.18); border-radius:4px; overflow:hidden; }
+  .sheet{ background:var(--charcoal); padding:14px 16px; }
+  .sheet h4{ font-size:11px; letter-spacing:.14em; color:var(--gold); text-transform:uppercase; margin-bottom:5px; }
+  .sheet p{ font-size:12px; color:var(--muted); line-height:1.45; }
+  .divider{ display:flex; align-items:center; gap:12px; margin:28px 0 20px; }
+  .divider::before,.divider::after{ content:''; flex:1; height:1px; background:rgba(212,175,55,.2); }
+  .divider span{ font-size:10px; letter-spacing:.3em; color:var(--muted); text-transform:uppercase; white-space:nowrap; }
+  .demo-desc{ margin-top:12px; font-size:11px; color:var(--muted); text-align:center; line-height:1.6; }
+  .demo-chips{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:10px; }
+  .chip{ font-size:10px; letter-spacing:.1em; color:var(--muted); background:rgba(255,255,255,.04);
+         border:1px solid rgba(255,255,255,.08); border-radius:2px; padding:3px 8px; }
+  .chip.live{ color:var(--green); border-color:rgba(107,214,163,.3); background:rgba(107,214,163,.06); }
+  .foot{ margin-top:26px; font-size:11px; color:#666; text-align:center; line-height:1.6; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="top">
+      <div class="brand">ZOBLENDS</div>
+      <div class="sub">BUSINESS&nbsp;&nbsp;OPERATIONS&nbsp;&nbsp;WORKBOOK</div>
+      <div class="meta" id="date"></div>
+    </div>
+    <div class="body">
+      <div class="status" id="status">Building workbook…</div>
+      <button class="btn" id="dl" disabled>Preparing…</button>
+      <div class="demo-chips" id="live-chips" style="margin-top:14px;display:none;"></div>
+
+      <div class="sheets">
+        <div class="sheet"><h4>Cover</h4><p>Branded title page with live date &amp; sheet navigation.</p></div>
+        <div class="sheet"><h4>Bookings Log</h4><p>Colour-coded statuses, auto-calc totals, summary KPIs, filters.</p></div>
+        <div class="sheet"><h4>Finance Tracker</h4><p>Income vs expenses, net profit, monthly SUMIFS breakdown.</p></div>
+        <div class="sheet"><h4>Analytics</h4><p>Dark dashboard — KPI cards &amp; live data-bar charts.</p></div>
+        <div class="sheet"><h4>Client Directory</h4><p>Auto visit counts, lifetime spend, VIP flags, top-5 highlight.</p></div>
+        <div class="sheet"><h4>Waitlist</h4><p>Status dropdown with grey-out for booked / cancelled.</p></div>
+      </div>
+
+      <div class="divider"><span>Demo Version</span></div>
+      <button class="btn btn--demo" id="dl-demo" disabled>Download with Sample Data</button>
+      <div class="demo-desc">Explore every formula, chart &amp; conditional format before adding your own data.</div>
+      <div class="demo-chips">
+        <span class="chip">53 bookings</span>
+        <span class="chip">24 clients</span>
+        <span class="chip">14 income entries</span>
+        <span class="chip">21 expenses</span>
+        <span class="chip">12 waitlist entries</span>
+        <span class="chip">Jan – Jun 2026</span>
+      </div>
+
+      <div class="foot">All figures in CAD ($) &bull; formulas, conditional formatting, dropdowns, freeze panes &amp; tab colours are live in Excel / Google Sheets.</div>
+    </div>
+  </div>
+
+  <script src="lib.js"></script>
+  <script src="builders-a.js"></script>
+  <script src="builders-b.js"></script>
+  <script>
+    const FILENAME      = 'Zoblends Business Operations Workbook.xlsx';
+    const FILENAME_DEMO = 'Zoblends Business Operations Workbook — Demo.xlsx';
+
+    document.getElementById('date').textContent =
+      'Generated ' + new Date().toLocaleDateString('en-CA',{month:'long',day:'2-digit',year:'numeric'});
+
+    /* rehydrate Date strings from sessionStorage */
+    function loadRealData(){
+      try{
+        const raw = sessionStorage.getItem('zbRealData');
+        if(!raw) return null;
+        sessionStorage.removeItem('zbRealData');
+        const d = JSON.parse(raw);
+        d.bookings.forEach(b=>{ b.d = new Date(b.d+'T12:00:00'); });
+        d.waitlist.forEach(w=>{ w.desired=new Date(w.desired+'T12:00:00'); w.added=new Date(w.added+'T12:00:00'); });
+        d.income.forEach(r=>{ r.d=new Date(r.d+'T12:00:00'); });
+        d.expenses.forEach(r=>{ r.d=new Date(r.d+'T12:00:00'); });
+        return d;
+      }catch(e){ return null; }
+    }
+
+    function bufToBlob(buf){
+      return new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    }
+    function triggerDownload(blob, filename){
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename;
+      document.body.appendChild(a); a.click(); a.remove();
+    }
+    async function buildWorkbook(data){
+      const wb=new ExcelJS.Workbook();
+      wb.creator='Zoblends'; wb.company='Zoblends'; wb.created=new Date();
+      window.ZBA.buildCover(wb);
+      window.ZBA.buildBookings(wb,data);
+      window.ZBA.buildFinance(wb,data);
+      window.ZBB.buildAnalytics(wb,data);
+      window.ZBB.buildClients(wb,data);
+      window.ZBB.buildWaitlist(wb,data);
+      return await wb.xlsx.writeBuffer();
+    }
+
+    async function init(){
+      const status  = document.getElementById('status');
+      const btn     = document.getElementById('dl');
+      const btnDemo = document.getElementById('dl-demo');
+      const chips   = document.getElementById('live-chips');
+      try{
+        if(typeof ExcelJS==='undefined') throw new Error('ExcelJS failed to load (network).');
+
+        const realData = loadRealData();
+        const mainData = realData || window.ZB.buildEmptyData();
+        const isLive   = !!realData;
+
+        const [mainBuf, demoBuf] = await Promise.all([
+          buildWorkbook(mainData),
+          buildWorkbook(window.ZB.buildData()),
+        ]);
+
+        if(isLive){
+          const bk = mainData.bookings.length;
+          const wl = mainData.waitlist.length;
+          chips.style.display='flex';
+          chips.innerHTML=
+            `<span class="chip live">${bk} live booking${bk!==1?'s':''}</span>`+
+            `<span class="chip live">${mainData.directory.length} clients</span>`+
+            `<span class="chip live">${wl} waitlist entr${wl!==1?'ies':'y'}</span>`+
+            `<span class="chip live">live data</span>`;
+          status.className='status ok';
+          status.textContent=`Ready — ${bk} bookings from your dashboard`;
+          btn.textContent='Download .xlsx — Live Data';
+        } else {
+          status.className='status ok';
+          status.textContent='Ready — 6 sheets, all formulas & dropdowns live';
+          btn.textContent='Download .xlsx';
+        }
+
+        btn.disabled=false;
+        btn.onclick=()=>triggerDownload(bufToBlob(mainBuf), FILENAME);
+
+        btnDemo.disabled=false;
+        btnDemo.textContent='Download with Sample Data';
+        btnDemo.onclick=()=>triggerDownload(bufToBlob(demoBuf), FILENAME_DEMO);
+
+      }catch(e){
+        status.className='status err';
+        status.textContent='Build error: '+(e.message||e);
+        btn.textContent='Build failed';
+        console.error(e);
+      }
+    }
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

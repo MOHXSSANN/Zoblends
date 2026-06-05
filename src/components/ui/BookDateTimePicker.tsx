@@ -3,15 +3,15 @@ import { Calendar } from "@/components/ui/calendar"
 import { supabase } from "@/lib/supabase"
 
 // ── Business rules ──────────────────────────────────────────────────
-const BUFFER_MIN          = 10     // minutes between appointments
-const MAX_PER_DAY         = 12     // max bookings per day
-const MIN_NOTICE_HRS      = 8     // minimum hours notice for same-day
-const LAST_MINUTE_HRS     = 1     // within this many hours = last-minute
-const DAY_START_MIN       = 10 * 60   // 10:00 AM
-const REGULAR_END_MIN     = 19 * 60   // 7:00 PM
-const LATE_NIGHT_END_MIN  = 22 * 60   // 10:00 PM
-export const LATE_NIGHT_FEE   = 15
-export const LAST_MINUTE_FEE  = 25
+const BUFFER_MIN             = 10       // minutes between appointments
+const MAX_PER_DAY            = 12       // max bookings per day
+const REGULAR_NOTICE_MIN     = 60       // 1-hour minimum notice for regular slots
+const LATE_NIGHT_UNLOCK_MIN  = 17 * 60  // late night only visible after 5pm
+const DAY_START_MIN          = 10 * 60  // 10:00 AM
+const REGULAR_END_MIN        = 19 * 60  // 7:00 PM
+const LATE_NIGHT_END_MIN     = 22 * 60  // 10:00 PM
+export const LATE_NIGHT_FEE  = 15
+export const LAST_MINUTE_FEE = 25
 
 export interface SlotFees { lateNight: boolean; lastMinute: boolean }
 
@@ -48,25 +48,31 @@ function labelToMin(label: string): number {
 }
 
 function buildSlots(durationMin: number, date: Date): Slot[] {
-  const now   = new Date()
-  const step  = durationMin + BUFFER_MIN
+  const now    = new Date()
+  const step   = durationMin + BUFFER_MIN
+  const nowMin = now.getHours() * 60 + now.getMinutes()
   const slots: Slot[] = []
 
   for (let start = DAY_START_MIN; start + durationMin <= LATE_NIGHT_END_MIN; start += step) {
+    const isLateNight = start >= REGULAR_END_MIN
+
+    // Late night slots only visible once the clock hits 5pm
+    if (isLateNight && nowMin < LATE_NIGHT_UNLOCK_MIN) continue
+
     const slotDate = new Date(date)
     slotDate.setHours(Math.floor(start / 60), start % 60, 0, 0)
+    const minsUntil = (slotDate.getTime() - now.getTime()) / 60_000
 
-    const hoursUntil = (slotDate.getTime() - now.getTime()) / 3_600_000
+    if (minsUntil < 0) continue  // past
 
-    // Outside booking window: require 8h notice OR allow last-minute (<1h) with fee
-    if (hoursUntil < 0) continue                   // past
-    if (hoursUntil >= LAST_MINUTE_HRS && hoursUntil < MIN_NOTICE_HRS) continue // blocked window
+    // Regular slots need at least 1 hour notice; late night allows last-minute with fee
+    if (!isLateNight && minsUntil < REGULAR_NOTICE_MIN) continue
 
     slots.push({
       label:      minToLabel(start),
       startMin:   start,
-      lateNight:  start >= REGULAR_END_MIN,
-      lastMinute: hoursUntil < LAST_MINUTE_HRS,
+      lateNight:  isLateNight,
+      lastMinute: isLateNight && minsUntil < REGULAR_NOTICE_MIN,
     })
   }
   return slots
@@ -120,12 +126,14 @@ export function BookDateTimePicker({ durationMin, onConfirm, onDateChange }: Pro
       .eq('status', 'confirmed')
       .gte('starts_at', `${day}T00:00:00`)
       .lte('starts_at', `${day}T23:59:59`)
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) console.error('[BookDateTimePicker]', error)
         const rows = data ?? []
         setDailyCount(rows.length)
         setTakenSlots(new Set(rows.map(b => isoToLabel(b.starts_at))))
         setLoading(false)
       })
+      .catch(() => setLoading(false))
   }, [date])
 
   const isDisabled = (d: Date) => {
@@ -148,7 +156,7 @@ export function BookDateTimePicker({ durationMin, onConfirm, onDateChange }: Pro
 
       {/* Calendar */}
       <div className="w-full flex justify-center">
-        <div style={{ width: '100%', maxWidth: 320 }}>
+        <div style={{ width: '100%', maxWidth: 320, position: 'relative' }}>
           <Calendar
             mode="single"
             selected={date}

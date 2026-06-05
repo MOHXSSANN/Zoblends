@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '../../lib/CartContext'
 import { useAuth } from '../../lib/AuthContext'
+import { supabase } from '../../lib/supabase'
 import { PRODUCTS } from '../../lib/products'
 import './Navbar.css'
 
@@ -21,27 +22,52 @@ export default function Navbar() {
   const [hidden, setHidden]             = useState(false)
   const [menuOpen, setMenuOpen]         = useState(false)
   const [cartOpen, setCartOpen]         = useState(false)
-  const [checkingOut, setCheckingOut]   = useState(false)
+  const [orderStep, setOrderStep]       = useState<'cart'|'form'|'placed'>('cart')
+  const [orderName, setOrderName]       = useState('')
+  const [orderEmail, setOrderEmail]     = useState('')
+  const [placingOrder, setPlacingOrder] = useState(false)
+  const [orderTotal, setOrderTotal]     = useState(0)
   const location = useLocation()
-  const { add, items, remove, total, count } = useCart()
+  const { add, items, remove, clear, total, count } = useCart()
   const { user, signInWithGoogle, signOut } = useAuth()
 
-  async function handleCheckout() {
-    if (!items.length || checkingOut) return
-    setCheckingOut(true)
-    try {
-      const res = await fetch('/api/create-shop-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, customerEmail: user?.email }),
-      })
-      const { url } = await res.json()
-      if (url) window.location.href = url
-    } catch {
-      alert('Checkout failed. Please try again.')
-    } finally {
-      setCheckingOut(false)
+  async function handlePlaceOrder() {
+    if (placingOrder) return
+    const name  = user?.user_metadata?.full_name || orderName
+    const email = user?.email || orderEmail
+    if (!email) return
+    setPlacingOrder(true)
+    const total_cents = Math.round(total * 100)
+    const snapshot = total
+    const { error } = await supabase.from('shop_orders').insert({
+      customer_email: email,
+      customer_name:  name  || null,
+      items,
+      total_cents,
+      status: 'pending',
+    })
+    if (error) {
+      console.error('[shop_orders insert]', error)
+      alert(`Order failed: ${error.message}`)
+      setPlacingOrder(false)
+      return
     }
+    setOrderTotal(snapshot)
+    clear()
+    setOrderStep('placed')
+    setPlacingOrder(false)
+  }
+
+  function openCart() {
+    setOrderStep('cart')
+    setOrderName('')
+    setOrderEmail('')
+    setCartOpen(true)
+  }
+
+  function closeCart() {
+    setCartOpen(false)
+    setTimeout(() => setOrderStep('cart'), 400)
   }
 
   useEffect(() => {
@@ -92,7 +118,7 @@ export default function Navbar() {
           <button
             className="navbar__cart-icon"
             aria-label="Open cart"
-            onClick={() => setCartOpen(true)}
+            onClick={openCart}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
@@ -122,7 +148,7 @@ export default function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setCartOpen(false)}
+              onClick={closeCart}
             />
             <motion.div
               className="navbar__cart-drawer"
@@ -132,11 +158,97 @@ export default function Navbar() {
               transition={{ duration: 0.35, ease: EASE }}
             >
               <div className="navbar__cart-header">
-                <span>Your Cart</span>
-                <button onClick={() => setCartOpen(false)}>✕</button>
+                <span>
+                  {orderStep === 'form'   ? 'Confirm Order' :
+                   orderStep === 'placed' ? 'Order Placed'  : 'Your Cart'}
+                </span>
+                <button onClick={closeCart}>✕</button>
               </div>
 
-              {items.length === 0 ? (
+              {/* ── Order placed success ── */}
+              {orderStep === 'placed' ? (
+                <div className="navbar__cart-success">
+                  <motion.div className="navbar__cart-success-img-wrap"
+                    animate={{ y: [0, -9, 0] }}
+                    transition={{ duration: 3, ease: 'easeInOut', repeat: Infinity, repeatType: 'loop' }}
+                  >
+                    <img src="/zoproducts.png" alt="Order confirmed" className="navbar__cart-success-img" />
+                  </motion.div>
+                  <p className="navbar__cart-success-title">Order received!</p>
+                  <div className="navbar__cart-success-total">
+                    <span className="navbar__cart-success-total-label">Total due</span>
+                    <span className="navbar__cart-success-total-val">${orderTotal.toFixed(2)} CAD</span>
+                  </div>
+                  <p className="navbar__cart-success-pay">Cash or e-transfer at pickup.</p>
+                  <div className="navbar__cart-success-address">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                      <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    340 Claridge Dr, Nepean, ON K2J 5C2
+                  </div>
+                  <button className="navbar__checkout-btn" style={{ marginTop: 20, width: '100%' }} onClick={closeCart}>
+                    <span className="navbar__checkout-btn-inner">Done</span>
+                  </button>
+                </div>
+
+              /* ── Order form (guest or confirm) ── */
+              ) : orderStep === 'form' ? (
+                <div className="navbar__cart-form">
+                  <div className="navbar__cart-items" style={{ marginBottom: 16 }}>
+                    {items.map(item => (
+                      <div key={item.id} className="navbar__cart-item">
+                        <div>
+                          <span className="navbar__cart-item-name">{item.name}</span>
+                          <span className="navbar__cart-item-meta">{item.price} × {item.qty}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="navbar__cart-total-row" style={{ marginBottom: 16 }}>
+                    <span className="navbar__cart-total-label">Total</span>
+                    <span className="navbar__cart-total">${total.toFixed(2)} CAD</span>
+                  </div>
+
+                  {!user && (
+                    <div className="navbar__order-fields">
+                      <input
+                        className="navbar__order-input"
+                        placeholder="Your name"
+                        value={orderName}
+                        onChange={e => setOrderName(e.target.value)}
+                      />
+                      <input
+                        className="navbar__order-input"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={orderEmail}
+                        onChange={e => setOrderEmail(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  <div className="navbar__cash-note">
+                    💵 Pay in person — cash or e-transfer at pickup.
+                  </div>
+
+                  <button
+                    className="navbar__checkout-btn"
+                    style={{ width: '100%' }}
+                    onClick={handlePlaceOrder}
+                    disabled={placingOrder || (!user && !orderEmail)}
+                  >
+                    <span className="navbar__checkout-btn-inner">
+                      {placingOrder ? 'Placing…' : 'Confirm Order →'}
+                    </span>
+                  </button>
+
+                  <button className="navbar__order-back" onClick={() => setOrderStep('cart')}>
+                    ← Back to cart
+                  </button>
+                </div>
+
+              /* ── Cart ── */
+              ) : items.length === 0 ? (
                 <div className="navbar__cart-empty">
                   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(245,244,240,0.2)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
@@ -153,9 +265,7 @@ export default function Navbar() {
                           <span className="navbar__cart-rec-name">{p.name}</span>
                           <span className="navbar__cart-rec-price">{p.price}</span>
                         </div>
-                        <button className="navbar__cart-rec-add" onClick={() => handleAdd(p)}>
-                          + Add
-                        </button>
+                        <button className="navbar__cart-rec-add" onClick={() => handleAdd(p)}>+ Add</button>
                       </div>
                     ))}
                   </div>
@@ -178,21 +288,13 @@ export default function Navbar() {
                       <span className="navbar__cart-total-label">Total</span>
                       <span className="navbar__cart-total">${total.toFixed(2)} CAD</span>
                     </div>
-                    <button
-                      className="navbar__checkout-btn"
-                      onClick={handleCheckout}
-                      disabled={checkingOut}
-                    >
-                      {checkingOut ? (
-                        <span className="navbar__checkout-btn-inner">
-                          <span className="navbar__checkout-spinner" />
-                          Redirecting…
-                        </span>
-                      ) : (
-                        <span className="navbar__checkout-btn-inner" style={{ padding: '16px 20px' }}>
-                          PLACE ORDER →
-                        </span>
-                      )}
+                    <div className="navbar__cash-note">
+                      💵 Pay in person — cash or e-transfer at pickup.
+                    </div>
+                    <button className="navbar__checkout-btn" onClick={() => setOrderStep('form')}>
+                      <span className="navbar__checkout-btn-inner">
+                        PLACE ORDER →
+                      </span>
                     </button>
                   </div>
                 </>
@@ -203,7 +305,7 @@ export default function Navbar() {
       </AnimatePresence>
 
       {/* ── Full-screen menu — pure CSS transitions, no JS animation overhead ── */}
-      <div className={`navbar__overlay${menuOpen ? ' navbar__overlay--open' : ''}`} aria-hidden={!menuOpen}>
+      <div className={`navbar__overlay${menuOpen ? ' navbar__overlay--open' : ''}`} inert={!menuOpen ? true : undefined}>
         <nav className="navbar__overlay-links">
           {location.pathname !== '/' && (
             <Link to="/" className="navbar__overlay-link">Home</Link>

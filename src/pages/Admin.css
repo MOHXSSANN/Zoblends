@@ -448,3 +448,93 @@
   transition: border-color 0.2s;
 }
 .admin__finance-link:hover { border-color: #d4af37; }
+
+/* ── Inventory tab ───────────────────────────────── */
+.admin__inventory { width: 100%; overflow-x: auto; }
+
+.admin__inventory-header,
+.admin__inventory-row {
+  display: grid;
+  grid-template-columns: 1fr 90px 90px 70px 70px 50px 60px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 4px;
+}
+
+.admin__inventory-header {
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(245,244,240,0.3);
+  border-bottom: 1px solid rgba(212,175,55,0.1);
+  margin-bottom: 4px;
+}
+
+.admin__inventory-row {
+  border-bottom: 1px solid rgba(245,244,240,0.04);
+}
+.admin__inventory-row:last-child { border-bottom: none; }
+
+.admin__inventory-name {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: rgba(245,244,240,0.85);
+}
+
+.admin__inventory-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: rgba(245,244,240,0.6);
+}
+
+.admin__inventory-input {
+  width: 54px;
+  background: rgba(245,244,240,0.05);
+  border: 1px solid rgba(212,175,55,0.15);
+  color: rgba(245,244,240,0.9);
+  font-family: var(--font-body);
+  font-size: 12px;
+  padding: 5px 6px;
+  outline: none;
+  -moz-appearance: textfield;
+}
+.admin__inventory-input::-webkit-outer-spin-button,
+.admin__inventory-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.admin__inventory-input:focus { border-color: rgba(212,175,55,0.5); }
+.admin__inventory-input--sm { width: 48px; }
+
+.admin__inventory-val {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: rgba(245,244,240,0.6);
+}
+
+.admin__inventory-low {
+  font-size: 8px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #d4af37;
+}
+.admin__inventory-out {
+  font-size: 8px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #e05555;
+}
+
+.admin__inventory-save {
+  padding: 5px 10px;
+  background: rgba(212,175,55,0.12);
+  border: 1px solid rgba(212,175,55,0.3);
+  color: #d4af37;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.admin__inventory-save:hover:not(:disabled) { background: rgba(212,175,55,0.22); }
+.admin__inventory-save:disabled { opacity: 0.3; cursor: default; }

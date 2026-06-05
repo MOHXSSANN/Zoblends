@@ -59,3 +59,15 @@
      3px  3px 0 0 #0a0908,
      3px  3px 0 0 #7a6010;
 }
+
+.zo-map__video--hidden {
+  display: none;
+}
+
+.zo-map__garage-inline {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

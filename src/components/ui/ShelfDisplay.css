@@ -161,6 +161,27 @@
   background: #2a5c3f;
   color: #6bd6a3;
 }
+.shelf-item__card-add--disabled {
+  background: rgba(245,244,240,0.05);
+  color: rgba(245,244,240,0.25);
+  cursor: not-allowed;
+  border-color: rgba(245,244,240,0.08);
+}
+.shelf-item__card-add--disabled:hover { opacity: 1; }
+
+.shelf-item__stock-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-family: var(--font-body);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 2px;
+  pointer-events: none;
+}
 
 /* Product wrapper — absolutely centered over the shelf base */
 .shelf-item__product-wrap {
