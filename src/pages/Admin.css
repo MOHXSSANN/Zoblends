@@ -237,21 +237,26 @@
   background: rgba(0,0,0,0.8);
   z-index: 1200;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  padding: 16px;
+}
+@media (min-width: 540px) {
+  .admin__panel-backdrop { align-items: center; padding: 20px; }
 }
 
 .admin__panel {
   background: #0f0e0c;
   border: 1px solid rgba(212,175,55,0.2);
-  padding: 24px 20px 32px;
+  border-bottom: none;
+  padding: 24px 20px 40px;
   width: 100%;
-  max-width: 400px;
-  max-height: 88vh;
+  max-width: 480px;
+  max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  border-radius: 2px;
+}
+@media (min-width: 540px) {
+  .admin__panel { border-bottom: 1px solid rgba(212,175,55,0.2); max-width: 420px; }
 }
 
 .admin__panel-close {
@@ -283,17 +288,19 @@
   letter-spacing: 0.2em; color: var(--gold); text-align: center; margin: 0 0 20px;
 }
 
-.admin__panel-rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.admin__panel-rows { display: flex; flex-direction: column; gap: 0; margin-bottom: 20px; }
 .admin__panel-row {
-  display: flex; justify-content: space-between; align-items: center; gap: 16px;
-  padding: 8px 0; border-bottom: 1px solid rgba(212,175,55,0.06);
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(212,175,55,0.06);
 }
 .admin__panel-row span:first-child {
-  font-family: var(--font-body); font-size: 10px; font-weight: 600;
-  letter-spacing: 0.16em; text-transform: uppercase; color: rgba(245,244,240,0.3);
+  font-family: var(--font-body); font-size: 9px; font-weight: 700;
+  letter-spacing: 0.18em; text-transform: uppercase; color: rgba(245,244,240,0.3);
+  flex-shrink: 0; padding-top: 2px;
 }
 .admin__panel-row span:last-child {
-  font-family: var(--font-body); font-size: 13px; color: rgba(245,244,240,0.85); text-align: right;
+  font-family: var(--font-body); font-size: 13px; color: rgba(245,244,240,0.85);
+  text-align: right; word-break: break-word; max-width: 65%;
 }
 
 .admin__panel-actions {
