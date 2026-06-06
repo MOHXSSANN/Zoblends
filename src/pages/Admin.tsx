@@ -44,7 +44,7 @@ const STATUS_BADGE: Record<string, { bg: string; border: string; color: string }
 
 export default function Admin() {
   const { user } = useAuth()
-  const [tab, setTab]           = useState<'upcoming'|'past'|'waitlist'|'orders'|'analytics'|'inventory'>('upcoming')
+  const [tab, setTab]           = useState<'upcoming'|'past'|'waitlist'|'orders'|'analytics'|'inventory'|'community'>('upcoming')
   const [bookings, setBookings] = useState<Booking[]>([])
   const [waitlist, setWaitlist] = useState<WaitlistEntry[]>([])
   const [orders, setOrders]         = useState<ShopOrder[]>([])
@@ -52,6 +52,7 @@ export default function Admin() {
   const [editStock, setEditStock]   = useState<Record<string, number>>({})
   const [editCost, setEditCost]     = useState<Record<string, number>>({})
   const [savingProd, setSavingProd] = useState<string | null>(null)
+  const [communityPosts, setCommunityPosts] = useState<{ id: string; user_name: string; user_avatar: string | null; image_url: string; caption: string | null; created_at: string; status: string }[]>([])
   const [loading, setLoading]       = useState(true)
   const [selected, setSelected] = useState<Booking | null>(null)
   const [updating, setUpdating] = useState(false)
@@ -66,11 +67,13 @@ export default function Admin() {
       supabase.from('waitlist').select('*').order('created_at', { ascending: true }),
       supabase.from('shop_orders').select('*').order('created_at', { ascending: false }),
       supabase.from('products').select('*').order('id'),
-    ]).then(([{ data: b }, { data: w }, { data: o }, { data: p }]) => {
+      supabase.from('community_posts').select('*').order('created_at', { ascending: false }),
+    ]).then(([{ data: b }, { data: w }, { data: o }, { data: p }, { data: c }]) => {
       setBookings((b as Booking[]) ?? [])
       setWaitlist((w as WaitlistEntry[]) ?? [])
       setOrders((o as ShopOrder[]) ?? [])
       setProducts((p as AdminProduct[]) ?? [])
+      setCommunityPosts(c ?? [])
       setLoading(false)
     })
   }, [isAdmin])
@@ -179,6 +182,11 @@ export default function Admin() {
       }).catch(()=>{})
     })
     setUpdating(false)
+  }
+
+  async function reviewPost(id: string, status: 'approved' | 'rejected') {
+    await supabase.from('community_posts').update({ status }).eq('id', id)
+    setCommunityPosts(prev => prev.map(p => p.id === id ? { ...p, status } : p))
   }
 
   async function fulfillOrder(id: string) {
@@ -368,7 +376,7 @@ const q = search.toLowerCase().trim()
 
         {/* Tabs */}
         <div className="admin__tabs">
-          {(['upcoming','past','waitlist','orders','analytics','inventory'] as const).map(t => (
+          {(['upcoming','past','waitlist','orders','analytics','inventory','community'] as const).map(t => (
             <button key={t} className={`admin__tab${tab===t?' admin__tab--active':''}`} onClick={() => setTab(t)}>
               {t.charAt(0).toUpperCase()+t.slice(1)}
               {t === 'waitlist' && activeWait.length > 0 && (
@@ -376,6 +384,9 @@ const q = search.toLowerCase().trim()
               )}
               {t === 'orders' && orders.length > 0 && (
                 <span className="admin__tab-badge">{orders.length}</span>
+              )}
+              {t === 'community' && communityPosts.filter(p => p.status === 'pending').length > 0 && (
+                <span className="admin__tab-badge">{communityPosts.filter(p => p.status === 'pending').length}</span>
               )}
             </button>
           ))}
@@ -569,6 +580,53 @@ const q = search.toLowerCase().trim()
                 </div>
               </div>
             ))}
+          </div>
+        ) : tab === 'community' ? (
+          <div className="admin__community">
+            {communityPosts.length === 0 ? (
+              <p className="admin__empty">No community posts yet.</p>
+            ) : (
+              <>
+                {['pending','approved','rejected'].map(status => {
+                  const group = communityPosts.filter(p => p.status === status)
+                  if (group.length === 0) return null
+                  return (
+                    <div key={status} className="admin__community-group">
+                      <div className="admin__community-group-label">
+                        {status === 'pending' ? '⏳ Pending Review' : status === 'approved' ? '✓ Approved' : '✕ Rejected'}
+                        <span style={{ marginLeft: 8, opacity: 0.5 }}>({group.length})</span>
+                      </div>
+                      <div className="admin__community-grid">
+                        {group.map(p => (
+                          <div key={p.id} className="admin__community-card">
+                            <img src={p.image_url} className="admin__community-img" alt="" />
+                            <div className="admin__community-info">
+                              <span className="admin__community-name">{p.user_name}</span>
+                              {p.caption && <span className="admin__community-caption">{p.caption}</span>}
+                              <span className="admin__community-date">
+                                {new Date(p.created_at).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              </span>
+                            </div>
+                            {status === 'pending' && (
+                              <div className="admin__community-actions">
+                                <button className="admin__community-approve" onClick={() => reviewPost(p.id, 'approved')}>Approve</button>
+                                <button className="admin__community-reject" onClick={() => reviewPost(p.id, 'rejected')}>Reject</button>
+                              </div>
+                            )}
+                            {status !== 'pending' && (
+                              <button className="admin__row-action" style={{ margin: '8px 12px 12px' }}
+                                onClick={() => reviewPost(p.id, status === 'approved' ? 'rejected' : 'approved')}>
+                                {status === 'approved' ? 'Unapprove' : 'Approve'}
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })}
+              </>
+            )}
           </div>
         ) : tab === 'waitlist' ? (
           <div className="admin__list">

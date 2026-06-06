@@ -8,11 +8,12 @@ import { PRODUCTS } from '../../lib/products'
 import './Navbar.css'
 
 const NAV_LINKS = [
-  { label: 'The Receipts',  href: '/gallery'  },
-  { label: 'The Barber',    href: '/about'    },
-  { label: 'Reviews',       href: '/reviews'  },
-  { label: 'Shop Products', href: '/shop'     },
-  { label: 'Get in Touch',  href: '/contact'  },
+  { label: 'The Receipts',  href: '/gallery'    },
+  { label: 'The Barber',    href: '/about'      },
+  { label: 'Reviews',       href: '/reviews'    },
+  { label: 'The Wall',      href: '/community'  },
+  { label: 'Shop Products', href: '/shop'       },
+  { label: 'Get in Touch',  href: '/contact'    },
 ]
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]

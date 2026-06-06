@@ -538,3 +538,92 @@
 }
 .admin__inventory-save:hover:not(:disabled) { background: rgba(212,175,55,0.22); }
 .admin__inventory-save:disabled { opacity: 0.3; cursor: default; }
+
+/* ── Community tab ── */
+.admin__community { padding: 8px 0; }
+.admin__community-group { margin-bottom: 32px; }
+.admin__community-group-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(245,244,240,0.35);
+  padding: 0 0 14px;
+  border-bottom: 1px solid rgba(212,175,55,0.08);
+  margin-bottom: 16px;
+}
+.admin__community-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+.admin__community-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(212,175,55,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.admin__community-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+}
+.admin__community-info {
+  padding: 10px 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.admin__community-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(245,244,240,0.85);
+  letter-spacing: 0.04em;
+}
+.admin__community-caption {
+  font-size: 11px;
+  color: rgba(245,244,240,0.45);
+  line-height: 1.4;
+}
+.admin__community-date {
+  font-size: 10px;
+  color: rgba(245,244,240,0.25);
+  letter-spacing: 0.08em;
+}
+.admin__community-actions {
+  display: flex;
+  gap: 8px;
+  padding: 0 12px 12px;
+}
+.admin__community-approve {
+  flex: 1;
+  background: rgba(107,214,163,0.12);
+  border: 1px solid rgba(107,214,163,0.4);
+  color: #6bd6a3;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 8px 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.admin__community-approve:hover { background: rgba(107,214,163,0.2); }
+.admin__community-reject {
+  flex: 1;
+  background: rgba(224,85,85,0.1);
+  border: 1px solid rgba(224,85,85,0.35);
+  color: #e05555;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 8px 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.admin__community-reject:hover { background: rgba(224,85,85,0.18); }

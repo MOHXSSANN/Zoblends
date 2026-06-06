@@ -10,6 +10,7 @@ import Shop       from './pages/Shop'
 import MyBookings from './pages/MyBookings'
 import Admin        from './pages/Admin'
 import AdminFinance  from './pages/AdminFinance'
+import Community    from './pages/Community'
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="/my-bookings"   element={<MyBookings />}   />
         <Route path="/admin"         element={<Admin />}        />
         <Route path="/admin/finance" element={<AdminFinance />} />
+        <Route path="/community"     element={<Community />}    />
       </Route>
     </Routes>
   )
