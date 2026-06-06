@@ -49,8 +49,16 @@ export default function Community() {
   const [commentBody, setCommentBody] = useState('')
   const [postingComment, setPostingComment] = useState(false)
   const [loadingPost, setLoadingPost] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const commentRef = useRef<HTMLTextAreaElement>(null)
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function showToast(msg: string) {
+    setToast(msg)
+    if (toastTimer.current) clearTimeout(toastTimer.current)
+    toastTimer.current = setTimeout(() => setToast(null), 4000)
+  }
 
   const fetchPosts = useCallback(async () => {
     const { data } = await supabase
@@ -122,7 +130,7 @@ export default function Community() {
   async function postComment() {
     if (!user || !activePost || !commentBody.trim() || postingComment) return
     if (profanity.isProfane(commentBody)) {
-      alert('Your comment contains inappropriate language. Please keep it clean.')
+      showToast("This ain't that kind of establishment. Keep it clean.")
       return
     }
     setPostingComment(true)
@@ -166,7 +174,7 @@ export default function Community() {
   async function handleSubmit() {
     if (!file || !user || uploading) return
     if (caption.trim() && profanity.isProfane(caption)) {
-      alert('Your caption contains inappropriate language. Please keep it clean.')
+      showToast("Watch the caption. Zo runs a clean shop.")
       return
     }
     setUploading(true)
@@ -315,6 +323,21 @@ export default function Community() {
               )}
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* ── Toast ── */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div className="community__toast"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 16 }}
+            transition={{ duration: 0.3, ease: EASE }}
+          >
+            <span className="community__toast-icon">✂️</span>
+            {toast}
+          </motion.div>
         )}
       </AnimatePresence>
 

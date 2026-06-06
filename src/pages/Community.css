@@ -546,3 +546,26 @@
 }
 .community__comment-post:disabled { opacity: 0.35; cursor: not-allowed }
 .community__comment-post:not(:disabled):hover { opacity: 0.85 }
+
+/* ── Toast ── */
+.community__toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
+  background: #0f0e0c;
+  border: 1px solid rgba(212,175,55,0.35);
+  color: rgba(245,244,240,0.85);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.community__toast-icon { font-size: 15px; }
