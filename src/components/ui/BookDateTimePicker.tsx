@@ -39,7 +39,6 @@ function minToLabel(m: number): string {
 function buildSlots(durationMin: number, date: Date): Slot[] {
   const now    = new Date()
   const step   = durationMin + BUFFER_MIN
-  const nowMin = now.getHours() * 60 + now.getMinutes()
   const slots: Slot[] = []
 
   for (let start = DAY_START_MIN; start + durationMin <= LATE_NIGHT_END_MIN; start += step) {
