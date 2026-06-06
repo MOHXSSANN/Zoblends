@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
-import { BookDateTimePicker, LATE_NIGHT_FEE, LAST_MINUTE_FEE, type SlotFees } from '../components/ui/BookDateTimePicker'
+import { BookDateTimePicker, type SlotFees } from '../components/ui/BookDateTimePicker'
 import './Page.css'
 import './Book.css'
 
@@ -41,7 +41,7 @@ export default function Book() {
   const [pickerDate, setPickerDate] = useState<Date | undefined>()
   const [info, setInfo]             = useState<GuestInfo>({ name: '', email: '', phone: '', notes: '' })
   const [errors, setErrors]         = useState<Partial<GuestInfo>>({})
-  const [fees, setFees]             = useState<SlotFees>({ lateNight: false, lastMinute: false })
+  const [fees, setFees]             = useState<SlotFees>({ lateNightFee: 0 })
   const [addons, setAddons]         = useState<string[]>([])
   const [submitting, setSubmitting]           = useState(false)
   const [confirmationNum, setConfirmationNum] = useState<string | null>(null)
@@ -122,8 +122,7 @@ export default function Book() {
 
   const totalPrice = (s: typeof SERVICES[0]) =>
     parseInt(s.price.replace(/\D/g,''), 10) +
-    (fees.lateNight ? LATE_NIGHT_FEE : 0) +
-    (fees.lastMinute ? LAST_MINUTE_FEE : 0) +
+    fees.lateNightFee +
     addonTotal
 
   async function handleSubmit() {
@@ -141,7 +140,7 @@ export default function Book() {
 
     const confNum = genConfirmationNumber()
     const total   = totalPrice(service)
-    const effectivePrice = (fees.lateNight || fees.lastMinute || addonTotal > 0)
+    const effectivePrice = (fees.lateNightFee > 0 || addonTotal > 0)
       ? `$${total}`
       : service.price
 
@@ -160,8 +159,8 @@ export default function Book() {
       status:           'confirmed',
       confirmation_number: confNum,
       notes:            info.notes.trim() || null,
-      late_night_fee:   fees.lateNight,
-      last_minute_fee:  fees.lastMinute,
+      late_night_fee:   fees.lateNightFee > 0,
+      last_minute_fee:  false,
       addons:           addonNames || null,
     }).select('id').single()
 
@@ -506,16 +505,10 @@ export default function Book() {
                     </div>
                   )
                 })}
-                {fees.lateNight && (
+                {fees.lateNightFee > 0 && (
                   <div className="book__summary-row">
                     <span className="book__summary-key">Late night fee</span>
-                    <span className="book__summary-val" style={{ color: '#d4af37' }}>+${LATE_NIGHT_FEE}</span>
-                  </div>
-                )}
-                {fees.lastMinute && (
-                  <div className="book__summary-row">
-                    <span className="book__summary-key">Last-minute fee</span>
-                    <span className="book__summary-val" style={{ color: '#e05555' }}>+${LAST_MINUTE_FEE}</span>
+                    <span className="book__summary-val" style={{ color: '#d4af37' }}>+${fees.lateNightFee}</span>
                   </div>
                 )}
                 <div className="book__summary-row">

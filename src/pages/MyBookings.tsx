@@ -162,7 +162,7 @@ export default function MyBookings() {
 
     // Calculate new price
     const base     = BASE_PRICES[b.service_name] ?? (parseInt(b.service_price.replace(/\D/g,''), 10) || 0)
-    const extra    = (fees.lateNight ? 15 : 0) + (fees.lastMinute ? 25 : 0)
+    const extra    = fees.lateNightFee
     const newPrice = extra > 0 ? `$${base + extra}` : `$${base}`
     const confNum  = genConfirmationNumber()
 
@@ -180,8 +180,8 @@ export default function MyBookings() {
       status:           'confirmed',
       confirmation_number: confNum,
       notes:            b.notes ?? null,
-      late_night_fee:   fees.lateNight,
-      last_minute_fee:  fees.lastMinute,
+      late_night_fee:   fees.lateNightFee > 0,
+      last_minute_fee:  false,
       addons:           b.addons ?? null,
     }).select('id').single()
 
@@ -223,8 +223,8 @@ export default function MyBookings() {
       status: 'confirmed',
       confirmation_number: confNum,
       service_price: newPrice,
-      late_night_fee: fees.lateNight,
-      last_minute_fee: fees.lastMinute,
+      late_night_fee: fees.lateNightFee > 0,
+      last_minute_fee: false,
       google_event_id: null,
     }
     setBookings(prev => [

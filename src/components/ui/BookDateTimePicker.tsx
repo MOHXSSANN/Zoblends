@@ -8,11 +8,10 @@ const MAX_PER_DAY            = 12       // max bookings per day
 const REGULAR_NOTICE_MIN     = 60       // regular slots need 1hr advance notice
 const DAY_START_MIN          = 10 * 60  // 10:00 AM
 const REGULAR_END_MIN        = 19 * 60  // 7:00 PM  — late night starts
+const PREMIUM_START_MIN      = 21 * 60  // 9:00 PM  — premium tier (+$20)
 const LATE_NIGHT_END_MIN     = 22 * 60  // 10:00 PM
-export const LATE_NIGHT_FEE  = 15
-export const LAST_MINUTE_FEE = 0
 
-export interface SlotFees { lateNight: boolean; lastMinute: boolean }
+export interface SlotFees { lateNightFee: number }
 
 interface Props {
   durationMin: number
@@ -23,8 +22,7 @@ interface Props {
 interface Slot {
   label: string
   startMin: number
-  lateNight: boolean
-  lastMinute: boolean
+  lateNightFee: number
 }
 
 const DAY_NAMES   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
@@ -45,7 +43,8 @@ function buildSlots(durationMin: number, date: Date): Slot[] {
   const slots: Slot[] = []
 
   for (let start = DAY_START_MIN; start + durationMin <= LATE_NIGHT_END_MIN; start += step) {
-    const isLateNight  = start >= REGULAR_END_MIN
+    const isLateNight = start >= REGULAR_END_MIN
+    const lateNightFee = start >= PREMIUM_START_MIN ? 20 : isLateNight ? 15 : 0
 
     const slotDate = new Date(date)
     slotDate.setHours(Math.floor(start / 60), start % 60, 0, 0)
@@ -59,8 +58,7 @@ function buildSlots(durationMin: number, date: Date): Slot[] {
     slots.push({
       label:      minToLabel(start),
       startMin:   start,
-      lateNight:  isLateNight,
-      lastMinute: false,
+      lateNightFee,
     })
   }
   return slots
@@ -206,14 +204,9 @@ export function BookDateTimePicker({ durationMin, onConfirm, onDateChange }: Pro
                             Booked
                           </span>
                         )}
-                        {!taken && s.lateNight && (
+                        {!taken && s.lateNightFee > 0 && (
                           <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#d4af37', background: 'rgba(212,175,55,0.1)', padding: '2px 6px' }}>
-                            +${LATE_NIGHT_FEE} Late Night
-                          </span>
-                        )}
-                        {!taken && s.lastMinute && (
-                          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#e05555', background: 'rgba(224,85,85,0.1)', padding: '2px 6px' }}>
-                            +${LAST_MINUTE_FEE} Last Minute
+                            +${s.lateNightFee} Late Night
                           </span>
                         )}
                       </span>
@@ -221,12 +214,11 @@ export function BookDateTimePicker({ durationMin, onConfirm, onDateChange }: Pro
 
                     {selected && (
                       <button
-                        onClick={() => onConfirm(date, time!, { lateNight: s.lateNight, lastMinute: s.lastMinute })}
+                        onClick={() => onConfirm(date, time!, { lateNightFee: s.lateNightFee })}
                         style={{ width: '100%', padding: '18px 16px', background: '#d4af37', color: '#000', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', outline: 'none', marginBottom: 2 }}
                       >
                         Continue — {s.label}
-                        {s.lateNight && ` (+$${LATE_NIGHT_FEE})`}
-                        {s.lastMinute && ` (+$${LAST_MINUTE_FEE})`}
+                        {s.lateNightFee > 0 && ` (+$${s.lateNightFee})`}
                       </button>
                     )}
                   </React.Fragment>
