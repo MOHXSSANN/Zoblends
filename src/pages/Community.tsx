@@ -329,15 +329,17 @@ export default function Community() {
       {/* ── Toast ── */}
       <AnimatePresence>
         {toast && (
-          <motion.div className="community__toast"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 16 }}
-            transition={{ duration: 0.3, ease: EASE }}
-          >
-            <span className="community__toast-icon">✂️</span>
-            {toast}
-          </motion.div>
+          <div className="community__toast-wrap">
+            <motion.div className="community__toast"
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              transition={{ duration: 0.3, ease: EASE }}
+            >
+              <span className="community__toast-icon">✂️</span>
+              {toast}
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
