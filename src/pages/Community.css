@@ -143,15 +143,15 @@
 /* ── Modal ── */
 .community__modal {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
+  margin: auto;
   z-index: 201;
   background: #0f0e0c;
   border: 1px solid rgba(212,175,55,0.15);
   padding: 40px 28px 32px;
   width: calc(100vw - 32px);
   max-width: 420px;
+  height: fit-content;
   max-height: 90vh;
   overflow-y: auto;
 }
@@ -292,9 +292,9 @@
 /* ── Lightbox ── */
 .community__lightbox {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
+  margin: auto;
+  height: fit-content;
   z-index: 201;
   width: calc(100vw - 32px);
   max-width: 560px;
