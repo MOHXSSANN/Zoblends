@@ -627,3 +627,82 @@
   transition: background 0.15s;
 }
 .admin__community-reject:hover { background: rgba(224,85,85,0.18); }
+.admin__community-toggle {
+  flex: 1;
+  background: rgba(212,175,55,0.08);
+  border: 1px solid rgba(212,175,55,0.3);
+  color: rgba(212,175,55,0.8);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 8px 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.admin__community-toggle:hover { background: rgba(212,175,55,0.15); }
+.admin__community-delete {
+  background: rgba(224,85,85,0.08);
+  border: 1px solid rgba(224,85,85,0.25);
+  color: rgba(224,85,85,0.7);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 8px 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.admin__community-delete:hover { background: rgba(224,85,85,0.18); color: #e05555; }
+.admin__community-comments-btn {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(245,244,240,0.45);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 8px 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.admin__community-comments-btn:hover { background: rgba(255,255,255,0.08); color: rgba(245,244,240,0.8); }
+.admin__community-comments {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.admin__community-no-comments {
+  font-size: 11px;
+  color: rgba(245,244,240,0.25);
+  text-align: center;
+  padding: 4px 0;
+}
+.admin__community-comment {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 2px;
+  padding: 7px 10px;
+}
+.admin__community-comment-text {
+  flex: 1;
+  font-size: 11px;
+  color: rgba(245,244,240,0.6);
+  line-height: 1.4;
+}
+.admin__community-comment-text strong {
+  color: rgba(212,175,55,0.7);
+  font-weight: 700;
+}
+.admin__community-comment .admin__community-delete {
+  padding: 4px 6px;
+  font-size: 9px;
+  flex-shrink: 0;
+}

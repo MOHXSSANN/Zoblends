@@ -53,6 +53,8 @@ export default function Admin() {
   const [editCost, setEditCost]     = useState<Record<string, number>>({})
   const [savingProd, setSavingProd] = useState<string | null>(null)
   const [communityPosts, setCommunityPosts] = useState<{ id: string; user_name: string; user_avatar: string | null; image_url: string; caption: string | null; created_at: string; status: string }[]>([])
+  const [postComments, setPostComments] = useState<Record<string, { id: string; user_name: string; body: string; created_at: string }[]>>({})
+  const [loadingComments, setLoadingComments] = useState<string | null>(null)
   const [loading, setLoading]       = useState(true)
   const [selected, setSelected] = useState<Booking | null>(null)
   const [updating, setUpdating] = useState(false)
@@ -187,6 +189,30 @@ export default function Admin() {
   async function reviewPost(id: string, status: 'approved' | 'rejected') {
     await supabase.from('community_posts').update({ status }).eq('id', id)
     setCommunityPosts(prev => prev.map(p => p.id === id ? { ...p, status } : p))
+  }
+
+  async function deletePost(id: string) {
+    if (!window.confirm('Delete this post permanently?')) return
+    await supabase.from('community_posts').delete().eq('id', id)
+    setCommunityPosts(prev => prev.filter(p => p.id !== id))
+    setPostComments(prev => { const n = { ...prev }; delete n[id]; return n })
+  }
+
+  async function toggleComments(postId: string) {
+    if (postComments[postId]) {
+      setPostComments(prev => { const n = { ...prev }; delete n[postId]; return n })
+      return
+    }
+    setLoadingComments(postId)
+    const { data } = await supabase.from('community_comments')
+      .select('id,user_name,body,created_at').eq('post_id', postId).order('created_at', { ascending: true })
+    setPostComments(prev => ({ ...prev, [postId]: data ?? [] }))
+    setLoadingComments(null)
+  }
+
+  async function deleteComment(postId: string, commentId: string) {
+    await supabase.from('community_comments').delete().eq('id', commentId)
+    setPostComments(prev => ({ ...prev, [postId]: prev[postId].filter(c => c.id !== commentId) }))
   }
 
   async function fulfillOrder(id: string) {
@@ -607,17 +633,34 @@ const q = search.toLowerCase().trim()
                                 {new Date(p.created_at).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' })}
                               </span>
                             </div>
-                            {status === 'pending' && (
-                              <div className="admin__community-actions">
+                            <div className="admin__community-actions">
+                              {status === 'pending' && <>
                                 <button className="admin__community-approve" onClick={() => reviewPost(p.id, 'approved')}>Approve</button>
                                 <button className="admin__community-reject" onClick={() => reviewPost(p.id, 'rejected')}>Reject</button>
-                              </div>
-                            )}
-                            {status !== 'pending' && (
-                              <button className="admin__row-action" style={{ margin: '8px 12px 12px' }}
-                                onClick={() => reviewPost(p.id, status === 'approved' ? 'rejected' : 'approved')}>
-                                {status === 'approved' ? 'Unapprove' : 'Approve'}
+                              </>}
+                              {status !== 'pending' && (
+                                <button className="admin__community-toggle" onClick={() => reviewPost(p.id, status === 'approved' ? 'rejected' : 'approved')}>
+                                  {status === 'approved' ? 'Unapprove' : 'Approve'}
+                                </button>
+                              )}
+                              <button className="admin__community-comments-btn" onClick={() => toggleComments(p.id)}>
+                                {postComments[p.id] ? 'Hide' : loadingComments === p.id ? '…' : 'Comments'}
                               </button>
+                              <button className="admin__community-delete" onClick={() => deletePost(p.id)}>Delete</button>
+                            </div>
+                            {postComments[p.id] && (
+                              <div className="admin__community-comments">
+                                {postComments[p.id].length === 0 ? (
+                                  <p className="admin__community-no-comments">No comments.</p>
+                                ) : postComments[p.id].map(c => (
+                                  <div key={c.id} className="admin__community-comment">
+                                    <div className="admin__community-comment-text">
+                                      <strong>{c.user_name.split(' ')[0]}</strong>: {c.body}
+                                    </div>
+                                    <button className="admin__community-delete" onClick={() => deleteComment(p.id, c.id)}>✕</button>
+                                  </div>
+                                ))}
+                              </div>
                             )}
                           </div>
                         ))}

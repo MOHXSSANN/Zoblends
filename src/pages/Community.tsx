@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { motion, AnimatePresence } from 'framer-motion'
+import Filter from 'bad-words'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
 import './Community.css'
+
+const profanity = new Filter()
 
 interface Post {
   id: string
@@ -118,6 +121,10 @@ export default function Community() {
 
   async function postComment() {
     if (!user || !activePost || !commentBody.trim() || postingComment) return
+    if (profanity.isProfane(commentBody)) {
+      alert('Your comment contains inappropriate language. Please keep it clean.')
+      return
+    }
     setPostingComment(true)
     const { data, error } = await supabase.from('community_comments').insert({
       post_id:    activePost.id,
@@ -158,6 +165,10 @@ export default function Community() {
 
   async function handleSubmit() {
     if (!file || !user || uploading) return
+    if (caption.trim() && profanity.isProfane(caption)) {
+      alert('Your caption contains inappropriate language. Please keep it clean.')
+      return
+    }
     setUploading(true)
     const ext  = file.name.split('.').pop()
     const path = `${user.id}/${Date.now()}.${ext}`
