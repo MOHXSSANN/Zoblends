@@ -5,11 +5,11 @@ import { supabase } from "@/lib/supabase"
 // ── Business rules ──────────────────────────────────────────────────
 const BUFFER_MIN             = 10       // minutes between appointments
 const MAX_PER_DAY            = 12       // max bookings per day
-const SAME_DAY_CUTOFF_MIN    = 60       // regular slots need 1hr advance notice
-const LAST_MINUTE_CUTOFF_MIN = 60       // late night <1hr = last-minute surcharge
-const LATE_NIGHT_UNLOCK_MIN  = 21 * 60  // late night only visible after 9pm
+const REGULAR_NOTICE_MIN     = 60       // regular slots need 1hr advance notice
+const LAST_MINUTE_CUTOFF_MIN = 60       // <1hr = last-minute surcharge (8pm+ slots only)
 const DAY_START_MIN          = 10 * 60  // 10:00 AM
 const REGULAR_END_MIN        = 19 * 60  // 7:00 PM
+const LAST_MINUTE_START_MIN  = 20 * 60  // last-minute fee applies from 8pm slots onwards
 const LATE_NIGHT_END_MIN     = 22 * 60  // 10:00 PM
 export const LATE_NIGHT_FEE  = 15
 export const LAST_MINUTE_FEE = 25
@@ -47,10 +47,8 @@ function buildSlots(durationMin: number, date: Date): Slot[] {
   const slots: Slot[] = []
 
   for (let start = DAY_START_MIN; start + durationMin <= LATE_NIGHT_END_MIN; start += step) {
-    const isLateNight = start >= REGULAR_END_MIN
-
-    // Late night slots only visible once the clock hits 5pm
-    if (isLateNight && nowMin < LATE_NIGHT_UNLOCK_MIN) continue
+    const isLateNight  = start >= REGULAR_END_MIN
+    const isLastMinuteEligible = start >= LAST_MINUTE_START_MIN
 
     const slotDate = new Date(date)
     slotDate.setHours(Math.floor(start / 60), start % 60, 0, 0)
@@ -58,14 +56,14 @@ function buildSlots(durationMin: number, date: Date): Slot[] {
 
     if (minsUntil < 0) continue  // past
 
-    // Regular slots require 8hr same-day notice
-    if (!isLateNight && minsUntil < SAME_DAY_CUTOFF_MIN) continue
+    // Regular slots need 1hr notice
+    if (!isLateNight && minsUntil < REGULAR_NOTICE_MIN) continue
 
     slots.push({
       label:      minToLabel(start),
       startMin:   start,
       lateNight:  isLateNight,
-      lastMinute: isLateNight && minsUntil < LAST_MINUTE_CUTOFF_MIN,
+      lastMinute: isLastMinuteEligible && minsUntil < LAST_MINUTE_CUTOFF_MIN,
     })
   }
   return slots
