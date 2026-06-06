@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { motion, AnimatePresence } from 'framer-motion'
-import Filter from 'bad-words'
+import { Filter } from 'bad-words'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
 import './Community.css'
