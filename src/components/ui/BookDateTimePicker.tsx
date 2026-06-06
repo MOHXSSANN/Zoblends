@@ -6,10 +6,9 @@ import { supabase } from "@/lib/supabase"
 const BUFFER_MIN             = 10       // minutes between appointments
 const MAX_PER_DAY            = 12       // max bookings per day
 const REGULAR_NOTICE_MIN     = 60       // regular slots need 1hr advance notice
-const LAST_MINUTE_CUTOFF_MIN = 60       // <1hr = last-minute surcharge (8pm+ slots only)
 const DAY_START_MIN          = 10 * 60  // 10:00 AM
-const REGULAR_END_MIN        = 19 * 60  // 7:00 PM
-const LAST_MINUTE_START_MIN  = 20 * 60  // last-minute fee applies from 8pm slots onwards
+const REGULAR_END_MIN        = 19 * 60  // 7:00 PM  — late night starts
+const LAST_MINUTE_START_MIN  = 21 * 60  // 9:00 PM  — last-minute tier starts
 const LATE_NIGHT_END_MIN     = 22 * 60  // 10:00 PM
 export const LATE_NIGHT_FEE  = 15
 export const LAST_MINUTE_FEE = 25
@@ -48,7 +47,7 @@ function buildSlots(durationMin: number, date: Date): Slot[] {
 
   for (let start = DAY_START_MIN; start + durationMin <= LATE_NIGHT_END_MIN; start += step) {
     const isLateNight  = start >= REGULAR_END_MIN
-    const isLastMinuteEligible = start >= LAST_MINUTE_START_MIN
+    const isLastMinute = start >= LAST_MINUTE_START_MIN
 
     const slotDate = new Date(date)
     slotDate.setHours(Math.floor(start / 60), start % 60, 0, 0)
@@ -63,7 +62,7 @@ function buildSlots(durationMin: number, date: Date): Slot[] {
       label:      minToLabel(start),
       startMin:   start,
       lateNight:  isLateNight,
-      lastMinute: isLastMinuteEligible && minsUntil < LAST_MINUTE_CUTOFF_MIN,
+      lastMinute: isLastMinute,
     })
   }
   return slots
