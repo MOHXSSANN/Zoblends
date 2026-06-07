@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase'
 import './Community.css'
 
 const profanity = new Filter()
+profanity.addWords('retarded', 'retard', 'gay', 'faggot', 'fag', 'tranny', 'dyke', 'spastic', 'negro', 'wetback', 'chink', 'spic', 'kike')
 
 interface Post {
   id: string
