@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import './ZoMap.css'
 
@@ -7,6 +7,12 @@ export default function ZoMap() {
   const garageRef = useRef<HTMLVideoElement>(null)
   const [ended,       setEnded]       = useState(false)
   const [showGarage,  setShowGarage]  = useState(false)
+
+  useEffect(() => {
+    const v = mapRef.current
+    if (!v) return
+    v.play().then(undefined, () => {})
+  }, [])
 
   function openGarage() {
     setShowGarage(true)
