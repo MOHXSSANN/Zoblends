@@ -11,7 +11,13 @@ export default function ZoMap() {
   useEffect(() => {
     const v = mapRef.current
     if (!v) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) v.play().then(undefined, () => {}) },
+      { threshold: 0.1 }
+    )
+    observer.observe(v)
     v.play().then(undefined, () => {})
+    return () => observer.disconnect()
   }, [])
 
   function openGarage() {
@@ -31,6 +37,7 @@ export default function ZoMap() {
         playsInline
         preload="auto"
         onEnded={() => setEnded(true)}
+        onCanPlay={e => (e.currentTarget as HTMLVideoElement).play().then(undefined, () => {})}
       />
 
       {/* Garage video — inline, same container */}
