@@ -46,7 +46,7 @@ export default function ZoMap() {
           <motion.video
             ref={garageRef}
             className="zo-map__video zo-map__garage-inline"
-            src="/zoview.mp4"
+            src="https://mhhagaztfurgivlspdss.supabase.co/storage/v1/object/public/videos/zoview.mp4"
             playsInline
             muted
             initial={{ opacity: 0 }}
