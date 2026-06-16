@@ -1,11 +1,45 @@
 /* ── Motion tokens ── */
 :root {
   --ease-out-quart: cubic-bezier(.165, .84, .44, 1);
-  --ease-in-out-cubic: cubic-bezier(.645, .045, .355, 1);
   --dur-2: 180ms;
   --dur-3: 240ms;
-  --dur-4: 300ms;
 }
+
+/* ── Marquee keyframes ── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(-100% - var(--gap, 1rem))); }
+}
+@keyframes marquee-vertical {
+  from { transform: translateY(0); }
+  to   { transform: translateY(calc(-100% - var(--gap, 1rem))); }
+}
+
+/* ── Marquee component ── */
+.marquee {
+  display: flex;
+  overflow: hidden;
+  gap: var(--gap, 1rem);
+}
+.marquee--horizontal { flex-direction: row; }
+.marquee--vertical   { flex-direction: column; }
+
+.marquee__track {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: space-around;
+  gap: var(--gap, 1rem);
+}
+.marquee__track--horizontal {
+  flex-direction: row;
+  animation: marquee var(--duration, 40s) linear infinite;
+}
+.marquee__track--vertical {
+  flex-direction: column;
+  animation: marquee-vertical var(--duration, 40s) linear infinite;
+}
+.marquee__track--reverse { animation-direction: reverse; }
+.marquee:hover .marquee__track--pause-hover { animation-play-state: paused; }
 
 /* ── Page shell ── */
 .reviews-page {
@@ -26,7 +60,6 @@
   align-items: center;
   gap: 10px;
 }
-
 .reviews__sub {
   font-family: var(--font-body);
   font-size: 13px;
@@ -55,18 +88,8 @@
   border: 1px solid rgba(212,175,55,0.15);
   text-align: center;
 }
-
-.rsc__stars {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-.rsc__star {
-  width: 28px;
-  height: 28px;
-}
-
+.rsc__stars { display: flex; gap: 6px; align-items: center; }
+.rsc__star  { width: 28px; height: 28px; }
 .rsc__score {
   font-family: var(--font-display);
   font-size: clamp(48px, 10vw, 72px);
@@ -76,15 +99,12 @@
   letter-spacing: -0.02em;
   margin: 4px 0 0;
 }
-
 .rsc__count {
   font-family: var(--font-body);
   font-size: clamp(16px, 3vw, 22px);
   font-weight: 500;
   color: rgba(245,244,240,0.45);
-  letter-spacing: 0.02em;
 }
-
 .rsc__summary {
   font-family: var(--font-body);
   font-size: 11px;
@@ -94,206 +114,120 @@
   margin: 4px 0 0;
 }
 
-/* ── Stars ── */
-.reviews__stars {
-  display: flex;
-  gap: 3px;
-}
-
-.reviews__star {
-  font-size: 16px;
-  color: #d4af37;
-  display: inline-block;
-}
-
-/* Animated star entrance — each star pops in with a scale bounce */
-@keyframes starPop {
-  0%   { opacity: 0; transform: scale(0.4) rotate(-20deg); }
-  65%  { opacity: 1; transform: scale(1.25) rotate(4deg); }
-  100% { opacity: 1; transform: scale(1) rotate(0deg); }
-}
-
-.reviews__stars--animate .reviews__star {
-  opacity: 0;
-  animation: starPop 400ms cubic-bezier(.165, .84, .44, 1) forwards;
-  animation-delay: calc(300ms + var(--i) * 80ms);
-}
-
-/* Small stars on cards */
-.reviews__card-stars .reviews__star {
-  font-size: 11px;
-  color: #d4af37;
-}
-
 /* ── Divider ── */
 .reviews__divider {
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(212,175,55,0.3) 30%, rgba(212,175,55,0.3) 70%, transparent);
   transform-origin: left center;
-  margin-bottom: 48px;
+  margin-bottom: 56px;
 }
 
-/* ── Grid ── */
-.reviews__grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
+/* ── 3D Marquee scene ── */
+.reviews__marquee-scene {
+  perspective: 320px;
+  width: 100%;
+  height: 420px;
+  overflow: hidden;
+  position: relative;
   margin-bottom: 64px;
 }
 
-@media (min-width: 580px) {
-  .reviews__grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (min-width: 860px) {
-  .reviews__grid { grid-template-columns: repeat(3, 1fr); }
-}
-
-/* ── Card — scroll-triggered entrance ── */
-@keyframes cardReveal {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.reviews__marquee-3d {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 14px;
+  height: 100%;
+  position: relative;
+  transform: translateX(-60px) translateY(0) translateZ(-80px) rotateX(18deg) rotateY(-8deg) rotateZ(18deg);
 }
 
-.reviews__card {
+/* ── Gradient fade overlays ── */
+.reviews__fade {
+  position: absolute;
+  pointer-events: none;
+  z-index: 10;
+}
+.reviews__fade--top {
+  inset: 0 0 auto 0;
+  height: 30%;
+  background: linear-gradient(to bottom, #040302, transparent);
+}
+.reviews__fade--bottom {
+  inset: auto 0 0 0;
+  height: 30%;
+  background: linear-gradient(to top, #040302, transparent);
+}
+.reviews__fade--left {
+  inset: 0 auto 0 0;
+  width: 20%;
+  background: linear-gradient(to right, #040302, transparent);
+}
+.reviews__fade--right {
+  inset: 0 0 0 auto;
+  width: 20%;
+  background: linear-gradient(to left, #040302, transparent);
+}
+
+/* ── Testimonial card ── */
+.tcard {
+  width: 200px;
+  flex-shrink: 0;
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(212,175,55,0.1);
-  padding: 22px 20px 18px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  position: relative;
-  overflow: hidden;
-
-  /* Hidden until IntersectionObserver fires */
-  opacity: 0;
-  transform: translateY(24px);
-
-  /* Hover — ease 150ms on compositor-only props */
-  transition:
-    border-color var(--dur-2) ease,
-    box-shadow var(--dur-2) ease,
-    transform var(--dur-2) var(--ease-out-quart);
-}
-
-/* Shimmer top edge on hover */
-.reviews__card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #d4af37, transparent);
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform var(--dur-3) var(--ease-out-quart);
-}
-
-.reviews__card:hover::before {
-  transform: scaleX(1);
-}
-
-.reviews__card:hover {
-  border-color: rgba(212,175,55,0.28);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 0 0 1px rgba(212,175,55,0.06);
-  transform: translateY(-4px);
-}
-
-/* When class added by IntersectionObserver */
-.reviews__card--visible {
-  animation: cardReveal 420ms var(--ease-out-quart) var(--delay, 0ms) forwards;
-}
-
-/* ── Card top row ── */
-.reviews__card-top {
-  display: flex;
-  align-items: flex-start;
   gap: 10px;
+  transition: border-color var(--dur-2) ease, transform var(--dur-2) var(--ease-out-quart);
+  margin-bottom: 14px;
+}
+.tcard:hover {
+  border-color: rgba(212,175,55,0.28);
+  transform: scale(1.02);
 }
 
-.reviews__avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: rgba(212,175,55,0.15);
-  border: 1px solid rgba(212,175,55,0.3);
-  color: #d4af37;
-  font-family: var(--font-display);
-  font-size: 14px;
-  font-weight: 700;
+.tcard__top {
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  letter-spacing: 0.04em;
+  gap: 8px;
 }
-
-.reviews__name {
+.tcard__avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid rgba(212,175,55,0.2);
+}
+.tcard__name {
   display: block;
   font-family: var(--font-body);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   color: rgba(245,244,240,0.9);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
-
-.reviews__date {
+.tcard__handle {
   display: block;
-  font-size: 10px;
-  color: rgba(245,244,240,0.28);
-  letter-spacing: 0.08em;
-  margin-top: 2px;
+  font-size: 9px;
+  color: rgba(245,244,240,0.3);
+  letter-spacing: 0.06em;
 }
-
-.reviews__card-stars {
+.tcard__stars {
   margin-left: auto;
+  font-size: 9px;
+  color: #d4af37;
+  letter-spacing: 1px;
   flex-shrink: 0;
 }
-
-/* ── Review text ── */
-.reviews__text {
+.tcard__body {
   font-family: var(--font-body);
-  font-size: 13px;
-  color: rgba(245,244,240,0.6);
-  line-height: 1.7;
+  font-size: 11px;
+  color: rgba(245,244,240,0.55);
+  line-height: 1.6;
   margin: 0;
   letter-spacing: 0.02em;
-  flex: 1;
-}
-
-.reviews__quote {
-  font-family: var(--font-display);
-  font-size: 32px;
-  line-height: 0.5;
-  color: rgba(212,175,55,0.25);
-  vertical-align: bottom;
-  margin-right: 2px;
-  display: inline-block;
-}
-
-/* ── Service tag ── */
-.reviews__service-tag {
-  display: inline-block;
-  font-family: var(--font-body);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(212,175,55,0.5);
-  border: 1px solid rgba(212,175,55,0.18);
-  padding: 4px 8px;
-  align-self: flex-start;
-  transition: color var(--dur-2) ease, border-color var(--dur-2) ease;
-}
-
-.reviews__card:hover .reviews__service-tag {
-  color: rgba(212,175,55,0.8);
-  border-color: rgba(212,175,55,0.35);
 }
 
 /* ── CTA ── */
@@ -304,7 +238,6 @@
   align-items: center;
   gap: 20px;
 }
-
 .reviews__cta-text {
   font-family: var(--font-body);
   font-size: 13px;
@@ -313,7 +246,6 @@
   text-transform: uppercase;
   margin: 0;
 }
-
 .reviews__cta-btn {
   display: inline-block;
   background: #d4af37;
@@ -325,40 +257,13 @@
   text-transform: uppercase;
   text-decoration: none;
   padding: 16px 36px;
-  transition:
-    opacity var(--dur-2) ease,
-    transform var(--dur-2) var(--ease-out-quart);
+  transition: opacity var(--dur-2) ease, transform var(--dur-2) var(--ease-out-quart);
 }
-
-.reviews__cta-btn:hover {
-  opacity: 0.88;
-  transform: translateY(-2px);
-}
-
-.reviews__cta-btn:active {
-  opacity: 1;
-  transform: translateY(0);
-  transition-duration: var(--dur-1);
-}
+.reviews__cta-btn:hover  { opacity: 0.88; transform: translateY(-2px); }
+.reviews__cta-btn:active { opacity: 1; transform: translateY(0); }
 
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
-  .reviews__card,
-  .reviews__card--visible {
-    animation: none;
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-  .reviews__stars--animate .reviews__star {
-    animation: none;
-    opacity: 1;
-  }
-  .reviews__card::before {
-    transition: none;
-  }
-  .reviews__cta-btn,
-  .reviews__card {
-    transition: none;
-  }
+  .marquee__track { animation: none; }
+  .reviews__cta-btn, .tcard { transition: none; }
 }
