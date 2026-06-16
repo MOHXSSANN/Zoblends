@@ -1,47 +1,49 @@
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
-import {
-  ContainerScroll,
-  CardsContainer,
-  CardTransformed,
-  ReviewStars,
-} from '../components/ui/AnimatedCardsStack'
+import { Carousel, TestimonialCard, type iTestimonial } from '../components/ui/retro-testimonial'
 import { ReviewSummaryCard } from '../components/ui/ReviewSummaryCard'
 import './Reviews.css'
 import './Page.css'
 
 const EASE_OUT_QUART: [number,number,number,number] = [0.165, 0.84, 0.44, 1]
 
-const TESTIMONIALS = [
+const BG = 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=2074&auto=format&fit=crop'
+
+const TESTIMONIALS: iTestimonial[] = [
   {
-    id: 1,
     name: 'Khalid M.',
-    service: 'Signature Blend',
-    rating: 5,
+    designation: 'Signature Blend',
     description: "Zo doesn't miss. Walked in with a faded mess and walked out looking like a whole different person. The attention to detail is on another level.",
+    profileImage: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop',
   },
   {
-    id: 2,
     name: 'Tyler B.',
-    service: 'Skin Fade',
-    rating: 5,
+    designation: 'Skin Fade',
     description: "Best barber in Ottawa no debate. Been going for 6 months straight — every single cut is clean. Wouldn't trust anyone else.",
+    profileImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop',
   },
   {
-    id: 3,
     name: 'Marcus J.',
-    service: 'Shape Up',
-    rating: 5,
+    designation: 'Shape Up',
     description: "The vibe, the precision, the conversation — everything is top tier. You can tell Zo actually cares about the craft.",
+    profileImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop',
   },
   {
-    id: 4,
     name: 'Aiden W.',
-    service: 'Full Cut & Style',
-    rating: 5,
+    designation: 'Full Cut & Style',
     description: "First time going and I was genuinely impressed. Booked my next appointment before I even left the chair.",
+    profileImage: 'https://images.unsplash.com/photo-1530268729831-4b0b9e170218?w=400&auto=format&fit=crop',
   },
 ]
+
+const cards = TESTIMONIALS.map((t, i) => (
+  <TestimonialCard
+    key={t.name}
+    testimonial={t}
+    index={i}
+    backgroundImage={BG}
+  />
+))
 
 export default function Reviews() {
   return (
@@ -51,8 +53,9 @@ export default function Reviews() {
         <meta name="description" content="Real clients. Real cuts. See what everyone's saying about Zoblends, Ottawa." />
       </Helmet>
 
-      {/* ── Top section: constrained width ── */}
       <div className="reviews-page">
+
+        {/* ── Header ── */}
         <motion.div
           className="reviews__header"
           initial={{ opacity: 0, y: 28 }}
@@ -64,6 +67,7 @@ export default function Reviews() {
           <p className="reviews__sub">Real clients. No filter.</p>
         </motion.div>
 
+        {/* ── Rating summary ── */}
         <motion.div
           className="reviews__stat-wrap"
           initial={{ opacity: 0, y: 20 }}
@@ -77,49 +81,23 @@ export default function Reviews() {
           />
         </motion.div>
 
+        {/* ── Divider ── */}
         <motion.div
           className="reviews__divider"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ duration: 0.6, ease: EASE_OUT_QUART, delay: 0.3 }}
         />
-      </div>
 
-      {/* ── Scroll stack: full viewport width, outside max-width wrapper ── */}
-      <ContainerScroll className="reviews__scroll-section">
-        <div className="reviews__sticky">
-          <CardsContainer className="reviews__card-stack">
-            {TESTIMONIALS.map((t, i) => (
-              <CardTransformed
-                key={t.id}
-                arrayLength={TESTIMONIALS.length}
-                index={i + 2}
-                variant="dark"
-                role="article"
-              >
-                <ReviewStars rating={t.rating} />
+        {/* ── Testimonial carousel ── */}
+        <Carousel items={cards} />
 
-                <blockquote className="acs__quote">
-                  <span className="acs__quote-mark">"</span>
-                  {t.description}
-                </blockquote>
-
-                <div className="acs__author">
-                  <span className="acs__name">{t.name}</span>
-                  <span className="acs__service">{t.service}</span>
-                </div>
-              </CardTransformed>
-            ))}
-          </CardsContainer>
-        </div>
-      </ContainerScroll>
-
-      {/* ── CTA: back to constrained width ── */}
-      <div className="reviews-page reviews-page--bottom">
+        {/* ── CTA ── */}
         <div className="reviews__cta">
           <p className="reviews__cta-text">Ready to get your cut?</p>
           <a href="/book" className="reviews__cta-btn">Book Now →</a>
         </div>
+
       </div>
     </>
   )

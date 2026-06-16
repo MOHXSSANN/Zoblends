@@ -1,14 +1,11 @@
 /* ── Page shell ── */
 .reviews-page {
+  min-height: 100dvh;
   background: var(--black);
-  padding: 120px 24px 48px;
+  padding: 120px 24px 100px;
   box-sizing: border-box;
   max-width: 900px;
   margin: 0 auto;
-}
-.reviews-page--bottom {
-  padding-top: 0;
-  padding-bottom: 100px;
 }
 
 /* ── Header ── */
@@ -79,83 +76,6 @@
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(212,175,55,0.3) 30%, rgba(212,175,55,0.3) 70%, transparent);
   transform-origin: left center;
-  margin-bottom: 0;
-}
-
-/* ── Full-width scroll container (height gives scroll distance) ── */
-.reviews__scroll-section {
-  height: 300vh;
-  width: 100%;
-  background: var(--black);
-}
-
-/* ── Sticky viewport pin ── */
-.reviews__sticky {
-  position: sticky;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100svh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 48px 24px;
-  box-sizing: border-box;
-}
-
-/* ── Card stack dimensions ── */
-.reviews__card-stack {
-  height: 420px;
-  width: min(340px, calc(100vw - 48px));
-  flex-shrink: 0;
-}
-
-/* ── Stars (inside cards) ── */
-.acs__star {
-  width: 18px;
-  height: 18px;
-}
-.acs__star--filled { color: #d4af37; }
-.acs__star--empty  { color: rgba(212,175,55,0.15); }
-
-/* ── Quote ── */
-.acs__quote {
-  font-family: var(--font-body);
-  font-size: 15px;
-  color: rgba(245,244,240,0.7);
-  line-height: 1.7;
-  text-align: center;
-  margin: 0;
-  letter-spacing: 0.02em;
-}
-.acs__quote-mark {
-  font-family: var(--font-display);
-  font-size: 40px;
-  line-height: 0.5;
-  color: rgba(212,175,55,0.3);
-  vertical-align: bottom;
-  margin-right: 2px;
-}
-
-/* ── Author ── */
-.acs__author {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-.acs__name {
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 700;
-  color: rgba(245,244,240,0.9);
-  letter-spacing: 0.06em;
-}
-.acs__service {
-  font-size: 10px;
-  color: rgba(212,175,55,0.5);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 }
 
 /* ── CTA ── */
