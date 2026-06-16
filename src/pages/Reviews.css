@@ -1,10 +1,14 @@
 /* ── Page shell ── */
 .reviews-page {
   background: var(--black);
-  padding: 120px 24px 100px;
+  padding: 120px 24px 48px;
   box-sizing: border-box;
   max-width: 900px;
   margin: 0 auto;
+}
+.reviews-page--bottom {
+  padding-top: 0;
+  padding-bottom: 100px;
 }
 
 /* ── Header ── */
@@ -76,6 +80,13 @@
   background: linear-gradient(90deg, transparent, rgba(212,175,55,0.3) 30%, rgba(212,175,55,0.3) 70%, transparent);
   transform-origin: left center;
   margin-bottom: 0;
+}
+
+/* ── Full-width scroll container (height gives scroll distance) ── */
+.reviews__scroll-section {
+  height: 300vh;
+  width: 100%;
+  background: var(--black);
 }
 
 /* ── Sticky viewport pin ── */

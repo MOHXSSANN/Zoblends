@@ -51,9 +51,8 @@ export default function Reviews() {
         <meta name="description" content="Real clients. Real cuts. See what everyone's saying about Zoblends, Ottawa." />
       </Helmet>
 
+      {/* ── Top section: constrained width ── */}
       <div className="reviews-page">
-
-        {/* ── Header ── */}
         <motion.div
           className="reviews__header"
           initial={{ opacity: 0, y: 28 }}
@@ -65,7 +64,6 @@ export default function Reviews() {
           <p className="reviews__sub">Real clients. No filter.</p>
         </motion.div>
 
-        {/* ── Animated rating card ── */}
         <motion.div
           className="reviews__stat-wrap"
           initial={{ opacity: 0, y: 20 }}
@@ -79,51 +77,49 @@ export default function Reviews() {
           />
         </motion.div>
 
-        {/* ── Divider ── */}
         <motion.div
           className="reviews__divider"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ duration: 0.6, ease: EASE_OUT_QUART, delay: 0.3 }}
         />
+      </div>
 
-        {/* ── Scroll-driven card stack ── */}
-        {/* height: 300vh gives the scroll distance for the animation */}
-        <ContainerScroll style={{ height: '300vh' }}>
-          {/* sticky: stays pinned while parent scrolls */}
-          <div className="reviews__sticky">
-            <CardsContainer className="reviews__card-stack">
-              {TESTIMONIALS.map((t, i) => (
-                <CardTransformed
-                  key={t.id}
-                  arrayLength={TESTIMONIALS.length}
-                  index={i + 2}
-                  variant="dark"
-                  role="article"
-                >
-                  <ReviewStars rating={t.rating} />
+      {/* ── Scroll stack: full viewport width, outside max-width wrapper ── */}
+      <ContainerScroll className="reviews__scroll-section">
+        <div className="reviews__sticky">
+          <CardsContainer className="reviews__card-stack">
+            {TESTIMONIALS.map((t, i) => (
+              <CardTransformed
+                key={t.id}
+                arrayLength={TESTIMONIALS.length}
+                index={i + 2}
+                variant="dark"
+                role="article"
+              >
+                <ReviewStars rating={t.rating} />
 
-                  <blockquote className="acs__quote">
-                    <span className="acs__quote-mark">"</span>
-                    {t.description}
-                  </blockquote>
+                <blockquote className="acs__quote">
+                  <span className="acs__quote-mark">"</span>
+                  {t.description}
+                </blockquote>
 
-                  <div className="acs__author">
-                    <span className="acs__name">{t.name}</span>
-                    <span className="acs__service">{t.service}</span>
-                  </div>
-                </CardTransformed>
-              ))}
-            </CardsContainer>
-          </div>
-        </ContainerScroll>
+                <div className="acs__author">
+                  <span className="acs__name">{t.name}</span>
+                  <span className="acs__service">{t.service}</span>
+                </div>
+              </CardTransformed>
+            ))}
+          </CardsContainer>
+        </div>
+      </ContainerScroll>
 
-        {/* ── CTA ── */}
+      {/* ── CTA: back to constrained width ── */}
+      <div className="reviews-page reviews-page--bottom">
         <div className="reviews__cta">
           <p className="reviews__cta-text">Ready to get your cut?</p>
           <a href="/book" className="reviews__cta-btn">Book Now →</a>
         </div>
-
       </div>
     </>
   )
