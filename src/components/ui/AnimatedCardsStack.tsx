@@ -1,4 +1,7 @@
+"use client"
+
 import * as React from 'react'
+import { cva, type VariantProps } from 'class-variance-authority'
 import {
   type HTMLMotionProps,
   type MotionValue,
@@ -7,54 +10,74 @@ import {
   useScroll,
   useTransform,
 } from 'framer-motion'
+import { cn } from '@/lib/utils'
+
+/* ── Card variants ── */
+const cardVariants = cva(
+  'absolute will-change-transform flex flex-col items-center justify-center gap-6 rounded-2xl p-7 box-border',
+  {
+    variants: {
+      variant: {
+        dark: 'w-full h-full border border-yellow-800/20 bg-[rgba(15,14,12,0.92)] backdrop-blur-md',
+        light: 'w-full h-full border border-stone-300/40 bg-white/80 backdrop-blur-md',
+      },
+    },
+    defaultVariants: { variant: 'dark' },
+  }
+)
 
 /* ── Context ── */
 interface ScrollCtx { scrollYProgress: MotionValue<number> }
-const ScrollContext = React.createContext<ScrollCtx | undefined>(undefined)
-function useScrollCtx() {
-  const ctx = React.useContext(ScrollContext)
+const ContainerScrollContext = React.createContext<ScrollCtx | undefined>(undefined)
+function useContainerScrollContext() {
+  const ctx = React.useContext(ContainerScrollContext)
   if (!ctx) throw new Error('Must be inside ContainerScroll')
   return ctx
 }
 
 /* ── ContainerScroll ── */
 export const ContainerScroll: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
-  children, style, className = '', ...props
+  children, style, className, ...props
 }) => {
   const ref = React.useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ['start center', 'end end'],
+    offset: ['start start', 'end end'],
   })
+
   return (
-    <ScrollContext.Provider value={{ scrollYProgress }}>
+    <ContainerScrollContext.Provider value={{ scrollYProgress }}>
       <div
         ref={ref}
-        className={`acs__container ${className}`}
+        className={cn('relative w-full', className)}
         style={{ perspective: '1000px', ...style }}
         {...props}
       >
         {children}
       </div>
-    </ScrollContext.Provider>
+    </ContainerScrollContext.Provider>
   )
 }
+ContainerScroll.displayName = 'ContainerScroll'
 
 /* ── CardsContainer ── */
 export const CardsContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
-  children, className = '', style, ...props
+  children, className, style, ...props
 }) => (
   <div
-    className={`acs__cards ${className}`}
+    className={cn('relative', className)}
     style={{ perspective: '1000px', ...style }}
     {...props}
   >
     {children}
   </div>
 )
+CardsContainer.displayName = 'CardsContainer'
 
 /* ── CardTransformed ── */
-interface CardTransformedProps extends HTMLMotionProps<'div'> {
+interface CardTransformedProps
+  extends HTMLMotionProps<'div'>,
+    VariantProps<typeof cardVariants> {
   arrayLength: number
   index: number
   incrementY?: number
@@ -63,13 +86,26 @@ interface CardTransformedProps extends HTMLMotionProps<'div'> {
 }
 
 export const CardTransformed = React.forwardRef<HTMLDivElement, CardTransformedProps>(
-  ({ arrayLength, index, incrementY = 10, incrementZ = 10, incrementRotation, className = '', style, ...props }, ref) => {
-    const { scrollYProgress } = useScrollCtx()
+  (
+    {
+      arrayLength,
+      index,
+      incrementY = 10,
+      incrementZ = 10,
+      incrementRotation,
+      className,
+      variant,
+      style,
+      ...props
+    },
+    ref
+  ) => {
+    const { scrollYProgress } = useContainerScrollContext()
     const rotation = incrementRotation ?? (-index + 90)
 
     const start = index / (arrayLength + 1)
     const end   = (index + 1) / (arrayLength + 1)
-    const range      = React.useMemo(() => [start, end], [start, end])
+    const range = React.useMemo(() => [start, end], [start, end])
     const rotateRange = [range[0] - 1.5, range[1] / 1.5]
 
     const y      = useTransform(scrollYProgress, range, ['0%', '-180%'])
@@ -86,12 +122,12 @@ export const CardTransformed = React.forwardRef<HTMLDivElement, CardTransformedP
       <motion.div
         ref={ref}
         layout="position"
-        className={`acs__card ${className}`}
+        className={cn(cardVariants({ variant, className }))}
         style={{
           top: index * incrementY,
           transform,
           backfaceVisibility: 'hidden',
-          zIndex: (arrayLength - index) * incrementZ,
+          zIndex: Math.max(0, (arrayLength - index) * incrementZ),
           filter,
           ...style,
         }}
@@ -109,17 +145,17 @@ interface ReviewStarsProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const ReviewStars = React.forwardRef<HTMLDivElement, ReviewStarsProps>(
-  ({ rating, maxRating = 5, className = '', ...props }, ref) => {
-    const filled   = Math.floor(rating)
-    const frac     = rating - filled
-    const empty    = maxRating - filled - (frac > 0 ? 1 : 0)
-    const starPath = "M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.54-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.05 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z"
+  ({ rating, maxRating = 5, className, ...props }, ref) => {
+    const filled = Math.floor(rating)
+    const frac   = rating - filled
+    const empty  = maxRating - filled - (frac > 0 ? 1 : 0)
+    const path   = 'M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.54-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.05 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z'
 
     return (
-      <div ref={ref} className={`acs__stars ${className}`} {...props}>
+      <div ref={ref} className={cn('flex items-center gap-1', className)} {...props}>
         {Array.from({ length: filled }).map((_, i) => (
           <svg key={`f${i}`} className="acs__star acs__star--filled" viewBox="0 0 20 20" fill="currentColor">
-            <path d={starPath} />
+            <path d={path} />
           </svg>
         ))}
         {frac > 0 && (
@@ -130,15 +166,15 @@ export const ReviewStars = React.forwardRef<HTMLDivElement, ReviewStarsProps>(
                 <stop offset={`${frac * 100}%`} stopColor="rgba(212,175,55,0.15)" />
               </linearGradient>
             </defs>
-            <path d={starPath} fill="url(#frac-star)" />
+            <path d={path} fill="url(#frac-star)" />
           </svg>
         )}
         {Array.from({ length: empty }).map((_, i) => (
           <svg key={`e${i}`} className="acs__star acs__star--empty" viewBox="0 0 20 20" fill="currentColor">
-            <path d={starPath} />
+            <path d={path} />
           </svg>
         ))}
-        <span className="acs__stars-sr">{rating}</span>
+        <span className="sr-only">{rating}</span>
       </div>
     )
   }

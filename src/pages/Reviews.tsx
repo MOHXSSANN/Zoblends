@@ -1,6 +1,11 @@
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
-import { ReviewStars } from '../components/ui/AnimatedCardsStack'
+import {
+  ContainerScroll,
+  CardsContainer,
+  CardTransformed,
+  ReviewStars,
+} from '../components/ui/AnimatedCardsStack'
 import { ReviewSummaryCard } from '../components/ui/ReviewSummaryCard'
 import './Reviews.css'
 import './Page.css'
@@ -82,36 +87,36 @@ export default function Reviews() {
           transition={{ duration: 0.6, ease: EASE_OUT_QUART, delay: 0.3 }}
         />
 
-        {/* ── Cards ── */}
-        <div className="reviews__cards-grid">
-          {TESTIMONIALS.map((t, i) => (
-            <motion.div
-              key={t.id}
-              className="acs__card"
-              initial={{ opacity: 0, y: 48, rotateX: 12 }}
-              whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-              viewport={{ once: true, amount: 0.25 }}
-              transition={{
-                duration: 0.65,
-                ease: EASE_OUT_QUART,
-                delay: i * 0.1,
-              }}
-              style={{ perspective: 800 }}
-            >
-              <ReviewStars rating={t.rating} />
+        {/* ── Scroll-driven card stack ── */}
+        {/* height: 300vh gives the scroll distance for the animation */}
+        <ContainerScroll style={{ height: '300vh' }}>
+          {/* sticky: stays pinned while parent scrolls */}
+          <div className="reviews__sticky">
+            <CardsContainer className="reviews__card-stack">
+              {TESTIMONIALS.map((t, i) => (
+                <CardTransformed
+                  key={t.id}
+                  arrayLength={TESTIMONIALS.length}
+                  index={i + 2}
+                  variant="dark"
+                  role="article"
+                >
+                  <ReviewStars rating={t.rating} />
 
-              <blockquote className="acs__quote">
-                <span className="acs__quote-mark">"</span>
-                {t.description}
-              </blockquote>
+                  <blockquote className="acs__quote">
+                    <span className="acs__quote-mark">"</span>
+                    {t.description}
+                  </blockquote>
 
-              <div className="acs__author">
-                <span className="acs__name">{t.name}</span>
-                <span className="acs__service">{t.service}</span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                  <div className="acs__author">
+                    <span className="acs__name">{t.name}</span>
+                    <span className="acs__service">{t.service}</span>
+                  </div>
+                </CardTransformed>
+              ))}
+            </CardsContainer>
+          </div>
+        </ContainerScroll>
 
         {/* ── CTA ── */}
         <div className="reviews__cta">
