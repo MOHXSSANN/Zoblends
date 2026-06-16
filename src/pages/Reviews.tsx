@@ -14,7 +14,6 @@ const TESTIMONIALS = [
     service: 'Signature Blend',
     rating: 5,
     description: "Zo doesn't miss. Walked in with a faded mess and walked out looking like a whole different person. The attention to detail is on another level.",
-    avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
   },
   {
     id: 2,
@@ -22,7 +21,6 @@ const TESTIMONIALS = [
     service: 'Skin Fade',
     rating: 5,
     description: "Best barber in Ottawa no debate. Been going for 6 months straight — every single cut is clean. Wouldn't trust anyone else.",
-    avatarUrl: 'https://randomuser.me/api/portraits/men/44.jpg',
   },
   {
     id: 3,
@@ -30,7 +28,6 @@ const TESTIMONIALS = [
     service: 'Shape Up',
     rating: 5,
     description: "The vibe, the precision, the conversation — everything is top tier. You can tell Zo actually cares about the craft.",
-    avatarUrl: 'https://randomuser.me/api/portraits/men/51.jpg',
   },
   {
     id: 4,
@@ -38,7 +35,6 @@ const TESTIMONIALS = [
     service: 'Full Cut & Style',
     rating: 5,
     description: "First time going and I was genuinely impressed. Booked my next appointment before I even left the chair.",
-    avatarUrl: 'https://randomuser.me/api/portraits/men/67.jpg',
   },
 ]
 
@@ -110,11 +106,8 @@ export default function Reviews() {
               </blockquote>
 
               <div className="acs__author">
-                <img src={t.avatarUrl} alt={t.name} className="acs__avatar" />
-                <div>
-                  <span className="acs__name">{t.name}</span>
-                  <span className="acs__service">{t.service}</span>
-                </div>
+                <span className="acs__name">{t.name}</span>
+                <span className="acs__service">{t.service}</span>
               </div>
             </motion.div>
           ))}
