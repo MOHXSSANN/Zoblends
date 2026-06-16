@@ -1,15 +1,11 @@
 /* ── Page shell ── */
 .reviews-page {
+  min-height: 100dvh;
   background: var(--black);
-  padding: 120px 24px 48px;
+  padding: 120px 24px 100px;
   box-sizing: border-box;
   max-width: 900px;
   margin: 0 auto;
-}
-.reviews-page--cta {
-  padding-top: 0;
-  padding-bottom: 100px;
-  min-height: unset;
 }
 
 /* ── Header ── */
@@ -83,26 +79,24 @@
   margin-bottom: 0;
 }
 
-/* ── Scroll section ── */
-.reviews__scroll-section {
-  min-height: 300vh;
-  width: 100%;
-  background: var(--black);
-}
-
-.reviews__sticky {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  width: 100%;
+/* ── Cards grid ── */
+.reviews__cards-grid {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 48px 24px;
-  box-sizing: border-box;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 48px;
+  margin-bottom: 64px;
 }
 
-/* ── Cards container ── */
+@media (min-width: 640px) {
+  .reviews__cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+}
+
+/* ── Cards container (kept for AnimatedCardsStack compatibility) ── */
 .acs__container {
   position: relative;
   width: 100%;
@@ -116,9 +110,6 @@
 
 /* ── Individual card ── */
 .acs__card {
-  position: absolute;
-  width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -130,7 +121,7 @@
   backdrop-filter: blur(12px);
   padding: 32px 28px;
   box-sizing: border-box;
-  will-change: transform;
+  will-change: transform, opacity;
 }
 
 /* ── Stars ── */

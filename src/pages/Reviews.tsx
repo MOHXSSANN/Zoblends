@@ -1,11 +1,6 @@
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
-import {
-  ContainerScroll,
-  CardsContainer,
-  CardTransformed,
-  ReviewStars,
-} from '../components/ui/AnimatedCardsStack'
+import { ReviewStars } from '../components/ui/AnimatedCardsStack'
 import { ReviewSummaryCard } from '../components/ui/ReviewSummaryCard'
 import './Reviews.css'
 import './Page.css'
@@ -55,8 +50,9 @@ export default function Reviews() {
         <meta name="description" content="Real clients. Real cuts. See what everyone's saying about Zoblends, Ottawa." />
       </Helmet>
 
-      {/* ── Top section (header + rating) ── */}
       <div className="reviews-page">
+
+        {/* ── Header ── */}
         <motion.div
           className="reviews__header"
           initial={{ opacity: 0, y: 28 }}
@@ -68,6 +64,7 @@ export default function Reviews() {
           <p className="reviews__sub">Real clients. No filter.</p>
         </motion.div>
 
+        {/* ── Animated rating card ── */}
         <motion.div
           className="reviews__stat-wrap"
           initial={{ opacity: 0, y: 20 }}
@@ -81,49 +78,54 @@ export default function Reviews() {
           />
         </motion.div>
 
+        {/* ── Divider ── */}
         <motion.div
           className="reviews__divider"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ duration: 0.6, ease: EASE_OUT_QUART, delay: 0.3 }}
         />
-      </div>
 
-      {/* ── Scroll-driven card stack (full-width, outside max-width wrapper) ── */}
-      <ContainerScroll className="reviews__scroll-section">
-        <div className="reviews__sticky">
-          <CardsContainer>
-            {TESTIMONIALS.map((t, i) => (
-              <CardTransformed
-                key={t.id}
-                arrayLength={TESTIMONIALS.length}
-                index={i + 1}
-                role="article"
-              >
-                <ReviewStars rating={t.rating} />
-                <blockquote className="acs__quote">
-                  <span className="acs__quote-mark">"</span>
-                  {t.description}
-                </blockquote>
-                <div className="acs__author">
-                  <img src={t.avatarUrl} alt={t.name} className="acs__avatar" />
-                  <div>
-                    <span className="acs__name">{t.name}</span>
-                    <span className="acs__service">{t.service}</span>
-                  </div>
+        {/* ── Cards ── */}
+        <div className="reviews__cards-grid">
+          {TESTIMONIALS.map((t, i) => (
+            <motion.div
+              key={t.id}
+              className="acs__card"
+              initial={{ opacity: 0, y: 48, rotateX: 12 }}
+              whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{
+                duration: 0.65,
+                ease: EASE_OUT_QUART,
+                delay: i * 0.1,
+              }}
+              style={{ perspective: 800 }}
+            >
+              <ReviewStars rating={t.rating} />
+
+              <blockquote className="acs__quote">
+                <span className="acs__quote-mark">"</span>
+                {t.description}
+              </blockquote>
+
+              <div className="acs__author">
+                <img src={t.avatarUrl} alt={t.name} className="acs__avatar" />
+                <div>
+                  <span className="acs__name">{t.name}</span>
+                  <span className="acs__service">{t.service}</span>
                 </div>
-              </CardTransformed>
-            ))}
-          </CardsContainer>
+              </div>
+            </motion.div>
+          ))}
         </div>
-      </ContainerScroll>
 
-      {/* ── CTA ── */}
-      <div className="reviews-page reviews-page--cta">
+        {/* ── CTA ── */}
         <div className="reviews__cta">
           <p className="reviews__cta-text">Ready to get your cut?</p>
           <a href="/book" className="reviews__cta-btn">Book Now →</a>
         </div>
+
       </div>
     </>
   )
