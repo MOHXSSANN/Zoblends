@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef, useMemo, useRef } from 'react'
+import { type ComponentPropsWithoutRef, useMemo, useRef } from 'react'
 
 interface MarqueeProps extends ComponentPropsWithoutRef<'div'> {
   reverse?: boolean
