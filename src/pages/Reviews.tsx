@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { motion } from 'framer-motion'
+import { ReviewSummaryCard } from '../components/ui/ReviewSummaryCard'
 import './Reviews.css'
 import './Page.css'
 
@@ -138,18 +139,13 @@ export default function Reviews() {
         </motion.div>
 
         {/* ── Rating stat ── */}
-        <motion.div
-          className="reviews__stat"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: EASE_OUT_QUART, delay: 0.2 }}
-        >
-          <div className="reviews__stat-score">5.0</div>
-          <div className="reviews__stat-right">
-            <StarRow rating={5} animate />
-            <span className="reviews__stat-count">{REVIEWS.length} reviews · Google</span>
-          </div>
-        </motion.div>
+        <div className="reviews__stat-wrap">
+          <ReviewSummaryCard
+            rating={5.0}
+            reviewCount={REVIEWS.length}
+            summaryText={`Outstanding — rated 5.0 across ${REVIEWS.length} reviews`}
+          />
+        </div>
 
         {/* ── Divider ── */}
         <motion.div
