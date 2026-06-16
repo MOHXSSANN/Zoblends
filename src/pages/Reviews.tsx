@@ -55,9 +55,8 @@ export default function Reviews() {
         <meta name="description" content="Real clients. Real cuts. See what everyone's saying about Zoblends, Ottawa." />
       </Helmet>
 
+      {/* ── Top section (header + rating) ── */}
       <div className="reviews-page">
-
-        {/* ── Header ── */}
         <motion.div
           className="reviews__header"
           initial={{ opacity: 0, y: 28 }}
@@ -69,7 +68,6 @@ export default function Reviews() {
           <p className="reviews__sub">Real clients. No filter.</p>
         </motion.div>
 
-        {/* ── Animated rating card ── */}
         <motion.div
           className="reviews__stat-wrap"
           initial={{ opacity: 0, y: 20 }}
@@ -83,58 +81,49 @@ export default function Reviews() {
           />
         </motion.div>
 
-        {/* ── Divider ── */}
         <motion.div
           className="reviews__divider"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ duration: 0.6, ease: EASE_OUT_QUART, delay: 0.3 }}
         />
+      </div>
 
-        {/* ── Scroll-driven card stack ── */}
-        <ContainerScroll className="reviews__scroll-section">
-          <div className="reviews__sticky">
-            <CardsContainer className="reviews__cards-wrap">
-              {TESTIMONIALS.map((t, i) => (
-                <CardTransformed
-                  key={t.id}
-                  arrayLength={TESTIMONIALS.length}
-                  index={i + 2}
-                  role="article"
-                >
-                  {/* Stars */}
-                  <ReviewStars rating={t.rating} />
-
-                  {/* Quote */}
-                  <blockquote className="acs__quote">
-                    <span className="acs__quote-mark">"</span>
-                    {t.description}
-                  </blockquote>
-
-                  {/* Author */}
-                  <div className="acs__author">
-                    <img
-                      src={t.avatarUrl}
-                      alt={t.name}
-                      className="acs__avatar"
-                    />
-                    <div>
-                      <span className="acs__name">{t.name}</span>
-                      <span className="acs__service">{t.service}</span>
-                    </div>
+      {/* ── Scroll-driven card stack (full-width, outside max-width wrapper) ── */}
+      <ContainerScroll className="reviews__scroll-section">
+        <div className="reviews__sticky">
+          <CardsContainer>
+            {TESTIMONIALS.map((t, i) => (
+              <CardTransformed
+                key={t.id}
+                arrayLength={TESTIMONIALS.length}
+                index={i + 1}
+                role="article"
+              >
+                <ReviewStars rating={t.rating} />
+                <blockquote className="acs__quote">
+                  <span className="acs__quote-mark">"</span>
+                  {t.description}
+                </blockquote>
+                <div className="acs__author">
+                  <img src={t.avatarUrl} alt={t.name} className="acs__avatar" />
+                  <div>
+                    <span className="acs__name">{t.name}</span>
+                    <span className="acs__service">{t.service}</span>
                   </div>
-                </CardTransformed>
-              ))}
-            </CardsContainer>
-          </div>
-        </ContainerScroll>
+                </div>
+              </CardTransformed>
+            ))}
+          </CardsContainer>
+        </div>
+      </ContainerScroll>
 
-        {/* ── CTA ── */}
+      {/* ── CTA ── */}
+      <div className="reviews-page reviews-page--cta">
         <div className="reviews__cta">
           <p className="reviews__cta-text">Ready to get your cut?</p>
           <a href="/book" className="reviews__cta-btn">Book Now →</a>
         </div>
-
       </div>
     </>
   )

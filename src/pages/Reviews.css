@@ -1,11 +1,15 @@
 /* ── Page shell ── */
 .reviews-page {
-  min-height: 100dvh;
   background: var(--black);
-  padding: 120px 24px 100px;
+  padding: 120px 24px 48px;
   box-sizing: border-box;
   max-width: 900px;
   margin: 0 auto;
+}
+.reviews-page--cta {
+  padding-top: 0;
+  padding-bottom: 100px;
+  min-height: unset;
 }
 
 /* ── Header ── */
@@ -83,6 +87,7 @@
 .reviews__scroll-section {
   min-height: 300vh;
   width: 100%;
+  background: var(--black);
 }
 
 .reviews__sticky {
@@ -93,25 +98,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 48px 0;
+  padding: 48px 24px;
   box-sizing: border-box;
 }
 
 /* ── Cards container ── */
 .acs__container {
   position: relative;
-  min-height: 100svh;
   width: 100%;
 }
 
 .acs__cards {
   position: relative;
   height: 420px;
-  width: 340px;
-}
-
-.reviews__cards-wrap {
-  margin: 0 auto;
+  width: min(340px, calc(100vw - 48px));
 }
 
 /* ── Individual card ── */
