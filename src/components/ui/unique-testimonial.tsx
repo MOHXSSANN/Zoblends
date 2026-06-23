@@ -88,7 +88,7 @@ export function Testimonials() {
 
   return (
     <div
-      className="flex flex-col items-center gap-10 py-16"
+      className="flex flex-col items-center gap-10 pt-24 pb-16"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -105,7 +105,21 @@ export function Testimonials() {
         </p>
       </div>
 
-      <div className="flex flex-col items-center gap-6 mt-2">
+      <div className="flex flex-col items-center gap-5 mt-2">
+        {/* Stars */}
+        <div
+          className={cn(
+            'flex items-center gap-1 transition-all duration-500 ease-out',
+            isAnimating ? 'opacity-0 scale-95' : 'opacity-100 scale-100',
+          )}
+        >
+          {Array.from({ length: 5 }).map((_, i) => (
+            <svg key={i} width="16" height="16" viewBox="0 0 16 16" fill="#d4af37">
+              <path d="M8 1l1.85 3.75L14 5.5l-3 2.92.71 4.13L8 10.4l-3.71 2.15L5 8.42 2 5.5l4.15-.75z" />
+            </svg>
+          ))}
+        </div>
+
         {/* Author + Role */}
         <div
           className={cn(
