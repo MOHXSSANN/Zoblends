@@ -1,43 +1,10 @@
 import { Helmet } from 'react-helmet-async'
-import { ClientsSection, type Stat, type Testimonial } from '../components/ui/testimonial-card'
+import { motion } from 'framer-motion'
+import { Testimonials } from '../components/ui/unique-testimonial'
 import './Reviews.css'
+import './Page.css'
 
-const stats: Stat[] = [
-  { value: '5.0', label: 'Avg Rating' },
-  { value: '100+', label: 'Happy Clients' },
-  { value: '3+', label: 'Years Running' },
-]
-
-const testimonials: Testimonial[] = [
-  {
-    name: 'Khalid M.',
-    title: 'Signature Blend',
-    quote: "Zo doesn't miss. Walked in with a faded mess and walked out looking like a whole different person. The attention to detail is on another level.",
-    avatarSrc: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&auto=format&fit=crop',
-    rating: 5.0,
-  },
-  {
-    name: 'Tyler B.',
-    title: 'Skin Fade',
-    quote: "Best barber in Ottawa no debate. Been going for 6 months straight — every single cut is clean. Wouldn't trust anyone else.",
-    avatarSrc: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop',
-    rating: 5.0,
-  },
-  {
-    name: 'Marcus J.',
-    title: 'Shape Up',
-    quote: "The vibe, the precision, the conversation — everything is top tier. You can tell Zo actually cares about the craft.",
-    avatarSrc: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop',
-    rating: 5.0,
-  },
-  {
-    name: 'Aiden W.',
-    title: 'Full Cut & Style',
-    quote: "First time going and I was genuinely impressed. Booked my next appointment before I even left the chair.",
-    avatarSrc: 'https://images.unsplash.com/photo-1530268729831-4b0b9e170218?w=200&auto=format&fit=crop',
-    rating: 5.0,
-  },
-]
+const EASE_OUT_QUART: [number,number,number,number] = [0.165, 0.84, 0.44, 1]
 
 export default function Reviews() {
   return (
@@ -47,18 +14,37 @@ export default function Reviews() {
         <meta name="description" content="Real clients. Real cuts. See what everyone's saying about Zoblends, Ottawa." />
       </Helmet>
 
-      <div className="reviews-page-outer">
-        <ClientsSection
-          tagLabel="Real Clients"
-          title="Hear It From Them"
-          description="Ottawa's go-to for clean fades and sharp cuts. Every client walks out a different person."
-          stats={stats}
-          testimonials={testimonials}
-          primaryActionLabel="Book Now"
-          secondaryActionLabel="View Services"
-          primaryActionHref="/book"
-          secondaryActionHref="/services"
+      <div className="reviews-page">
+        <motion.div
+          className="reviews__header"
+          initial={{ opacity: 0, y: 28 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: EASE_OUT_QUART }}
+        >
+          <span className="page__eyebrow">03 / Reviews</span>
+          <h1 className="page__title">Hear It From Them</h1>
+          <p className="reviews__sub">Real clients. No filter.</p>
+        </motion.div>
+
+        <motion.div
+          className="reviews__divider"
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 0.6, ease: EASE_OUT_QUART, delay: 0.2 }}
         />
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: EASE_OUT_QUART, delay: 0.3 }}
+        >
+          <Testimonials />
+        </motion.div>
+
+        <div className="reviews__cta">
+          <p className="reviews__cta-text">Ready to get your cut?</p>
+          <a href="/book" className="reviews__cta-btn">Book Now →</a>
+        </div>
       </div>
     </>
   )
