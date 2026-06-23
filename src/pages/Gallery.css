@@ -41,6 +41,22 @@
   gap: 16px;
 }
 
+@media (min-width: 769px) {
+  .gallery__ba-grid {
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .gallery__tabs {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
+}
+
 @media (max-width: 600px) {
   .gallery__ba-grid {
     grid-template-columns: 1fr;

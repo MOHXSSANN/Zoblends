@@ -10,6 +10,12 @@
   touch-action: pan-y;
 }
 
+@media (min-width: 769px) {
+  .ba {
+    aspect-ratio: 3 / 4;
+  }
+}
+
 /* After image — full size underneath */
 .ba__img--after {
   position: absolute;
