@@ -11,14 +11,14 @@ const testimonials = [
   },
   {
     id: 2,
-    quote: "Best barber in Ottawa no debate. Been going 6 months straight — every cut is clean.",
+    quote: "Best barber in Ottawa, no debate. Six months straight and every cut has been clean.",
     author: 'Tyler B.',
     role: 'Skin Fade',
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop',
   },
   {
     id: 3,
-    quote: "The vibe, the precision, the conversation — everything is top tier. You can tell Zo cares.",
+    quote: "The vibe, the precision, the conversation. Everything is top tier. You can tell Zo cares.",
     author: 'Marcus J.',
     role: 'Shape Up',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop',
@@ -53,24 +53,16 @@ export function Testimonials() {
   return (
     <div className="flex flex-col items-center gap-10 py-16">
       {/* Quote */}
-      <div className="relative px-8">
-        <span className="absolute -left-2 -top-6 text-7xl font-serif text-[rgba(212,175,55,0.08)] select-none pointer-events-none">
-          "
-        </span>
-
+      <div className="px-4">
         <p
           className={cn(
-            'text-2xl md:text-3xl font-light text-[rgba(245,244,240,0.9)] text-center max-w-lg leading-relaxed',
+            'text-2xl md:text-3xl font-light text-[rgba(245,244,240,0.88)] text-center max-w-md leading-relaxed tracking-wide',
             'transition-all duration-[400ms] ease-out',
             isAnimating ? 'opacity-0 blur-sm scale-[0.98]' : 'opacity-100 blur-0 scale-100',
           )}
         >
           {displayedQuote}
         </p>
-
-        <span className="absolute -right-2 -bottom-8 text-7xl font-serif text-[rgba(212,175,55,0.08)] select-none pointer-events-none">
-          "
-        </span>
       </div>
 
       <div className="flex flex-col items-center gap-6 mt-2">
