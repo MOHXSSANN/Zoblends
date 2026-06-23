@@ -802,3 +802,10 @@
   .navbar { padding: 16px 4px; }
   .navbar--scrolled { padding: 10px 4px; }
 }
+
+@media (min-width: 769px) {
+  .navbar__inner {
+    max-width: 100%;
+    padding: 0 32px;
+  }
+}

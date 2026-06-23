@@ -38,14 +38,23 @@
   color: rgba(245, 244, 240, 0.7);
 }
 
-/* ── List — full viewport width breakout regardless of parent padding ── */
+/* ── List — full viewport width breakout on mobile ── */
 .shelf-list {
   display: flex;
   flex-direction: column;
   width: calc(100% + 48px);
   margin-left: -24px;
-  overflow-x: clip; /* clip not hidden — doesn't create scroll context on iOS */
+  overflow-x: clip;
   touch-action: pan-y;
+}
+
+@media (min-width: 769px) {
+  .shelf-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+    margin-left: 0;
+  }
 }
 
 .shelf-empty {
@@ -229,4 +238,20 @@
 
 @media (hover: hover) {
   .shelf-item__hint { display: none; }
+}
+
+@media (min-width: 769px) {
+  .shelf-item {
+    border-bottom: 1px solid rgba(212, 175, 55, 0.07);
+    border-right: 1px solid rgba(212, 175, 55, 0.07);
+  }
+
+  .shelf-item:nth-child(3n) {
+    border-right: none;
+  }
+
+  .shelf-item__product {
+    width: 22vw;
+    max-width: 200px;
+  }
 }
