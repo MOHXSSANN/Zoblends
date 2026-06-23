@@ -81,7 +81,7 @@ export function Testimonials() {
   const handleTouchEnd = (e: React.TouchEvent) => {
     const dx = e.changedTouches[0].clientX - touchStartX.current
     const dy = e.changedTouches[0].clientY - touchStartY.current
-    if (Math.abs(dx) < Math.abs(dy) || Math.abs(dx) < 40) return
+    if (Math.abs(dx) < Math.abs(dy) || Math.abs(dx) < 25) return
     if (dx < 0) handleSelect(Math.min(activeIndex + 1, testimonials.length - 1))
     else handleSelect(Math.max(activeIndex - 1, 0))
   }
@@ -89,6 +89,7 @@ export function Testimonials() {
   return (
     <div
       className="flex flex-col items-center gap-10 pt-24 pb-16"
+      style={{ touchAction: 'pan-y' }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
