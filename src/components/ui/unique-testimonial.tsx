@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 const testimonials = [
@@ -58,6 +58,8 @@ export function Testimonials() {
   const [displayedQuote, setDisplayedQuote] = useState(testimonials[0].quote)
   const [displayedAuthor, setDisplayedAuthor] = useState(testimonials[0].author)
   const [displayedRole, setDisplayedRole] = useState(testimonials[0].role)
+  const touchStartX = useRef(0)
+  const touchStartY = useRef(0)
 
   const handleSelect = (index: number) => {
     if (index === activeIndex || isAnimating) return
@@ -71,8 +73,25 @@ export function Testimonials() {
     }, 200)
   }
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+    touchStartY.current = e.touches[0].clientY
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const dx = e.changedTouches[0].clientX - touchStartX.current
+    const dy = e.changedTouches[0].clientY - touchStartY.current
+    if (Math.abs(dx) < Math.abs(dy) || Math.abs(dx) < 40) return
+    if (dx < 0) handleSelect(Math.min(activeIndex + 1, testimonials.length - 1))
+    else handleSelect(Math.max(activeIndex - 1, 0))
+  }
+
   return (
-    <div className="flex flex-col items-center gap-10 py-16">
+    <div
+      className="flex flex-col items-center gap-10 py-16"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* Quote */}
       <div className="px-4">
         <p
