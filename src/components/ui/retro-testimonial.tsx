@@ -112,7 +112,7 @@ export const Carousel = ({ items, initialScroll = 0 }: iCarouselProps) => {
 // ===== TestimonialCard =====
 export const TestimonialCard = ({
   testimonial,
-  index,
+  index: _index,
   layout = false,
   onCardClose = () => {},
   backgroundImage = 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=2074&auto=format&fit=crop',
