@@ -107,11 +107,9 @@ export default function ShelfDisplay({ products, onAdd, added }: ShelfDisplayPro
                     onClick={e => e.stopPropagation()}
                   >
                     <div className="shelf-item__card-inner">
-                      <div className="shelf-item__card-left">
-                        <span className="shelf-item__card-name">{p.name}</span>
-                        <span className="shelf-item__card-desc">{p.desc}</span>
-                      </div>
-                      <div className="shelf-item__card-right">
+                      <span className="shelf-item__card-name">{p.name}</span>
+                      <span className="shelf-item__card-desc">{p.desc}</span>
+                      <div className="shelf-item__card-bottom">
                         <span className="shelf-item__card-price">{p.price}</span>
                         <button
                           className={`shelf-item__card-add${added === p.id ? ' shelf-item__card-add--done' : ''}${outOfStock ? ' shelf-item__card-add--disabled' : ''}`}
