@@ -9,7 +9,7 @@ interface Props {
 
 export default function BeforeAfter({ before, after, label }: Props) {
   const containerRef  = useRef<HTMLDivElement>(null)
-  const beforeRef     = useRef<HTMLDivElement>(null)
+  const beforeImgRef  = useRef<HTMLImageElement>(null)
   const dividerRef    = useRef<HTMLDivElement>(null)
   const handleRef     = useRef<HTMLDivElement>(null)
   const dragging      = useRef(false)
@@ -28,10 +28,10 @@ export default function BeforeAfter({ before, after, label }: Props) {
     rafId.current = requestAnimationFrame(() => {
       rafId.current = null
       const pos = getPercent(clientX)
-      // Direct DOM — zero React re-renders during drag
-      if (beforeRef.current)  beforeRef.current.style.width   = `${pos}%`
-      if (dividerRef.current) dividerRef.current.style.left   = `${pos}%`
-      if (handleRef.current)  handleRef.current.style.left    = `${pos}%`
+      // clip-path on the image — GPU composited, no layout reflow, no artifacts
+      if (beforeImgRef.current) beforeImgRef.current.style.clipPath = `inset(0 ${100 - pos}% 0 0)`
+      if (dividerRef.current)   dividerRef.current.style.left = `${pos}%`
+      if (handleRef.current)    handleRef.current.style.left  = `${pos}%`
       const delta = clientX - lastClientX.current
       if (Math.abs(delta) > 3) {
         setGoingRight(delta > 0)
@@ -53,9 +53,14 @@ export default function BeforeAfter({ before, after, label }: Props) {
     >
       <img className="ba__img--after" src={after} alt="After" draggable={false} />
 
-      <div className="ba__before-wrap" ref={beforeRef} style={{ width: '50%' }}>
-        <img className="ba__img--before" src={before} alt="Before" draggable={false} />
-      </div>
+      <img
+        className="ba__img--before"
+        ref={beforeImgRef}
+        src={before}
+        alt="Before"
+        draggable={false}
+        style={{ clipPath: 'inset(0 50% 0 0)' }}
+      />
 
       <div className="ba__divider" ref={dividerRef} style={{ left: '50%' }} />
 

@@ -19,15 +19,18 @@ const BEFORE_AFTERS = [
     after:  '/B4andAFTER/ab32c5c4-6d5c-49d4-83ae-d297237d4abd.png',
     label: 'Textured Crop',
   },
+  {
+    before: '/B4andAFTER/9257a01e-ec32-4667-823a-2db67b9054c2.png',
+    after:  '/B4andAFTER/ed12293c-ac90-4bfc-9e9b-4eaffc1e61a3.png',
+    label: 'Signature Blend',
+  },
 ]
 
 // ── Photo grid ───────────────────────────────────────────────────────────────
 const PHOTOS: { src: string; tag: string }[] = [
   { src: '/B4andAFTER/a3865943-2aa4-4a35-bb18-a167327bf574.png', tag: 'Slick Back' },
-  { src: '/B4andAFTER/9257a01e-ec32-4667-823a-2db67b9054c2.png', tag: 'Curly Fade' },
   { src: '/B4andAFTER/75bfa533-fc0e-43c8-8fe5-fd22e6de403f.png', tag: 'Afro Fade' },
   { src: '/B4andAFTER/a013fd32-0db8-442a-ba1e-4b4107867eb0.png', tag: 'Textured Crop' },
-  { src: '/B4andAFTER/ed12293c-ac90-4bfc-9e9b-4eaffc1e61a3.png', tag: 'Curly Fade' },
 ]
 
 // ── Videos ───────────────────────────────────────────────────────────────────
