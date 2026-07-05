@@ -14,10 +14,6 @@ function GaragePixel() {
         loop
         playsInline
         preload="auto"
-        onLoadedMetadata={e => {
-          const v = e.currentTarget
-          if (v.duration > 4) v.currentTime = v.duration - 4
-        }}
       />
     </div>
   )
