@@ -44,5 +44,5 @@ export const PRODUCTS: Product[] = [
   // New products
   { id: 'p17', name: 'RedOne Lemon Aftershave 5000ml',            price: '$55',   desc: 'RedOne Professional Lemon aftershave lotion. Refreshing scent, soothes skin post-shave. 5L.', image: '/ZOPROD/redone-lemon.png', stock: 1 },
   { id: 'p18', name: 'Argan Oil Defining Curl Cream 9.8oz',       price: '$20',   desc: 'One \'n Only Argan Oil Defining Curl Cream with Acacia Collagen. Combats aging hair. 280g.',  image: '/ZOPROD/13.png', stock: 3 },
-  { id: 'p19', name: 'LV3 Texturizing Sea Salt Spray 250ml',      price: '$15',   desc: 'L3VEL3 sea salt texturizing spray. Adds volume, grit and natural wave. 250ml.',               image: '/ZOPROD/lv3-seasalt.png', stock: 5 },
+  { id: 'p19', name: 'LV3 Texturizing Sea Salt Spray 250ml',      price: '$15',   desc: 'L3VEL3 sea salt texturizing spray. Adds volume, grit and natural wave. 250ml.',               image: '/17.png', stock: 5 },
 ]
