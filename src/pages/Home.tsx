@@ -1,17 +1,44 @@
+import { useRef, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import HeroSection from '../components/hero/HeroSection'
 import NewsletterBanner from '../components/layout/NewsletterBanner'
 import './Home.css'
 
 function GaragePixel() {
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    function seekToClip() {
+      const start = Math.max(0, video!.duration - 4)
+      video!.currentTime = start
+      video!.play()
+    }
+
+    function loopClip() {
+      if (video!.currentTime >= video!.duration - 0.15) {
+        video!.currentTime = Math.max(0, video!.duration - 4)
+      }
+    }
+
+    video.addEventListener('loadedmetadata', seekToClip)
+    video.addEventListener('timeupdate', loopClip)
+
+    return () => {
+      video.removeEventListener('loadedmetadata', seekToClip)
+      video.removeEventListener('timeupdate', loopClip)
+    }
+  }, [])
+
   return (
     <section className="home-garage">
       <video
+        ref={videoRef}
         className="home-garage__video"
         src="/zo3d/Zo3dmap.mp4"
-        autoPlay
         muted
-        loop
         playsInline
         preload="auto"
       />
