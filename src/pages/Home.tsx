@@ -5,7 +5,7 @@ import './Home.css'
 
 function GaragePixel() {
   return (
-    <div className="home-garage">
+    <section className="home-garage">
       <video
         className="home-garage__video"
         src="/zo3d/Zo3dmap.mp4"
@@ -15,7 +15,12 @@ function GaragePixel() {
         playsInline
         preload="auto"
       />
-    </div>
+      <div className="home-garage__overlay" />
+      <div className="home-garage__text">
+        <span className="home-garage__label">The Experience</span>
+        <h2 className="home-garage__heading">Welcome to<br />the Garage</h2>
+      </div>
+    </section>
   )
 }
 
