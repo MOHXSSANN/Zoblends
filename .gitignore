@@ -6,6 +6,7 @@ skills-lock.json
 # Large media (store separately / use Git LFS)
 public/*.mp4
 public/**/*.mp4
+!public/zo3d/Zo3dmap.mp4
 
 # Logs
 logs
