@@ -11,23 +11,30 @@ function GaragePixel() {
     const video = videoRef.current
     if (!video) return
 
-    function seekToClip() {
-      const start = Math.max(0, video!.duration - 4)
-      video!.currentTime = start
-      video!.play()
+    function seek() {
+      if (!isFinite(video!.duration) || video!.duration < 4) return
+      video!.currentTime = video!.duration - 4
+      video!.play().catch(() => {})
     }
 
     function loopClip() {
+      if (!isFinite(video!.duration)) return
       if (video!.currentTime >= video!.duration - 0.15) {
-        video!.currentTime = Math.max(0, video!.duration - 4)
+        video!.currentTime = video!.duration - 4
       }
     }
 
-    video.addEventListener('loadedmetadata', seekToClip)
+    // metadata may already be available if browser cached the file
+    if (video.readyState >= 1) {
+      seek()
+    } else {
+      video.addEventListener('loadedmetadata', seek, { once: true })
+    }
+
     video.addEventListener('timeupdate', loopClip)
 
     return () => {
-      video.removeEventListener('loadedmetadata', seekToClip)
+      video.removeEventListener('loadedmetadata', seek)
       video.removeEventListener('timeupdate', loopClip)
     }
   }, [])
