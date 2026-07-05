@@ -10,28 +10,24 @@ const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
 // ── Before / After pairs ─────────────────────────────────────────────────────
 const BEFORE_AFTERS = [
   {
-    before: '/B4andAFTER/IMG_1584.jpg',
-    after:  '/B4andAFTER/IMG_1587.jpg',
-    label: 'Slick Back',
-  },
-  {
-    before: '/B4andAFTER/IMG_1613.jpg',
-    after:  '/B4andAFTER/IMG_1615.jpg',
+    before: '/B4andAFTER/fb7d4da9-eb4f-491e-a10b-f5418ed0b217.png',
+    after:  '/B4andAFTER/2bfe1200-2e12-4608-b109-677c7b2efbf8.png',
     label: 'Curly Fade',
   },
   {
-    before: '/B4andAFTER/IMG_1634.jpg',
-    after:  '/B4andAFTER/IMG_1638.jpg',
+    before: '/B4andAFTER/7ef68d33-b64d-433f-a6ed-9a6c4119cf64.png',
+    after:  '/B4andAFTER/ab32c5c4-6d5c-49d4-83ae-d297237d4abd.png',
     label: 'Textured Crop',
   },
 ]
 
 // ── Photo grid ───────────────────────────────────────────────────────────────
 const PHOTOS: { src: string; tag: string }[] = [
-  { src: '/B4andAFTER/IMG_0487.jpeg', tag: 'Taper Fade' },
-  { src: '/B4andAFTER/IMG_1616.jpg',  tag: 'Curly Fade' },
-  { src: '/B4andAFTER/IMG_1639.jpg',  tag: 'Textured Crop' },
-  { src: '/B4andAFTER/IMG_6612.png',  tag: 'Fade' },
+  { src: '/B4andAFTER/a3865943-2aa4-4a35-bb18-a167327bf574.png', tag: 'Slick Back' },
+  { src: '/B4andAFTER/9257a01e-ec32-4667-823a-2db67b9054c2.png', tag: 'Curly Fade' },
+  { src: '/B4andAFTER/75bfa533-fc0e-43c8-8fe5-fd22e6de403f.png', tag: 'Afro Fade' },
+  { src: '/B4andAFTER/a013fd32-0db8-442a-ba1e-4b4107867eb0.png', tag: 'Textured Crop' },
+  { src: '/B4andAFTER/ed12293c-ac90-4bfc-9e9b-4eaffc1e61a3.png', tag: 'Curly Fade' },
 ]
 
 // ── Videos ───────────────────────────────────────────────────────────────────
