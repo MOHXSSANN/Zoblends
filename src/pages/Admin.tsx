@@ -6,7 +6,7 @@ import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
 import './Admin.css'
 
-const ADMIN_EMAIL = 'mo.hxssan360@gmail.com'
+const ADMIN_EMAILS = ['mo.hxssan360@gmail.com', 'zawadsamin@gmail.com']
 const EASE: [number,number,number,number] = [0.16,1,0.3,1]
 
 interface Booking {
@@ -60,7 +60,7 @@ export default function Admin() {
   const [updating, setUpdating] = useState(false)
   const [search, setSearch]     = useState('')
 
-  const isAdmin = !!user && user.email === ADMIN_EMAIL
+  const isAdmin = !!user && ADMIN_EMAILS.includes(user.email ?? '')
 
   useEffect(() => {
     if (!isAdmin) return

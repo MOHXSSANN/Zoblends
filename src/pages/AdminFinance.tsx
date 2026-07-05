@@ -9,7 +9,7 @@ import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
 import './AdminFinance.css'
 
-const ADMIN_EMAIL = 'mo.hxssan360@gmail.com'
+const ADMIN_EMAILS = ['mo.hxssan360@gmail.com', 'zawadsamin@gmail.com']
 
 interface Booking {
   service_name: string
@@ -52,7 +52,7 @@ export default function AdminFinance() {
   const [adding,    setAdding]    = useState(false)
   const [showForm,  setShowForm]  = useState(false)
 
-  const isAdmin = !!user && user.email === ADMIN_EMAIL
+  const isAdmin = !!user && ADMIN_EMAILS.includes(user.email ?? '')
 
   function fetchAll() {
     if (!isAdmin) return
