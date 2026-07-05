@@ -17,11 +17,10 @@ function GaragePixel() {
       video!.play().catch(() => {})
     }
 
-    function loopClip() {
+    function restart() {
       if (!isFinite(video!.duration)) return
-      if (video!.currentTime >= video!.duration - 0.15) {
-        video!.currentTime = video!.duration - 4
-      }
+      video!.currentTime = Math.max(0, video!.duration - 4)
+      video!.play().catch(() => {})
     }
 
     if (video.readyState >= 1) {
@@ -29,13 +28,12 @@ function GaragePixel() {
     }
     video.addEventListener('loadedmetadata', seek, { once: true })
     video.addEventListener('canplay', seek, { once: true })
-
-    video.addEventListener('timeupdate', loopClip)
+    video.addEventListener('ended', restart)
 
     return () => {
       video.removeEventListener('loadedmetadata', seek)
       video.removeEventListener('canplay', seek)
-      video.removeEventListener('timeupdate', loopClip)
+      video.removeEventListener('ended', restart)
     }
   }, [])
 
