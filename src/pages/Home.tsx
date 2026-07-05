@@ -44,7 +44,7 @@ function GaragePixel() {
       <video
         ref={videoRef}
         className="home-garage__video"
-        src="/zo3d/Zo3dmap.mp4"
+        src="https://mhhagaztfurgivlspdss.supabase.co/storage/v1/object/public/videos/zoview.mp4"
         muted
         playsInline
         preload="auto"
