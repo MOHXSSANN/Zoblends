@@ -1,3 +1,29 @@
+/* ── Pixelated garage intro ──────────────────────── */
+.book__intro {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  z-index: 9999;
+  background: #0a0908;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.book__intro video {
+  /* Render at 1/8 size then scale up → block-pixel aesthetic */
+  width: 12.5vw;
+  height: 12.5vh;
+  object-fit: cover;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  transform: scale(8);
+  transform-origin: center center;
+  will-change: transform;
+}
+
 /* ── Hero video ──────────────────────────────────── */
 .book__hero {
   position: relative;

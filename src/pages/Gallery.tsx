@@ -8,39 +8,30 @@ import './Gallery.css'
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
 // ── Before / After pairs ─────────────────────────────────────────────────────
-// Replace src strings with real image URLs once you have them
 const BEFORE_AFTERS = [
   {
-    before: 'https://images.unsplash.com/photo-1622288432450-277d0fef5ed6?w=600&q=80',
-    after:  'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600&q=80',
-    label: 'Skin Fade',
+    before: '/B4andAFTER/IMG_1584.jpg',
+    after:  '/B4andAFTER/IMG_1587.jpg',
+    label: 'Slick Back',
   },
   {
-    before: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=600&q=80',
-    after:  'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=600&q=80',
-    label: 'Full Service',
+    before: '/B4andAFTER/IMG_1613.jpg',
+    after:  '/B4andAFTER/IMG_1615.jpg',
+    label: 'Curly Fade',
   },
   {
-    before: 'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=600&q=80',
-    after:  'https://images.unsplash.com/photo-1567894340315-735d7c361db0?w=600&q=80',
-    label: 'Lineup',
-  },
-  {
-    before: 'https://images.unsplash.com/photo-1542327897-d73f4005b533?w=600&q=80',
-    after:  'https://images.unsplash.com/photo-1521119989659-a83eee488004?w=600&q=80',
-    label: 'Kids Cut',
+    before: '/B4andAFTER/IMG_1634.jpg',
+    after:  '/B4andAFTER/IMG_1638.jpg',
+    label: 'Textured Crop',
   },
 ]
 
 // ── Photo grid ───────────────────────────────────────────────────────────────
-// Replace src strings with real image URLs
 const PHOTOS: { src: string; tag: string }[] = [
-  { src: '', tag: 'Fade' },
-  { src: '', tag: 'Lineup' },
-  { src: '', tag: 'Beard' },
-  { src: '', tag: 'Fade' },
-  { src: '', tag: 'Kids' },
-  { src: '', tag: 'Full Service' },
+  { src: '/B4andAFTER/IMG_0487.jpeg', tag: 'Taper Fade' },
+  { src: '/B4andAFTER/IMG_1616.jpg',  tag: 'Curly Fade' },
+  { src: '/B4andAFTER/IMG_1639.jpg',  tag: 'Textured Crop' },
+  { src: '/B4andAFTER/IMG_6612.png',  tag: 'Fade' },
 ]
 
 // ── Videos ───────────────────────────────────────────────────────────────────
@@ -49,7 +40,10 @@ const VIDEOS: { src: string; poster?: string; label: string }[] = [
     src: 'https://mhhagaztfurgivlspdss.supabase.co/storage/v1/object/public/videos/Zovid.mp4',
     label: 'Taper Process',
   },
-  { src: '', label: 'Lineup Detail' },
+  { src: '/B4andAFTER/IMG_1195.mov', label: 'The Process' },
+  { src: '/B4andAFTER/IMG_1199.mov', label: 'The Detail' },
+  { src: '/B4andAFTER/IMG_6614.MOV', label: 'The Blend' },
+  { src: '/B4andAFTER/IMG_6750.MOV', label: 'The Finish' },
 ]
 
 type Tab = 'photos' | 'before-after' | 'videos'

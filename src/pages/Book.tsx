@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -34,6 +34,8 @@ const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct'
 export default function Book() {
   const { user } = useAuth()
   const location = useLocation()
+  const [showIntro, setShowIntro]   = useState(true)
+  const introVideoRef               = useRef<HTMLVideoElement>(null)
   const [step, setStep]             = useState<Step>('service')
   const [service, setService]       = useState<typeof SERVICES[0] | null>(null)
   const [date, setDate]             = useState<Date | null>(null)
@@ -48,6 +50,26 @@ export default function Book() {
   const [submitError, setSubmitError]         = useState<string | null>(null)
   const [lastService, setLastService]         = useState<string | null>(null)
   const [editingContact, setEditingContact]   = useState(false)
+
+  // Pixelated intro: seek to last 4 seconds, auto-dismiss on end
+  useEffect(() => {
+    const video = introVideoRef.current
+    if (!video) return
+    const onMeta = () => {
+      if (video.duration > 4) video.currentTime = video.duration - 4
+      video.play().catch(() => setShowIntro(false))
+    }
+    const onEnd = () => setShowIntro(false)
+    // Fallback: dismiss after 5s in case video fails
+    const fallback = setTimeout(() => setShowIntro(false), 5000)
+    video.addEventListener('loadedmetadata', onMeta)
+    video.addEventListener('ended', onEnd)
+    return () => {
+      clearTimeout(fallback)
+      video.removeEventListener('loadedmetadata', onMeta)
+      video.removeEventListener('ended', onEnd)
+    }
+  }, [])
 
   // Pre-select service from reschedule / "book again" navigation
   useEffect(() => {
@@ -248,6 +270,25 @@ export default function Book() {
 
   return (
     <>
+      <AnimatePresence>
+        {showIntro && (
+          <motion.div
+            className="book__intro"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <video
+              ref={introVideoRef}
+              src="/zo3d/Zo3dmap.mp4"
+              muted
+              playsInline
+              preload="auto"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <Helmet>
         <title>Secure a Spot | Zoblends</title>
         <meta name="description" content="Book your chair with Zoblends." />
