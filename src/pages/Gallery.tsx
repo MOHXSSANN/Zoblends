@@ -13,6 +13,7 @@ const BEFORE_AFTERS = [
     before: '/B4andAFTER/fb7d4da9-eb4f-491e-a10b-f5418ed0b217.png',
     after:  '/B4andAFTER/2bfe1200-2e12-4608-b109-677c7b2efbf8.png',
     label: 'Curly Fade',
+    afterScale: 1.2,
   },
   {
     before: '/B4andAFTER/7ef68d33-b64d-433f-a6ed-9a6c4119cf64.png',
@@ -99,7 +100,7 @@ export default function Gallery() {
           >
             {BEFORE_AFTERS.map((item) =>
               item.before && item.after ? (
-                <BeforeAfter key={item.label} before={item.before} after={item.after} label={item.label} />
+                <BeforeAfter key={item.label} before={item.before} after={item.after} label={item.label} afterScale={(item as any).afterScale} beforeScale={(item as any).beforeScale} />
               ) : (
                 <div key={item.label} className="gallery__placeholder">
                   <span>{item.label}</span>
@@ -159,12 +160,14 @@ export default function Gallery() {
                   transition={{ delay: i * 0.08, duration: 0.5, ease: EASE }}
                 >
                   <video
-                    src={v.src}
                     poster={v.poster}
                     controls
                     playsInline
                     preload="metadata"
-                  />
+                  >
+                    <source src={v.src} type="video/mp4" />
+                    <source src={v.src} type="video/quicktime" />
+                  </video>
                   <span className="gallery__video-label">{v.label}</span>
                 </motion.div>
               ) : (

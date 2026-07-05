@@ -5,9 +5,13 @@ interface Props {
   before: string
   after: string
   label?: string
+  beforeScale?: number
+  afterScale?: number
+  beforePosition?: string
+  afterPosition?: string
 }
 
-export default function BeforeAfter({ before, after, label }: Props) {
+export default function BeforeAfter({ before, after, label, beforeScale = 1, afterScale = 1, beforePosition = 'top center', afterPosition = 'top center' }: Props) {
   const containerRef  = useRef<HTMLDivElement>(null)
   const beforeImgRef  = useRef<HTMLImageElement>(null)
   const dividerRef    = useRef<HTMLDivElement>(null)
@@ -51,7 +55,13 @@ export default function BeforeAfter({ before, after, label }: Props) {
       onTouchMove={e   => { if (dragging.current) { e.preventDefault(); move(e.touches[0].clientX) } }}
       onTouchEnd={() => { dragging.current = false }}
     >
-      <img className="ba__img--after" src={after} alt="After" draggable={false} />
+      <img
+        className="ba__img--after"
+        src={after}
+        alt="After"
+        draggable={false}
+        style={{ objectPosition: afterPosition, transform: `scale(${afterScale})`, transformOrigin: 'top center' }}
+      />
 
       <img
         className="ba__img--before"
@@ -59,7 +69,7 @@ export default function BeforeAfter({ before, after, label }: Props) {
         src={before}
         alt="Before"
         draggable={false}
-        style={{ clipPath: 'inset(0 50% 0 0)' }}
+        style={{ clipPath: 'inset(0 50% 0 0)', objectPosition: beforePosition, transform: `scale(${beforeScale})`, transformOrigin: 'top center' }}
       />
 
       <div className="ba__divider" ref={dividerRef} style={{ left: '50%' }} />
