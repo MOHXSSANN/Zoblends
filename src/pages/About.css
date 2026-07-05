@@ -1,0 +1,23 @@
+/* ── Pixelated garage section ── */
+.about-garage {
+  position: relative;
+  width: 100%;
+  height: 60vh;
+  overflow: hidden;
+  background: #0a0908;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-garage__video {
+  /* Render at 1/8 size then scale back up — creates block-pixel look */
+  width: 12.5vw;
+  height: 12.5vh;
+  object-fit: cover;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  transform: scale(8);
+  transform-origin: center center;
+  will-change: transform;
+}

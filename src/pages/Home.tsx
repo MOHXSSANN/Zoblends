@@ -13,11 +13,6 @@ export default function Home() {
 
       <HeroSection />
 
-      <section className="home-section home-section--featured">
-        <div className="home-section__label">01 / Featured Work</div>
-        <p className="home-section__placeholder">Gallery coming soon</p>
-      </section>
-
       <NewsletterBanner />
     </>
   )
