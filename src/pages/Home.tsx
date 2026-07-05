@@ -24,17 +24,17 @@ function GaragePixel() {
       }
     }
 
-    // metadata may already be available if browser cached the file
     if (video.readyState >= 1) {
       seek()
-    } else {
-      video.addEventListener('loadedmetadata', seek, { once: true })
     }
+    video.addEventListener('loadedmetadata', seek, { once: true })
+    video.addEventListener('canplay', seek, { once: true })
 
     video.addEventListener('timeupdate', loopClip)
 
     return () => {
       video.removeEventListener('loadedmetadata', seek)
+      video.removeEventListener('canplay', seek)
       video.removeEventListener('timeupdate', loopClip)
     }
   }, [])

@@ -9,11 +9,17 @@
 
 .home-garage__video {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  top: 50%;
+  left: 50%;
+  /* 12.5vw × 8.75vh scaled ×8 = 100vw × 70vh — same block-pixel trick as booking intro */
+  width: 12.5vw;
+  height: 8.75vh;
   object-fit: cover;
-  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  transform: translate(-50%, -50%) scale(8);
+  transform-origin: center center;
+  will-change: transform;
 }
 
 .home-garage__overlay {
