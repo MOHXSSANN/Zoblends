@@ -281,6 +281,7 @@ export default function Book() {
             <video
               ref={introVideoRef}
               src="/zo3d/Zo3dmap.mp4"
+              autoPlay
               muted
               playsInline
               preload="auto"
