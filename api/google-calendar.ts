@@ -57,6 +57,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           colorId: '5',
           attendees: [
             { email: 'zawadsamin@gmail.com' },
+            { email: 'mo.hxssan360@gmail.com' },
           ],
         },
       })

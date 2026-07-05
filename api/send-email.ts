@@ -2,7 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY!
 const FROM          = 'Zoblends <bookings@zoblends.com>'
-const ADMIN_EMAIL   = 'mo.hxssan360@gmail.com'
+const ADMIN_EMAILS  = ['mo.hxssan360@gmail.com', 'zawadsamin@gmail.com']
 
 type EmailType =
   | { type: 'booking-confirmation';  to: string; name: string; service: string; date: string; time: string; duration: string; price: string; confirmationNumber: string }
@@ -277,7 +277,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     case 'admin-new-booking':
       subject = `New booking: ${data.name} · ${data.service} · ${data.date}`
       html    = adminNewBookingHtml(data)
-      to      = ADMIN_EMAIL
+      to      = ADMIN_EMAILS.join(',')
       break
     case 're-engagement':
       subject = `Hey ${data.name.split(' ')[0]}, it's been a while — book your next cut`
@@ -291,7 +291,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: FROM, to: [to], subject, html }),
+    body: JSON.stringify({ from: FROM, to: to.split(','), subject, html }),
   })
 
   const body = await r.json()
