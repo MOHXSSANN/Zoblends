@@ -166,7 +166,7 @@ export default function Book() {
 
     if (error) {
       console.error('[booking insert error]', error)
-      setSubmitError('Something went wrong. Please try again.')
+      setSubmitError(`Error: ${error.message || error.code || 'Something went wrong. Please try again.'}`)
       setSubmitting(false)
       return
     }
