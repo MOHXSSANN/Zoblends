@@ -248,10 +248,6 @@ export default function Book() {
 
   return (
     <>
-      <AnimatePresence>
-        )}
-      </AnimatePresence>
-
       <Helmet>
         <title>Secure a Spot | Zoblends</title>
         <meta name="description" content="Book your chair with Zoblends." />
