@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { createClient } from '@supabase/supabase-js'
+import { google } from 'googleapis'
 
 const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID || ''
 const TZ          = process.env.GOOGLE_TZ || 'America/Toronto'
@@ -11,8 +12,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.json({ ok: true, skipped: true })
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { google } = require('googleapis')
   const auth = new google.auth.GoogleAuth({
     credentials: {
       client_email: process.env.GOOGLE_CLIENT_EMAIL,
