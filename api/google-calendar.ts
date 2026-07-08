@@ -46,18 +46,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ].filter(Boolean).join('\n')
 
       const { data: event } = await cal.events.insert({
-        calendarId:   CALENDAR_ID,
-        sendUpdates:  'all',
-        requestBody:  {
+        calendarId:  CALENDAR_ID,
+        requestBody: {
           summary:     `${booking.service} — ${booking.name}`,
           description: desc,
           start: { dateTime: start.toISOString(), timeZone: TZ },
           end:   { dateTime: end.toISOString(),   timeZone: TZ },
           colorId: '5',
-          attendees: [
-            { email: 'zawadsamin@gmail.com' },
-            { email: 'mo.hxssan360@gmail.com' },
-          ],
         },
       })
 
