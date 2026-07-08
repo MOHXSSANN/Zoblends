@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase"
 // ── Business rules ──────────────────────────────────────────────────
 const BUFFER_MIN             = 10       // minutes between appointments
 const MAX_PER_DAY            = 12       // max bookings per day
-const REGULAR_NOTICE_MIN     = 60       // regular slots need 1hr advance notice
+const BOOKING_NOTICE_MIN     = 6 * 60   // all slots need 6hr advance notice
 const DAY_START_MIN          = 10 * 60  // 10:00 AM
 const REGULAR_END_MIN        = 19 * 60  // 7:00 PM  — late night starts
 const PREMIUM_START_MIN      = 21 * 60  // 9:00 PM  — premium tier (+$20)
@@ -51,8 +51,8 @@ function buildSlots(durationMin: number, date: Date): Slot[] {
 
     if (minsUntil < 0) continue  // past
 
-    // Regular slots need 1hr notice
-    if (!isLateNight && minsUntil < REGULAR_NOTICE_MIN) continue
+    // All slots need 6hr advance notice
+    if (minsUntil < BOOKING_NOTICE_MIN) continue
 
     slots.push({
       label:      minToLabel(start),
