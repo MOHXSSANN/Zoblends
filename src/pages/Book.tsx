@@ -359,7 +359,7 @@ export default function Book() {
               <div className="book__section-label">Your Details</div>
 
               <div className="book__form">
-                {user && info.name && info.email && info.phone && !editingContact ? (
+                {user && info.name && info.email && info.phone.length >= 7 && !editingContact ? (
                   <div className="book__prefilled">
                     <div className="book__prefilled-row">
                       <span className="book__prefilled-label">Name</span>
@@ -540,7 +540,7 @@ export default function Book() {
                 </p>
               </div>
               <div className="book__form">
-                {user && info.name && info.email && info.phone ? (
+                {user && info.name && info.email && info.phone.length >= 7 ? (
                   <div className="book__prefilled">
                     <div className="book__prefilled-row">
                       <span className="book__prefilled-label">Name</span>
