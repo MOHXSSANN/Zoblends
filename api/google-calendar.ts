@@ -79,7 +79,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(400).json({ error: 'Unknown action or missing params' })
   } catch (err: unknown) {
-    console.error('[google-calendar]', err)
-    return res.json({ ok: false, error: String(err) })
+    const e = err as { message?: string; status?: number; response?: { data?: unknown } }
+    console.error('[google-calendar] message:', e?.message)
+    console.error('[google-calendar] status:', e?.status)
+    console.error('[google-calendar] data:', JSON.stringify(e?.response?.data))
+    return res.json({ ok: false, error: e?.message, data: e?.response?.data })
   }
 }
