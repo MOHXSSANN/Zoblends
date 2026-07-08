@@ -588,6 +588,7 @@
   text-align: center;
   padding: 40px 0;
   gap: 12px;
+  width: 100%;
 }
 
 .book__done-img-wrap {
