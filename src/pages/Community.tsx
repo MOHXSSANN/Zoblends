@@ -218,6 +218,25 @@ export default function Community() {
           )}
         </motion.div>
 
+        <motion.div className="community__ig"
+          initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.1, ease: EASE }}
+        >
+          <span className="community__eyebrow">Follow Along</span>
+          <a href="https://instagram.com/zo_blendz_" target="_blank" rel="noopener noreferrer" className="community__ig-handle">
+            @zo_blendz_
+          </a>
+          <div className="community__ig-widget">
+            <iframe
+              src="https://snapwidget.com/embed/1127999"
+              className="snapwidget-widget"
+              frameBorder="0"
+              scrolling="no"
+              title="Posts from Instagram"
+            />
+          </div>
+        </motion.div>
+
         {loading ? (
           <p className="community__loading">Loading…</p>
         ) : posts.length === 0 ? (

@@ -1,6 +1,7 @@
 # Claude / agent internals
 .claude/
 .agents/
+.playwright-cli/
 skills-lock.json
 
 # Large media (store separately / use Git LFS)
