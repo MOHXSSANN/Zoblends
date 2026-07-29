@@ -190,6 +190,7 @@ function bookingReminderHtml(d: Extract<EmailType, { type: 'booking-reminder' }>
       <p style="font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:rgba(212,175,55,0.4);margin:0 0 4px;">Confirmation</p>
       <p style="font-family:Georgia,serif;font-size:20px;font-weight:700;letter-spacing:0.2em;color:#d4af37;margin:0;">${d.confirmationNumber}</p>
     </div>
+    ${btn('View Booking →', 'https://zoblends.com/my-bookings', 'outline')}
     <p style="font-size:11px;color:rgba(245,244,240,0.25);text-align:center;margin:16px 0 0;letter-spacing:0.08em;">Need to cancel? DM <a href="https://instagram.com/zo_blendz_" style="color:#d4af37;">@zo_blendz_</a> as soon as possible.</p>
   `)
 }

@@ -9,9 +9,6 @@ export interface Product {
 }
 
 export const PRODUCTS: Product[] = [
-  // Capes
-  { id: 'p1',  name: 'Barber Flow Camo Cape',                    price: 'TBD',   desc: 'Charcoal camo barber cape. Lightweight and water-resistant with snap closure.',               image: '/ZOPROD/15.png' },
-
   // Tools
   { id: 'p2',  name: 'ELV8 Fade Brush & Comb',                  price: '$2.50', desc: 'Dual-sided fade brush and comb combo. Black. Built for precision blending.',                 image: '/ZOPROD/17.png', stock: 9 },
 

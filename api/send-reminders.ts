@@ -35,6 +35,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Allow GET (from Vercel cron) or POST (manual trigger)
   if (req.method !== 'GET' && req.method !== 'POST') return res.status(405).end()
 
+  if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
+    return res.status(401).json({ error: 'unauthorized' })
+  }
+
   const now = new Date()
 
   // Window: bookings starting in 22–26 hours (24h reminder)
