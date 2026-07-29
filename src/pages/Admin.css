@@ -58,14 +58,11 @@
 /* Tabs */
 .admin__tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 0;
   border-bottom: 1px solid rgba(212,175,55,0.1);
   margin-bottom: 24px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
 }
-.admin__tabs::-webkit-scrollbar { display: none; }
 .admin__tab {
   background: none;
   border: none;
