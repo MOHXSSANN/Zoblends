@@ -2,14 +2,26 @@ import * as React from "react"
 import { Calendar } from "@/components/ui/calendar"
 import { supabase } from "@/lib/supabase"
 
-// ── Business rules ──────────────────────────────────────────────────
-const BUFFER_MIN             = 10       // minutes between appointments
-const MAX_PER_DAY            = 12       // max bookings per day
-const BOOKING_NOTICE_MIN     = 6 * 60   // all slots need 6hr advance notice
-const DAY_START_MIN          = 10 * 60  // 10:00 AM
-const REGULAR_END_MIN        = 19 * 60  // 7:00 PM  — late night starts
-const PREMIUM_START_MIN      = 21 * 60  // 9:00 PM  — premium tier (+$20)
-const LATE_NIGHT_END_MIN     = 22 * 60  // 10:00 PM
+// ── Business rules (fallback defaults — real values load from booking_settings) ──
+interface BookingSettings {
+  day_start_min: number       // 10:00 AM
+  regular_end_min: number     // 7:00 PM  — late night starts
+  premium_start_min: number   // 9:00 PM  — premium tier (+$20)
+  late_night_end_min: number  // 10:00 PM
+  buffer_min: number          // minutes between appointments
+  max_per_day: number         // max bookings per day
+  booking_notice_min: number  // advance notice required, in minutes
+}
+
+const DEFAULT_SETTINGS: BookingSettings = {
+  day_start_min:      10 * 60,
+  regular_end_min:    19 * 60,
+  premium_start_min:  21 * 60,
+  late_night_end_min: 22 * 60,
+  buffer_min:         10,
+  max_per_day:        12,
+  booking_notice_min: 6 * 60,
+}
 
 export interface SlotFees { lateNightFee: number }
 
@@ -36,14 +48,14 @@ function minToLabel(m: number): string {
 }
 
 
-function buildSlots(durationMin: number, date: Date): Slot[] {
+function buildSlots(durationMin: number, date: Date, settings: BookingSettings): Slot[] {
   const now    = new Date()
-  const step   = durationMin + BUFFER_MIN
+  const step   = durationMin + settings.buffer_min
   const slots: Slot[] = []
 
-  for (let start = DAY_START_MIN; start + durationMin <= LATE_NIGHT_END_MIN; start += step) {
-    const isLateNight = start >= REGULAR_END_MIN
-    const lateNightFee = start >= PREMIUM_START_MIN ? 20 : isLateNight ? 15 : 0
+  for (let start = settings.day_start_min; start + durationMin <= settings.late_night_end_min; start += step) {
+    const isLateNight = start >= settings.regular_end_min
+    const lateNightFee = start >= settings.premium_start_min ? 20 : isLateNight ? 15 : 0
 
     const slotDate = new Date(date)
     slotDate.setHours(Math.floor(start / 60), start % 60, 0, 0)
@@ -51,8 +63,8 @@ function buildSlots(durationMin: number, date: Date): Slot[] {
 
     if (minsUntil < 0) continue  // past
 
-    // All slots need 6hr advance notice
-    if (minsUntil < BOOKING_NOTICE_MIN) continue
+    // All slots need the configured advance notice
+    if (minsUntil < settings.booking_notice_min) continue
 
     slots.push({
       label:      minToLabel(start),
@@ -76,6 +88,13 @@ export function BookDateTimePicker({ durationMin, onConfirm, onDateChange }: Pro
   const [dailyCount,   setDailyCount]   = React.useState(0)
   const [fullDates,    setFullDates]    = React.useState<Set<string>>(new Set())
   const [loading,      setLoading]      = React.useState(false)
+  const [settings,     setSettings]     = React.useState<BookingSettings>(DEFAULT_SETTINGS)
+
+  // Load business hours / booking rules (admin-editable)
+  React.useEffect(() => {
+    supabase.from('booking_settings').select('*').eq('id', 1).single()
+      .then(({ data }) => { if (data) setSettings(data as BookingSettings) })
+  }, [])
 
   // Pre-load full days for the next 60 days so calendar can grey them out
   React.useEffect(() => {
@@ -94,10 +113,10 @@ export function BookDateTimePicker({ durationMin, onConfirm, onDateChange }: Pro
           const day = b.starts_at.slice(0, 10)
           counts[day] = (counts[day] ?? 0) + 1
         })
-        const full = new Set(Object.entries(counts).filter(([,c]) => c >= MAX_PER_DAY).map(([d]) => d))
+        const full = new Set(Object.entries(counts).filter(([,c]) => c >= settings.max_per_day).map(([d]) => d))
         setFullDates(full)
       })
-  }, [])
+  }, [settings.max_per_day])
 
   // Load taken slots + daily count when date changes
   React.useEffect(() => {
@@ -131,8 +150,8 @@ export function BookDateTimePicker({ durationMin, onConfirm, onDateChange }: Pro
     setDate(d); setTime(null); onDateChange?.(d)
   }
 
-  const slots      = date ? buildSlots(durationMin, date) : []
-  const dayFull    = dailyCount >= MAX_PER_DAY
+  const slots      = date ? buildSlots(durationMin, date, settings) : []
+  const dayFull    = dailyCount >= settings.max_per_day
   const fmtDate    = (d: Date) => `${DAY_NAMES[d.getDay()]}, ${MONTH_NAMES[d.getMonth()]} ${d.getDate()}`
 
   return (

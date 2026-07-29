@@ -449,6 +449,41 @@
 }
 .admin__finance-link:hover { border-color: #d4af37; }
 
+/* ── Settings tab ─────────────────────────────────── */
+.admin__settings { display: flex; flex-direction: column; gap: 32px; padding-bottom: 60px; }
+.admin__settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(212,175,55,0.06);
+}
+.admin__settings-row label {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: rgba(245,244,240,0.7);
+}
+.admin__settings-input {
+  background: rgba(245,244,240,0.05);
+  border: 1px solid rgba(212,175,55,0.15);
+  color: rgba(245,244,240,0.9);
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 7px 10px;
+  outline: none;
+}
+.admin__settings-input:focus { border-color: rgba(212,175,55,0.5); }
+.admin__settings-input--num { width: 70px; -moz-appearance: textfield; }
+.admin__settings-input--num::-webkit-outer-spin-button,
+.admin__settings-input--num::-webkit-inner-spin-button { -webkit-appearance: none; }
+.admin__settings-note {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: rgba(245,244,240,0.3);
+  text-align: center;
+}
+
 /* ── Inventory tab ───────────────────────────────── */
 .admin__inventory { width: 100%; overflow-x: auto; }
 

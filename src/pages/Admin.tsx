@@ -29,6 +29,11 @@ interface AdminProduct {
   id: string; name: string; price_cents: number; cost_price_cents: number
   stock: number; image_url?: string; active: boolean
 }
+interface BookingSettingsRow {
+  id: number
+  day_start_min: number; regular_end_min: number; premium_start_min: number; late_night_end_min: number
+  buffer_min: number; max_per_day: number; booking_notice_min: number
+}
 
 const MONTH = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const fmt = (iso: string) => { const d = new Date(iso); return `${MONTH[d.getMonth()]} ${d.getDate()} · ${fmtTime(iso)}` }
@@ -44,7 +49,7 @@ const STATUS_BADGE: Record<string, { bg: string; border: string; color: string }
 
 export default function Admin() {
   const { user } = useAuth()
-  const [tab, setTab]           = useState<'upcoming'|'past'|'waitlist'|'orders'|'analytics'|'inventory'|'community'>('upcoming')
+  const [tab, setTab]           = useState<'upcoming'|'past'|'waitlist'|'orders'|'analytics'|'inventory'|'community'|'settings'>('upcoming')
   const [bookings, setBookings] = useState<Booking[]>([])
   const [waitlist, setWaitlist] = useState<WaitlistEntry[]>([])
   const [orders, setOrders]         = useState<ShopOrder[]>([])
@@ -53,6 +58,9 @@ export default function Admin() {
   const [editCost, setEditCost]     = useState<Record<string, number>>({})
   const [savingProd, setSavingProd] = useState<string | null>(null)
   const [communityPosts, setCommunityPosts] = useState<{ id: string; user_name: string; user_avatar: string | null; image_url: string; caption: string | null; created_at: string; status: string }[]>([])
+  const [settings, setSettings]     = useState<BookingSettingsRow | null>(null)
+  const [editSettings, setEditSettings] = useState<Partial<Record<keyof BookingSettingsRow, number>>>({})
+  const [savingSettings, setSavingSettings] = useState(false)
   const [postComments, setPostComments] = useState<Record<string, { id: string; user_name: string; body: string; created_at: string }[]>>({})
   const [loadingComments, setLoadingComments] = useState<string | null>(null)
   const [loading, setLoading]       = useState(true)
@@ -70,15 +78,36 @@ export default function Admin() {
       supabase.from('shop_orders').select('*').order('created_at', { ascending: false }),
       supabase.from('products').select('*').order('id'),
       supabase.from('community_posts').select('*').order('created_at', { ascending: false }),
-    ]).then(([{ data: b }, { data: w }, { data: o }, { data: p }, { data: c }]) => {
+      supabase.from('booking_settings').select('*').eq('id', 1).single(),
+    ]).then(([{ data: b }, { data: w }, { data: o }, { data: p }, { data: c }, { data: s }]) => {
       setBookings((b as Booking[]) ?? [])
       setWaitlist((w as WaitlistEntry[]) ?? [])
       setOrders((o as ShopOrder[]) ?? [])
       setProducts((p as AdminProduct[]) ?? [])
       setCommunityPosts(c ?? [])
+      setSettings((s as BookingSettingsRow) ?? null)
       setLoading(false)
     })
   }, [isAdmin])
+
+  function minToTimeInput(m: number): string {
+    return `${String(Math.floor(m / 60)).padStart(2,'0')}:${String(m % 60).padStart(2,'0')}`
+  }
+  function timeInputToMin(t: string): number {
+    const [h, m] = t.split(':').map(Number)
+    return h * 60 + m
+  }
+
+  async function saveSettings() {
+    if (!settings || Object.keys(editSettings).length === 0) return
+    setSavingSettings(true)
+    const { error } = await supabase.from('booking_settings').update(editSettings).eq('id', 1)
+    if (!error) {
+      setSettings(prev => prev ? { ...prev, ...editSettings } : prev)
+      setEditSettings({})
+    }
+    setSavingSettings(false)
+  }
 
   useEffect(() => {
     if (!isAdmin || tab !== 'orders') return
@@ -402,7 +431,7 @@ const q = search.toLowerCase().trim()
 
         {/* Tabs */}
         <div className="admin__tabs">
-          {(['upcoming','past','waitlist','orders','analytics','inventory','community'] as const).map(t => (
+          {(['upcoming','past','waitlist','orders','analytics','inventory','community','settings'] as const).map(t => (
             <button key={t} className={`admin__tab${tab===t?' admin__tab--active':''}`} onClick={() => setTab(t)}>
               {t.charAt(0).toUpperCase()+t.slice(1)}
               {t === 'waitlist' && activeWait.length > 0 && (
@@ -668,6 +697,81 @@ const q = search.toLowerCase().trim()
                     </div>
                   )
                 })}
+              </>
+            )}
+          </div>
+        ) : tab === 'settings' ? (
+          <div className="admin__settings">
+            {!settings ? (
+              <p className="admin__empty">Loading settings…</p>
+            ) : (
+              <>
+                <div className="admin__analytics-section">
+                  <div className="admin__analytics-title">Business Hours</div>
+                  <div className="admin__settings-row">
+                    <label>Opens at</label>
+                    <input type="time" className="admin__settings-input"
+                      value={minToTimeInput(editSettings.day_start_min ?? settings.day_start_min)}
+                      onChange={e => setEditSettings(prev => ({ ...prev, day_start_min: timeInputToMin(e.target.value) }))}
+                    />
+                  </div>
+                  <div className="admin__settings-row">
+                    <label>Late night starts (regular hours end)</label>
+                    <input type="time" className="admin__settings-input"
+                      value={minToTimeInput(editSettings.regular_end_min ?? settings.regular_end_min)}
+                      onChange={e => setEditSettings(prev => ({ ...prev, regular_end_min: timeInputToMin(e.target.value) }))}
+                    />
+                  </div>
+                  <div className="admin__settings-row">
+                    <label>Premium tier starts (+$20)</label>
+                    <input type="time" className="admin__settings-input"
+                      value={minToTimeInput(editSettings.premium_start_min ?? settings.premium_start_min)}
+                      onChange={e => setEditSettings(prev => ({ ...prev, premium_start_min: timeInputToMin(e.target.value) }))}
+                    />
+                  </div>
+                  <div className="admin__settings-row">
+                    <label>Closes at</label>
+                    <input type="time" className="admin__settings-input"
+                      value={minToTimeInput(editSettings.late_night_end_min ?? settings.late_night_end_min)}
+                      onChange={e => setEditSettings(prev => ({ ...prev, late_night_end_min: timeInputToMin(e.target.value) }))}
+                    />
+                  </div>
+                </div>
+
+                <div className="admin__analytics-section">
+                  <div className="admin__analytics-title">Booking Rules</div>
+                  <div className="admin__settings-row">
+                    <label>Buffer between appointments (minutes)</label>
+                    <input type="number" min={0} className="admin__settings-input admin__settings-input--num"
+                      value={editSettings.buffer_min ?? settings.buffer_min}
+                      onChange={e => setEditSettings(prev => ({ ...prev, buffer_min: parseInt(e.target.value) || 0 }))}
+                    />
+                  </div>
+                  <div className="admin__settings-row">
+                    <label>Max bookings per day</label>
+                    <input type="number" min={1} className="admin__settings-input admin__settings-input--num"
+                      value={editSettings.max_per_day ?? settings.max_per_day}
+                      onChange={e => setEditSettings(prev => ({ ...prev, max_per_day: parseInt(e.target.value) || 1 }))}
+                    />
+                  </div>
+                  <div className="admin__settings-row">
+                    <label>Advance notice required (hours)</label>
+                    <input type="number" min={0} step={0.5} className="admin__settings-input admin__settings-input--num"
+                      value={(editSettings.booking_notice_min ?? settings.booking_notice_min) / 60}
+                      onChange={e => setEditSettings(prev => ({ ...prev, booking_notice_min: Math.round((parseFloat(e.target.value) || 0) * 60) }))}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  className="admin__export-btn"
+                  style={{ background:'rgba(212,175,55,0.12)', border:'1px solid rgba(212,175,55,0.45)', color:'#d4af37' }}
+                  onClick={saveSettings}
+                  disabled={Object.keys(editSettings).length === 0 || savingSettings}
+                >
+                  {savingSettings ? 'Saving…' : 'Save Changes'}
+                </button>
+                <p className="admin__settings-note">Changes apply immediately to the live booking page — no deploy needed.</p>
               </>
             )}
           </div>
