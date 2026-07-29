@@ -231,7 +231,7 @@ export default function Community() {
               src="https://snapwidget.com/embed/1127999"
               className="snapwidget-widget"
               frameBorder="0"
-              scrolling="no"
+              scrolling="yes"
               title="Posts from Instagram"
             />
           </div>
